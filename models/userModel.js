@@ -13,5 +13,5 @@ exports.createUser = () => {}
 exports.getByEmail = () => {}
 exports.getById = () => {}
 exports.updateProfile = () => {}
-exports.softDelete() = () => {}
+exports.softDelete = () => {}
 exports.getByRole = (role) => {}
