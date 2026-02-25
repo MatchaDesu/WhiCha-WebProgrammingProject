@@ -1,0 +1,2 @@
+exports.completeLesson = () => {};
+exports.getCourseProgress = () => {};

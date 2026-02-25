@@ -1,0 +1,32 @@
+<div class="flex items-center min-w-screen min-h-screen ">
+    <div class="flex flex-col max-w-md md:w-1/2 mx-auto px-6 py-12 gap-4 shadow-lg bg-default-white rounded-2xl">
+        <h2 class="text-2xl font-bold text-center md:text-4xl ">เข้าสู่ระบบ</h2>
+
+        <form action="/signin" method="POST" class="space-y-4">
+
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-sm md:text-lg font-medium">อีเมล</label>
+                    <input type="email" name="email" required
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+                </div>
+
+                <div>
+                    <label class="block text-sm md:text-lg font-medium">รหัสผ่าน</label>
+                    <input type="password" name="password" required
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+                </div>
+            </div>
+
+
+            <button type="submit" class="w-full text-white bg-secondary  py-2 rounded-lg">
+                เข้าสู่ระบบ
+            </button>
+
+        </form>
+
+        <a href="/signup" class="text-center">
+            สร้างบัญชีผู้ใช้ใหม่
+        </a>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+<section id="hero">
+    <div class="container mx-auto flex flex-col-reverse items-center md:flex-row px-6 py-12 gap-8">
+
+        <!-- Profile -->
+
+        <form action="/users/<%= user.user_id %>/profile" method="POST" onchange="previewImage(event)"
+            enctype="multipart/form-data">
+
+            <div class="mb-4">
+                <img id="imagePreview" class="hidden w-48 h-48 object-cover" />
+            </div>
+
+            <input type="file" name="profileImage" accept="image/*" required>
+
+            <button type="submit">
+                Upload
+            </button>
+        </form>
+
+    </div>
+
+    <script src="/js/scripts.js"></script>
+</section>

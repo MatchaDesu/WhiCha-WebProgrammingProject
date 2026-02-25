@@ -1,0 +1,49 @@
+<!-- Navigation Bar -->
+<header class="sticky top-0 shadow-lg bg-white">
+    <nav class="container mx-auto p-6">
+        <div class="flex items-center justify-between">
+
+            <!-- Logo -->
+            <a href="/" class="flex items-center h-10">
+                <img src="/img/logo-green.png" alt="Logo" class="w-auto h-full">
+                <span class="text-xl font-bold">WhiCha</span>
+            </a>
+
+
+            <div class="flex items-center gap-6">
+
+                <!-- Menu Items -->
+                <div class="hidden lg:flex gap-2">
+                    <a href="/" class="navbar-item">หน้าแรก</a>
+                    <a href="/courses" class="navbar-item">เลือกดูคอร์ส</a>
+                    <a href="#" class="navbar-item">การเรียนของฉัน</a>
+                    <a href="#" class="navbar-item">เกี่ยวกับเรา</a>
+                    <a href="#" class="navbar-item">คู่มือ</a>
+                </div>
+
+                <!-- Profile -->
+                <button class="relative flex justify-center" onclick="toggleDropdown(this)">
+
+                    <div class="rounded-full overflow-hidden w-10 h-10">
+                        <img src="<%= user.profile_image || '/icon/profile-anonymous.svg' %>" alt="" class="hidden w-full h-full object-cover lg:block">
+                        <img src="/icon/hamburger-menu.svg" alt="" class="h-full lg:hidden">
+                    </div>
+
+                    <div
+                        class="dropdown-menu hidden">
+                        <a href="/users/<%= user.user_id %>" class="dropdown-item">โปรไฟล์</a>
+                        <a href="/courses" class="dropdown-item">เลือกดูคอร์ส</a>
+                        <a href="#" class="dropdown-item">การเรียนของฉัน</a>
+                        <a href="#" class="dropdown-item">เกี่ยวกับเรา</a>
+                        <a href="#" class="dropdown-item">คู่มือ</a>
+                        <hr>
+                        <a href="/signout" class="dropdown-item text-alert">ออกจากระบบ</a>
+                    </div>
+                </button>
+
+            </div>
+        </div>
+    </nav>
+</header>
+
+<script src="/js/scripts.js"></script>

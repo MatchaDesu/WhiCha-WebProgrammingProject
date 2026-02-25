@@ -1,0 +1,69 @@
+<section id="content">
+    <div class="container mx-auto grid grid-cols-1 items-start lg:grid-cols-4 px-6 py-12 gap-8">
+
+        <!-- Filter Course -->
+        <div class="hidden lg:grid col-span-1 p-4 gap-4 border">
+            <% for (let i=0; i<12; i++) {%> 
+            <div>
+                <h1 class="text-3xl mb-2 md:text-4xl">หมวดหมู่</h1>
+                <ul>
+                    <% for (let i=0; i<12; i++) {%> 
+                    <li class="flex gap-2">
+                        <input type="checkbox"><span class="test-xl md:text-2xl">ข้อ <%= i %></span>
+                    </li>
+                    <% } %>
+                </ul>
+                
+            </div>
+            <% } %>
+        </div>
+
+        <!-- Course Catalog -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 col-span-3 p-4 gap-4 place-items-center border">
+
+            <!-- Card -->
+            <% courses.forEach(course => { %> 
+
+                <a href="" class="w-full max-w-sm rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
+
+                    <!-- Banner -->
+                    <div class="w-full aspect-video">
+                        <img src="img/profile.jpg" alt="" class="h-full w-full object-cover">
+                    </div>
+
+                    <div class="flex flex-col p-4 gap-2">
+
+                        <!-- Course Name -->
+                        <h2 class="text-xl font-semibold line-clamp-2">
+                            <%= course.course_name %>
+                        </h2>
+
+                        <!-- Couse Desc -->
+                        <p class="text-sm text-gray-500">
+                            <%= course.course_description %>
+                        </p>
+
+                        <!-- Instuctor -->
+                        <div class="flex items-center gap-2">
+                            <div class="rounded-full overflow-hidden shrink-0">
+                                <img src="img/avatar.jpg" alt="" class="h-6">
+                            </div>
+                            <h3 class="text-lg line-clamp-1">
+                                <%= course.instructor_name %>
+                            </h3>
+                        </div>
+
+                        <hr>
+
+                        <!-- Course Price & Tags -->
+                        <span class="text-2xl text-secondary py-4">
+                            ฿ <%= course.course_price %>
+                        </span>
+                    </div>
+                </a>
+            <% });  %>
+
+        </div>
+
+    </div>
+</section>
