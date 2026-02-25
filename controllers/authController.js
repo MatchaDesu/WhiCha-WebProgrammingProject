@@ -9,7 +9,7 @@ exports.postSignIn = async (req, res) => {
 
   const user = await userModel.getByEmail(email);
 
-  if (!user || user.user_password !== password) {
+  if (!user || user.password !== password) {
     return res.render('auth/signIn', { layout: 'layouts/auth', error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
   }
 
