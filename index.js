@@ -22,11 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session);
-
-if (process.env.NODE_ENV === "production") {
-    app.use(requireLogin);
-}
-
+app.use(requireLogin);
 app.use(localUser);
 
 // ตั้ง layout main เป็น default
