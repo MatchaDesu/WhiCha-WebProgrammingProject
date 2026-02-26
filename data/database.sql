@@ -8,7 +8,7 @@ CREATE TABLE users (
     email TEXT UNIQUE NOT NULL,
     phone VARCHAR(15) NOT NULL,
     profile_image TEXT,
-    role TEXT CHECK(role IN ('student','instructor','manager')),
+    role TEXT CHECK(role IN ('student','instructor','manager')) DEFAULT 'student' ,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL

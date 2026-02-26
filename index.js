@@ -1,11 +1,12 @@
 require('dotenv').config();
 
 const express = require('express');
-const session = require('./config/session');
 const expressEjsLayouts = require('express-ejs-layouts');
 
 const app = express();
 const path = require('path');
+const session = require('./config/session');
+
 const PORT = process.env.PORT || 3000;
 
 const { requireLogin } = require('./middlewares/authMiddleware');
