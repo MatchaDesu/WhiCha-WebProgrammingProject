@@ -23,6 +23,20 @@ exports.getProfile = async (req, res) => {
     }
 };
 
+exports.editProfile = async (req, res) => {
+    try {
+        const user = await userModel.getById(req.params.id);
+
+        if (!user) {
+            return res.status(404).send("user not found");
+        }
+
+        res.render('users/edit', { user });
+    } catch (err) {
+        res.status(500).send("Server Error");
+    }
+};
+
 exports.uploadProfile = async (req, res) => {
 
     try {
@@ -42,15 +56,3 @@ exports.uploadProfile = async (req, res) => {
     }
 
 };
-
-// exports.createuser = async (req, res) => {
-//     try {
-//         const { title, description } = req.body;
-
-//         await userModel.create(title, description);
-
-//         res.redirect('/users');
-//     } catch (err) {
-//         res.status(500).send("Server Error");
-//     }
-// };

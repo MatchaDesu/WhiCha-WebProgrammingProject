@@ -4,8 +4,9 @@ const userController = require('../controllers/userController');
 const upload = require('../middlewares/uploadMiddleware');
 
 router.get("/:id", userController.getProfile);
+router.get("/:id/edit", userController.editProfile);
 
 // Upload
-router.post('/:id/profile', upload.single('profileImage'),userController.uploadProfile);
+router.post('/:id/profile', upload.single('profileImage'), userController.uploadProfile);
 
 module.exports = router;

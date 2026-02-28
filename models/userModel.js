@@ -48,7 +48,19 @@ exports.getByRole = (role) => {
   });
 };
 
-exports.updateProfile = () => { }
+exports.updateProfile = (user_id, path) => {
+  return new Promise((resolve, reject) => {
+
+    const sql = `UPDATE users
+                SET profile_image = ?
+                WHERE user_id = ?`;
+
+    db.run(sql, [path, user_id], function (err) {
+      if (err) return reject(err);
+      resolve({changes: this.changes});
+    });
+  });
+};
 
 exports.softDelete = () => { }
 

@@ -1,23 +1,76 @@
-<section id="hero">
-    <div class="container mx-auto flex flex-col-reverse items-center md:flex-row px-6 py-12 gap-8">
+<div class="w-full h-40 bg-amber-100"></div>
 
-        <!-- Profile -->
+<div class="container max-w-7xl mx-auto flex flex-col items-center px-6 py-6">
 
-        <form action="/users/<%= user.user_id %>/profile" method="POST" onchange="previewImage(event)"
-            enctype="multipart/form-data">
+    <form class="flex flex-col items-center gap-4" action="/users/<%= user.user_id %>/profile" method="POST"
+        enctype="multipart/form-data">
 
-            <div class="mb-4">
-                <img id="imagePreview" class="hidden w-48 h-48 object-cover" />
+        <!-- Profile Image -->
+        <div class="-mt-15 flex flex-col justify-center">
+            <div class="h-50 aspect-square md:h-40 rounded-full overflow-hidden bg-white">
+                <img id="imagePreview" src="<%= user.profile_image || '/icon/profile-anonymous.svg' %>"
+                    class="w-full h-full object-cover">
             </div>
+        </div>
 
-            <input type="file" name="profileImage" accept="image/*" required>
+        <input type="file" id="profileImage" name="profileImage" accept="image/*" class="hidden"
+            onchange="previewImage(event)">
 
-            <button type="submit">
-                Upload
+        <button type="button" onclick="document.getElementById('profileImage').click()"
+            class="px-6 py-2 bg-secondary text-white rounded-md">
+            เปลี่ยนรูปโปรไฟล์
+        </button>
+
+        <div>
+            <label class="block text-sm md:text-lg font-medium">ชื่อผู้ใช้</label>
+            <input type="text" name="username" required
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+        </div>
+
+        <div>
+            <label class="block text-sm md:text-lg font-medium">ชื่อจริง</label>
+            <input type="text" name="first_name" required
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+        </div>
+
+        <div>
+            <label class="block text-sm md:text-lg font-medium">นามสกุล</label>
+            <input type="text" name="last_name" required
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+        </div>
+
+        <div>
+            <label class="block text-sm md:text-lg font-medium">อีเมล</label>
+            <input type="email" name="email" required
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+        </div>
+
+        <div>
+            <label class="block text-sm md:text-lg font-medium">เบอร์โทร</label>
+            <input type="tel" name="phone" required
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+        </div>
+
+        <div>
+            <label class="block text-sm md:text-lg font-medium">รหัสผ่าน</label>
+            <input type="password" name="password" required
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+        </div>
+
+        <div>
+            <label class="block text-sm md:text-lg font-medium">ยืนยันรหัสผ่าน</label>
+            <input type="password" name="confirm_password" required
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+        </div>
+
+        <div class="h-12 flex items-center mt-3">
+            <button type="submit" class="px-6 py-2 bg-secondary text-white rounded-md">
+                ยืนยัน
             </button>
-        </form>
+        </div>
 
-    </div>
+    </form>
 
-    <script src="/js/scripts.js"></script>
-</section>
+</div>
+
+<script src="/js/scripts.js"></script>
