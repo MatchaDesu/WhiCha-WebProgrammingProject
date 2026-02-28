@@ -1,34 +1,35 @@
-<div class="container mx-auto flex flex-col border">
+<div class="w-full h-40 bg-red-300"></div>
 
+<div class="container max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-6 py-6">
 
-    <div class="flex bg-white px-6 py-4 border">
+    <div class="flex flex-col items-center gap-x-8 md:flex-row">
 
-        <div class="flex gap-8">
-
-            <div class="h-32 w-32 rounded-full overflow-hidden border">
-                <img src="<%= user.profile_image || '/icon/profile-anonymous.svg' %>" alt=""
+        <!-- Profile Image -->
+        <div class="-mt-15 flex justify-center">
+            <div class="h-50 aspect-square md:h-40 rounded-full overflow-hidden bg-white">
+                <img src="<%= user.profile_image || '/icon/profile-anonymous.svg' %>"
                     class="w-full h-full object-cover">
             </div>
+        </div>
 
-            <div class="flex flex-col justify-center gap-2">
-                <h1 class="text-4xl">
-                    <%= user.username %>
-                </h1>
-                <h2 class="text-2xl">
-                    <%= user.first_name + " " + user.last_name%>
-                </h2>
+        <!-- Profile Info -->
+        <div class="flex flex-col items-center md:items-start text-center md:text-left">
 
-                <button>
-                    Click
-                </button>
+            <h1 class="text-3xl md:text-4xl font-semibold">
+                <%= user.username %>
+            </h1>
 
-            </div>
-
-
-
+            <p class="text-slate-400">
+                <%= user.first_name + " " + user.last_name %>
+            </p>
         </div>
     </div>
 
-</div>
+    <!-- Edit -->
+    <div class="h-12 flex items-center mt-3">
+        <a href="/users/<%= user.user_id %>/edit" class="px-6 py-2 bg-secondary text-white rounded-md">
+            แก้ไขโปรไฟล์
+        </a>
+    </div>
 
-<script src="/js/scripts.js"></script>
+</div>

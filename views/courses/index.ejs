@@ -22,7 +22,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 col-span-3 p-4 gap-4 place-items-center border">
 
             <!-- Card -->
-            <% courses.forEach(course => { %> 
+            <% if courses.forEach(course => { %> 
 
                 <a href="" class="w-full max-w-sm rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
 
@@ -46,7 +46,7 @@
                         <!-- Instuctor -->
                         <div class="flex items-center gap-2">
                             <div class="rounded-full overflow-hidden shrink-0">
-                                <img src="img/avatar.jpg" alt="" class="h-6">
+                                <img src="/img/avatar.jpg" alt="" class="h-6">
                             </div>
                             <h3 class="text-lg line-clamp-1">
                                 <%= course.instructor_name %>
