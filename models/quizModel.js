@@ -1,18 +1,34 @@
 const db = require('../config/db');
 
 exports.createQuiz = (quiz) => {
-    return new Promise((resolve, reject) => {
-        const { course_id, title, description } = quiz;
+  return new Promise((resolve, reject) => {
+    const { course_id, title, description } = quiz;
 
-        const sql = `INSERT INTO quizzes (course_id, title, description) 
+    const sql = `INSERT INTO quizzes (course_id, title, description) 
                  VALUES (?, ?, ?)`;
 
-        db.run(sql, [course_id, title, description], function (err) {
-            if (err) return reject(err);
+    db.run(sql, [course_id, title, description], function (err) {
+      if (err) return reject(err);
 
-            resolve({ quiz_id: this.lastID });
-        });
+      resolve({ quiz_id: this.lastID });
     });
+  });
+};
+
+exports.getById = (quiz_id) => {
+  return new Promise((resolve, reject) => {
+
+    const sql = `
+      SELECT *
+      FROM quizzes
+      WHERE quiz_id = ?
+    `;
+
+    db.get(sql, [quiz_id], (err, row) => {
+      if (err) return reject(err);
+      resolve(row);
+    });
+  });
 };
 
 exports.updateQuiz = (quiz_id, quiz) => {
@@ -49,7 +65,7 @@ exports.getByCourse = (course_id) => {
     const sql = `SELECT * FROM quizzes 
                  WHERE course_id = ? 
                  ORDER BY created_at ASC`;
-    
+
     db.all(sql, [course_id], (err, rows) => {
       if (err) return reject(err);
       resolve(rows);

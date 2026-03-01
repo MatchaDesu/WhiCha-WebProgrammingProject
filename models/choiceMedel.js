@@ -45,4 +45,15 @@ exports.getChoicesByQuestion = (question_id) => {
   });
 };
 
-exports.deleteChoice = () => {};
+exports.deleteChoice = (choice_id) => {
+  return new Promise((resolve, reject) => {
+
+    const sql = `DELETE FROM choices WHERE choice_id = ?`;
+
+    db.run(sql, [choice_id], function (err) {
+      if (err) return reject(err);
+
+      resolve({ changes: this.changes });
+    });
+  });
+};

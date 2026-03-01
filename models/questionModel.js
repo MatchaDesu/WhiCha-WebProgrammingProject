@@ -32,31 +32,54 @@ exports.updateQuestion = (question_id, question) => {
     });
 };
 
-exports.reorderQuestion = (question_id, new_order_index) => {
+exports.reorderQuestions = (quiz_id, bulkUpdate) => {
     return new Promise((resolve, reject) => {
-        const sql = `UPDATE questions 
-                 SET order_index = ? 
-                 WHERE question_id = ?`;
 
-        db.run(sql, [new_order_index, question_id], function (err) {
-            if (err) return reject(err);
-            resolve({ changes: this.changes });
+        const stmt = db.prepare(`
+      UPDATE questions
+      SET order_index = ?
+      WHERE question_id = ?
+      AND quiz_id = ?
+    `);
+
+        db.serialize(() => {
+            bulkUpdate.forEach(item => {
+                stmt.run(item.order_index, item.question_id, quiz_id);
+            });
+
+            stmt.finalize(err => {
+                if (err) return reject(err);
+                resolve(true);
+            });
         });
     });
 };
 
 //ดึง question ทั้งหมด ของ quiz นี้
 exports.getQuestionsByQuiz = (quiz_id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM questions 
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM questions 
                  WHERE quiz_id = ? 
                  ORDER BY order_index ASC`;
 
-    db.all(sql, [quiz_id], (err, rows) => {
-      if (err) return reject(err);
-      resolve(rows);
+        db.all(sql, [quiz_id], (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows);
+        });
     });
-  });
 };
 
-exports.deleteQuestion = () => { };
+exports.deleteQuestion = (question_id) => {
+    return new Promise((resolve, reject) => {
+
+        const sql = `
+      DELETE FROM questions
+      WHERE question_id = ?
+    `;
+
+        db.run(sql, [question_id], function (err) {
+            if (err) return reject(err);
+            resolve({ changes: this.changes });
+        });
+    });
+};

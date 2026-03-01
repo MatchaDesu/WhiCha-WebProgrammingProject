@@ -23,24 +23,24 @@ exports.getAll = () => {
     });
 };
 
-exports.getById = (id) => {
+exports.getById = (category_id) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM categories WHERE category_id = ?`;
 
-        db.get(sql, [id], (err, row) => {
+        db.get(sql, [category_id], (err, row) => {
             if (err) return reject(err);
             resolve(row);
         });
     });
 };
 
-exports.update = (id, category_name) => {
+exports.update = (category_id, category_name) => {
     return new Promise((resolve, reject) => {
         const sql = `UPDATE categories 
                  SET category_name = ? 
                  WHERE category_id = ?`;
 
-        db.run(sql, [category_name, id], function (err) {
+        db.run(sql, [category_name, category_id], function (err) {
             if (err) return reject(err);
 
             resolve({ changes: this.changes });
@@ -48,12 +48,12 @@ exports.update = (id, category_name) => {
     });
 };
 
-exports.delete = (id) => {
+exports.delete = (category_id) => {
   return new Promise((resolve, reject) => {
 
     const sql = `DELETE FROM categories WHERE category_id = ?`;
 
-    db.run(sql, [id], function (err) {
+    db.run(sql, [category_id], function (err) {
       if (err) return reject(err);
       resolve({ changes: this.changes });
     });
