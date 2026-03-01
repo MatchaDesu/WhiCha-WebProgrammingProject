@@ -1,19 +1,22 @@
 const userModel = require("../models/userModel");
+const categoryModel = require("../models/categoryModel");
 
-exports.localUser = async (req, res, next) => {
-
-  if (!req.session.user) {
-    res.locals.user = null;
-    return next();
-  }
-
+exports.loadGlobalData = async (req, res, next) => {
   try {
-    const user = await userModel.getById(req.session.user.id);
+    // USER
+    if (req.session.user) {
+      const user = await userModel.getById(req.session.user.id);
+      res.locals.user = user;
+    } else {
+      res.locals.user = null;
+    }
 
-    res.locals.user = user;
+    // CATEGORIES
+    const categories = await categoryModel.getAll();
+    res.locals.categories = categories;
+
     next();
   } catch (err) {
-
     next(err);
   }
 };

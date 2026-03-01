@@ -10,7 +10,7 @@ const session = require('./config/session');
 const PORT = process.env.PORT || 3000;
 
 const { requireLogin } = require('./middlewares/authMiddleware');
-const { localUser } = require('./middlewares/globalMiddleware');
+const { loadGlobalData } = require('./middlewares/globalMiddleware');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(session);
 app.use(requireLogin);
-app.use(localUser);
+app.use(loadGlobalData);
 
 // ตั้ง layout main เป็น default
 app.set("layout", "layouts/main");

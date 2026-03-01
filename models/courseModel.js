@@ -32,7 +32,9 @@ exports.getAllPublished = () => {
     return new Promise((resolve, reject) => {
 
         const sql = `
-            SELECT c.*, u.username AS instructor_name
+            SELECT c.*,
+            u.username AS instructor_name,
+            u.profile_image AS instructor_profile
             FROM courses c
             JOIN users u ON c.instructor_id = u.user_id
             WHERE c.course_status = 'published'
@@ -50,7 +52,9 @@ exports.getById = (course_id) => {
     return new Promise((resolve, reject) => {
 
         const sql = `
-            SELECT c.*, u.username AS instructor_name
+            SELECT c.*,
+            u.username AS instructor_name,
+            u.profile_image AS instructor_profile
             FROM courses c
             JOIN users u ON c.instructor_id = u.user_id
             WHERE c.course_id = ?

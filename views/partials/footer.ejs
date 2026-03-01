@@ -44,19 +44,11 @@
 
                 <!-- Item Body -->
                 <div class="flex flex-wrap">
-                    <a href="" class="footer-item">คณิตศาสตร์</a>
-                    <a href="" class="footer-item">วิทยาศาสตร์</a>
-                    <a href="" class="footer-item">ศิลปะ</a>
-                    <a href="" class="footer-item">ภาษา</a>
-                    <a href="" class="footer-item">การงานอาชีพ</a>
-                    <a href="" class="footer-item">เคมี</a>
-                    <a href="" class="footer-item">ฟิสิกส์</a>
-                    <a href="" class="footer-item">ชีวะ</a>
-                    <a href="" class="footer-item">ประวิติศาสตร์</a>
-                    <a href="" class="footer-item">ดนตรี</a>
-                    <a href="" class="footer-item">หน้าที่พลเมือง</a>
-                    <a href="" class="footer-item">สุขศึกษาและพลศึกษา</a>
-                    <a href="" class="footer-item">ลูกเสือ</a>
+                    <% categories.forEach(category=> { %>
+                        <a href="/courses?category=<%= category.category_id %>" class="footer-item">
+                            <%= category.category_name %>
+                        </a>
+                        <% }) %>
                 </div>
 
             </div>

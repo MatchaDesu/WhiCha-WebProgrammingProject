@@ -3,32 +3,30 @@
 
         <!-- Filter Course -->
         <div class="hidden lg:grid col-span-1 p-4 gap-4 border">
-            <% for (let i=0; i<12; i++) {%> 
             <div>
                 <h1 class="text-3xl mb-2 md:text-4xl">หมวดหมู่</h1>
                 <ul>
-                    <% for (let i=0; i<12; i++) {%> 
+                    <% categories.forEach(category => { %> 
                     <li class="flex gap-2">
-                        <input type="checkbox"><span class="test-xl md:text-2xl">ข้อ <%= i %></span>
+                        <input type="checkbox"><span class="test-xl md:text-2xl"> <%= category.category_name %></span>
                     </li>
-                    <% } %>
+                    <% }); %>
                 </ul>
                 
             </div>
-            <% } %>
         </div>
 
         <!-- Course Catalog -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 col-span-3 p-4 gap-4 place-items-center border">
 
             <!-- Card -->
-            <% if courses.forEach(course => { %> 
+            <% courses.forEach(course => { %> 
 
-                <a href="" class="w-full max-w-sm rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
+                <a href="/courses/<%= course.course_id %>" class="w-full max-w-sm rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
 
                     <!-- Banner -->
                     <div class="w-full aspect-video">
-                        <img src="img/profile.jpg" alt="" class="h-full w-full object-cover">
+                        <img src="<%= course.course_image %>" alt="" class="h-full w-full object-cover">
                     </div>
 
                     <div class="flex flex-col p-4 gap-2">
@@ -45,8 +43,8 @@
 
                         <!-- Instuctor -->
                         <div class="flex items-center gap-2">
-                            <div class="rounded-full overflow-hidden shrink-0">
-                                <img src="/img/avatar.jpg" alt="" class="h-6">
+                            <div class="h-6 aspect-square rounded-full overflow-hidden shrink-0">
+                                <img src="<%= course.instructor_profile %>" alt="" class="h-full w-full object-cover">
                             </div>
                             <h3 class="text-lg line-clamp-1">
                                 <%= course.instructor_name %>

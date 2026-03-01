@@ -1,13 +1,15 @@
 const db = require('../config/db');
 
+const anonymous_profile = '/icon/profile-anonymous.svg';
+
 exports.createUser = (user) => {
   return new Promise((resolve, reject) => {
 
     const { username, first_name, last_name, email, phone, password } = user;
-    const sql = `INSERT INTO users (username, password, first_name, last_name, email, phone)
-                  VALUES (?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO users (username, password, first_name, last_name, email, phone, profile_image)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-    db.run(sql, [username, password, first_name, last_name, email, phone], function (err) {
+    db.run(sql, [username, password, first_name, last_name, email, phone, anonymous_profile], function (err) {
       if (err) return reject(err);
       resolve({ user_id: this.lastID });
     });
