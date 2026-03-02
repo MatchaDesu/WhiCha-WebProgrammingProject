@@ -1,77 +1,116 @@
--- 1. เพิ่มข้อมูล Users (ผู้สอน 1 คน, ผู้จัดการ 1 คน, นักเรียน 2 คน)
-INSERT INTO users (username, password, first_name, last_name, email, phone, role) VALUES
-('teacher_somchai', 'hashed_pass_1', 'Somchai', 'Jaidee', 'somchai@email.com', '0811111111', 'instructor'),
-('admin_jane', 'hashed_pass_2', 'Jane', 'Manager', 'jane@email.com', '0822222222', 'manager'),
-('student_alice', 'hashed_pass_3', 'Alice', 'Learn', 'alice@email.com', '0833333333', 'student'),
-('student_bob', 'hashed_pass_4', 'Bob', 'Study', 'bob@email.com', '0844444444', 'student');
+INSERT INTO users (username, password, first_name, last_name, email, phone, role)
+VALUES 
+('instructor1', '1234', 'Somchai', 'Tech', 'instructor1@mail.com', '0800000001', 'instructor'),
+('student1', '1234', 'Anan', 'Learner', 'student1@mail.com', '0800000002', 'student');
 
--- 2. เพิ่มข้อมูล Categories (หมวดหมู่คอร์สเรียน)
-INSERT INTO categories (category_name) VALUES
+INSERT INTO categories (category_name)
+VALUES 
 ('Programming'),
-('Design & Arts'),
-('Business');
+('Web Development'),
+('Database'),
+('UX/UI'),
+('DevOps');
 
--- 3. เพิ่มข้อมูล Courses (คอร์สเรียน 2 คอร์ส โดยดึง instructor_id = 1)
-INSERT INTO courses (instructor_id, category_id, course_name, description, course_status, course_price) VALUES
-(1, 1, 'Python 101 for Beginners', 'เรียน Python ตั้งแต่ศูนย์จนเขียนโปรแกรมเป็น', 'published', 1500),
-(1, 2, 'Photoshop Masterclass', 'พื้นฐานการแต่งรูปด้วย Photoshop', 'draft', 990);
+INSERT INTO courses 
+(instructor_id, category_id, course_name, description, course_status, course_price)
+VALUES
+(1, 1, 'JavaScript Fundamentals', 'พื้นฐาน JavaScript ตั้งแต่เริ่มต้น', 'published', 1500),
+(1, 2, 'Node.js Backend Development', 'สร้าง Backend ด้วย Node.js', 'published', 2000),
+(1, 3, 'SQL Mastery', 'เรียน SQL ตั้งแต่พื้นฐานถึงขั้นสูง', 'published', 1800),
+(1, 4, 'UI/UX Design Basics', 'พื้นฐานการออกแบบ UX/UI', 'published', 1200),
+(1, 5, 'DevOps for Beginners', 'พื้นฐาน CI/CD และ Deployment', 'published', 2200);
 
--- 4. เพิ่มข้อมูล Enrollments (นักเรียน Alice(3) และ Bob(4) ลงทะเบียนเรียนคอร์ส Python(1))
-INSERT INTO enrollments (user_id, course_id) VALUES
-(3, 1),
-(4, 1);
-
--- 5. เพิ่มข้อมูล Modules (สร้าง 2 บทเรียนหลัก ให้คอร์ส Python(1))
+-- Course 1 (JavaScript)
 INSERT INTO modules (course_id, module_name, order_index) VALUES
-(1, 'Chapter 1: Getting Started', 1),
-(1, 'Chapter 2: Core Concepts', 2);
+(1, 'Introduction to JavaScript', 1),
+(1, 'Variables and Data Types', 2),
+(1, 'Operators', 3),
+(1, 'Control Flow', 4),
+(1, 'Functions', 5),
+(1, 'Arrays', 6),
+(1, 'Objects', 7),
+(1, 'DOM Manipulation', 8),
+(1, 'Events', 9),
+(1, 'Mini Project', 10);
 
--- 6. เพิ่มข้อมูล Lessons (สร้างเนื้อหาย่อย ให้คอร์ส Python(1))
-INSERT INTO lessons (course_id, lesson_name, content) VALUES
-(1, 'Welcome to Python', '# ยินดีต้อนรับ\nมาทำความรู้จักกับ Python กันเถอะ'),
-(1, 'Installation Guide', '# การติดตั้ง\nสอนการโหลดและติดตั้งโปรแกรม'),
-(1, 'Variables & Data Types', '# ตัวแปร\nวิธีประกาศตัวแปรใน Python');
+-- Course 2 (Node.js)
+INSERT INTO modules (course_id, module_name, order_index) VALUES
+(2, 'Node.js Intro', 1),
+(2, 'NPM and Packages', 2),
+(2, 'Express Basics', 3),
+(2, 'Routing', 4),
+(2, 'Middleware', 5),
+(2, 'REST API', 6),
+(2, 'Authentication', 7),
+(2, 'File Upload', 8),
+(2, 'Deployment', 9),
+(2, 'Final Project', 10);
 
--- 7. เพิ่มข้อมูล Quizzes (สร้างแบบทดสอบ ให้คอร์ส Python(1))
-INSERT INTO quizzes (course_id, title, description) VALUES
-(1, 'Chapter 1 Quiz', 'แบบทดสอบเก็บคะแนนประจำบทที่ 1');
+-- Course 3 (SQL)
+INSERT INTO modules (course_id, module_name, order_index) VALUES
+(3, 'Database Intro', 1),
+(3, 'SELECT Statement', 2),
+(3, 'WHERE Clause', 3),
+(3, 'JOIN Basics', 4),
+(3, 'GROUP BY', 5),
+(3, 'Indexes', 6),
+(3, 'Transactions', 7),
+(3, 'Subqueries', 8),
+(3, 'Optimization', 9),
+(3, 'SQL Project', 10);
 
--- 8. เพิ่มข้อมูล Modules Items (นำเนื้อหาและแบบทดสอบ ไปเรียงใส่ลงใน Module)
--- Module 1 (บทที่ 1) มี: Lesson 1 -> Lesson 2 -> Quiz 1
--- Module 2 (บทที่ 2) มี: Lesson 3
-INSERT INTO modules_items (module_id, item_id, item_type, order_index) VALUES
-(1, 1, 'lesson', 1),
-(1, 2, 'lesson', 2),
-(1, 1, 'quiz', 3),
-(2, 3, 'lesson', 1);
+-- Course 4 (UI/UX)
+INSERT INTO modules (course_id, module_name, order_index) VALUES
+(4, 'UX Principles', 1),
+(4, 'User Research', 2),
+(4, 'Wireframing', 3),
+(4, 'Prototyping', 4),
+(4, 'Color Theory', 5),
+(4, 'Typography', 6),
+(4, 'Design Systems', 7),
+(4, 'Accessibility', 8),
+(4, 'Usability Testing', 9),
+(4, 'Portfolio Project', 10);
 
--- 9. เพิ่มข้อมูล Content Medias (ไฟล์สื่อประกอบบทเรียน สำหรับ Lesson 1 และ 2)
-INSERT INTO content_medias (lesson_id, media_name, media_path) VALUES
-(1, 'Intro Video', '/storage/videos/intro.mp4'),
-(2, 'Install PDF', '/storage/docs/install_guide.pdf');
+-- Course 5 (DevOps)
+INSERT INTO modules (course_id, module_name, order_index) VALUES
+(5, 'DevOps Intro', 1),
+(5, 'Linux Basics', 2),
+(5, 'Git Workflow', 3),
+(5, 'CI/CD Concepts', 4),
+(5, 'Docker Basics', 5),
+(5, 'Docker Compose', 6),
+(5, 'Cloud Deployment', 7),
+(5, 'Monitoring', 8),
+(5, 'Scaling', 9),
+(5, 'Final Deployment Project', 10);
 
--- 10. เพิ่มข้อมูล Lesson Progress (บันทึกว่านักเรียนเรียนบทไหนจบแล้วบ้าง)
--- Alice(3) เรียนจบ Lesson 1 และ 2
--- Bob(4) เพิ่งเรียนจบ Lesson 1
-INSERT INTO lesson_progress (lesson_id, user_id) VALUES
-(1, 3),
-(2, 3),
-(1, 4);
+INSERT INTO lessons (module_id, lesson_name, content)
+VALUES
+(1, 'Lesson for Module 1', 'เนื้อหาของบทเรียน module 1');
 
--- 11. เพิ่มข้อมูล Questions (สร้างคำถาม 2 ข้อ สำหรับ Quiz 1)
-INSERT INTO questions (quiz_id, question_text, question_type, points, order_index) VALUES
-(1, 'นามสกุลไฟล์ของภาษา Python คือข้อใด?', 'single', 1, 1),
-(1, 'Python เป็นภาษาโปรแกรมที่ต้องทำการ Compile ก่อนรันเสมอ (True/False)?', 'true_false', 1, 2);
+INSERT INTO quizzes (module_id, title, description)
+VALUES
+(1, 'Quiz Module 1', 'แบบทดสอบประจำ Module 1');
 
--- 12. เพิ่มข้อมูล Choices (ตัวเลือกคำตอบของแต่ละข้อ โดย 1=ถูก, 0=ผิด)
-INSERT INTO choices (question_id, choice_text, is_correct) VALUES
-(1, '.py', 1),
-(1, '.python', 0),
-(1, '.pt', 0),
-(1, '.php', 0),
-(2, 'True (จริง)', 0),
-(2, 'False (เท็จ)', 1);
+INSERT INTO lessons (module_id, lesson_name, content)
+SELECT module_id,
+       'Lesson for Module ' || module_id,
+       'Content for Module ' || module_id
+FROM modules;
 
--- 13. เพิ่มข้อมูล Quiz Attempts (จำลองว่า Alice(3) สอบเสร็จแล้ว ได้ 2 คะแนนเต็ม)
-INSERT INTO quiz_attempts (quiz_id, user_id, score, submitted_at) VALUES
-(1, 3, 2, CURRENT_TIMESTAMP);
+INSERT INTO quizzes (module_id, title, description)
+SELECT module_id,
+       'Quiz Module ' || module_id,
+       'Quiz description for module ' || module_id
+FROM modules;
+
+INSERT INTO questions (quiz_id, question_text, question_type, points, order_index)
+VALUES
+(1, 'JavaScript เป็นภาษาแบบไหน?', 'single', 1, 1);
+
+INSERT INTO choices (question_id, choice_text, is_correct)
+VALUES
+(1, 'Programming Language', 1),
+(1, 'Database', 0),
+(1, 'Operating System', 0);

@@ -1,0 +1,121 @@
+<section class="py-16 px-6">
+  <div class="container mx-auto max-w-3xl">
+
+    <!-- Header -->
+    <div class="flex flex-col items-center mb-14">
+      <h1 class="text-3xl md:text-4xl font-semibold text-center">
+        สร้างคอร์สใหม่
+      </h1>
+      <p class="text-center text-gray-600 mt-4 md:text-lg">
+        กรอกข้อมูลพื้นฐานของคอร์สก่อน จากนั้นคุณสามารถเพิ่มบทเรียนและแบบทดสอบได้
+      </p>
+    </div>
+
+    <!-- Form -->
+    <form action="/instructor/courses/create" 
+          method="POST"
+          class="flex flex-col gap-10">
+
+      <!-- Course Name -->
+      <div class="flex flex-col gap-3">
+        <label class="text-lg font-semibold">
+          ชื่อคอร์ส *
+        </label>
+        <input 
+          type="text" 
+          name="course_name"
+          required
+          class="w-full border px-4 py-3 focus:outline-none focus:border-black"
+          placeholder="เช่น Complete Node.js Bootcamp"
+        >
+      </div>
+
+      <!-- Category -->
+      <div class="flex flex-col gap-3">
+        <label class="text-lg font-semibold">
+          หมวดหมู่ *
+        </label>
+        <select 
+          name="category_id"
+          required
+          class="w-full border px-4 py-3 focus:outline-none focus:border-black"
+        >
+          <option value="">-- เลือกหมวดหมู่ --</option>
+          <% categories.forEach(category => { %>
+            <option value="<%= category.category_id %>">
+              <%= category.category_name %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- Description -->
+      <div class="flex flex-col gap-3">
+        <label class="text-lg font-semibold">
+          คำอธิบายคอร์ส
+        </label>
+        <textarea 
+          name="description"
+          rows="5"
+          class="w-full border px-4 py-3 focus:outline-none focus:border-black"
+          placeholder="อธิบายว่าคอร์สนี้จะสอนอะไร เหมาะกับใคร..."
+        ></textarea>
+      </div>
+
+      <!-- Price -->
+      <div class="flex flex-col gap-3">
+        <label class="text-lg font-semibold">
+          ราคาคอร์ส (บาท)
+        </label>
+        <input 
+          type="number"
+          name="course_price"
+          min="0"
+          value="0"
+          class="w-full border px-4 py-3 focus:outline-none focus:border-black"
+        >
+      </div>
+
+      <!-- Course Image -->
+      <div class="flex flex-col gap-3">
+        <label class="text-lg font-semibold">
+          รูปปกคอร์ส
+        </label>
+        <input 
+          type="file"
+          name="course_image"
+          accept="image/*"
+          class="w-full border px-4 py-3 bg-white"
+        >
+      </div>
+
+      <!-- Divider -->
+      <div class="w-16 h-0.5 bg-gray-300 mx-auto"></div>
+
+      <!-- Buttons -->
+      <div class="flex flex-col md:flex-row justify-center gap-6 pt-4">
+
+        <button 
+          type="submit" 
+          name="action"
+          value="draft"
+          class="px-8 py-3 border hover:bg-gray-50 transition"
+        >
+          บันทึกเป็น Draft
+        </button>
+
+        <button 
+          type="submit"
+          name="action"
+          value="continue"
+          class="px-8 py-3 bg-black text-white hover:opacity-80 transition"
+        >
+          บันทึกและไปจัดการเนื้อหา →
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+</section>

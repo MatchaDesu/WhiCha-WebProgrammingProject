@@ -1,18 +1,109 @@
-<%= course.course_name %>
-<%= course.description %>
-<%= course.instructor_name %>
-<%= course.instructor_profile %>
-<%= course.course_image %>
-<%= course.course_price %>
-<%= course.publish_date %>
-<%= course.created_at %>
+<div class="min-h-screen bg-gray-50 py-16">
 
-<% if (!isEnrolled) {%>
-    <form action="/courses/<%= course.course_id %>/enroll" method="POST">
-        <button type="submit">Enroll</button>
-    </form>
-<% } else { %>
-    <a href="/courses/<%= course.course_id %>/learn">
-        <button>Go to Learn</button>
-    </a>
-<% } %>
+  <div class="max-w-6xl mx-auto px-6">
+
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden grid md:grid-cols-2 gap-10">
+
+      <!-- ===== LEFT : IMAGE ===== -->
+      <div class="relative">
+        <% if (course.course_image) { %>
+          <img src="<%= course.course_image %>"
+               class="w-full h-full object-cover">
+        <% } else { %>
+          <div class="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold">
+            <%= course.course_name.charAt(0) %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- ===== RIGHT : INFO ===== -->
+      <div class="p-10 flex flex-col justify-between">
+
+        <div>
+
+          <!-- Title -->
+          <h1 class="text-4xl font-bold text-gray-900 mb-4">
+            <%= course.course_name %>
+          </h1>
+
+          <!-- Instructor -->
+          <div class="flex items-center gap-4 mb-6">
+
+            <% if (course.instructor_profile) { %>
+              <img src="<%= course.instructor_profile %>"
+                   class="w-12 h-12 rounded-full object-cover">
+            <% } else { %>
+              <div class="w-12 h-12 rounded-full bg-gray-300"></div>
+            <% } %>
+
+            <div>
+              <p class="text-sm text-gray-500">Instructor</p>
+              <p class="font-semibold text-gray-800">
+                <%= course.instructor_name %>
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Description -->
+          <p class="text-gray-600 leading-relaxed mb-8">
+            <%= course.description %>
+          </p>
+
+          <!-- Meta -->
+          <div class="grid grid-cols-2 gap-6 text-sm text-gray-500 mb-8">
+            <div>
+              <p class="font-medium text-gray-700">Created</p>
+              <p><%= course.created_at %></p>
+            </div>
+
+            <% if (course.publish_date) { %>
+            <div>
+              <p class="font-medium text-gray-700">Published</p>
+              <p><%= course.publish_date %></p>
+            </div>
+            <% } %>
+          </div>
+
+        </div>
+
+        <!-- ===== PRICE + BUTTON ===== -->
+        <div class="border-t pt-6 flex items-center justify-between">
+
+          <div>
+            <% if (course.course_price == 0) { %>
+              <p class="text-2xl font-bold text-green-600">
+                Free
+              </p>
+            <% } else { %>
+              <p class="text-2xl font-bold text-indigo-600">
+                ฿<%= course.course_price %>
+              </p>
+            <% } %>
+          </div>
+
+          <% if (!isEnrolled) { %>
+            <form action="/courses/<%= course.course_id %>/enroll" method="POST">
+              <button
+                class="px-8 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition shadow-md">
+                Enroll Now
+              </button>
+            </form>
+          <% } else { %>
+            <a href="/courses/<%= course.course_id %>/learn">
+              <button
+                class="px-8 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition shadow-md">
+                Go to Learn
+              </button>
+            </a>
+          <% } %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

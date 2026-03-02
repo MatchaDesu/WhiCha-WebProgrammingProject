@@ -79,14 +79,13 @@ CREATE TABLE modules_items (
 --lessons
 CREATE TABLE lessons (
     lesson_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    course_id INTEGER NOT NULL,
+    module_id INTEGER NOT NULL,
     lesson_name TEXT,
     content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP NULL,
 
-    FOREIGN KEY (course_id)
-        REFERENCES courses(course_id)
+    FOREIGN KEY (module_id)
+        REFERENCES modules(module_id)
         ON DELETE CASCADE
 );
 
@@ -119,13 +118,13 @@ CREATE TABLE lesson_progress (
 --quizzes
 CREATE TABLE quizzes (
     quiz_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    course_id INTEGER NOT NULL,
+    module_id INTEGER NOT NULL,
     title TEXT,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (course_id)
-        REFERENCES courses(course_id)
+    FOREIGN KEY (module_id)
+        REFERENCES modules(module_id)
         ON DELETE CASCADE
 );
 

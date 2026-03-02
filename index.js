@@ -41,6 +41,12 @@ app.use("/courses", courseRoutes);
 const userRoutes = require("./routes/userRoute");
 app.use("/users", userRoutes);
 
+const instructorRoutes = require("./routes/instructorRoute");
+app.use("/instructor", instructorRoutes);
+
+const adminRoutes = require("./routes/adminRoute");
+app.use("/admin", adminRoutes);
+
 app.listen(PORT, () => {
     console.log("Server is Running...");
 })

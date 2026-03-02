@@ -1,28 +1,28 @@
 const db = require('../config/db');
 
-exports.addItemToModule = ({ module_id, item_type, ref_id, order_index }) => {
+exports.addItemToModule = ({ module_id, item_type, item_id, order_index }) => {
   return new Promise((resolve, reject) => {
 
     const sql = `
-      INSERT INTO module_items (module_id, item_type, ref_id, order_index)
+      INSERT INTO modules_items
+      (module_id, item_id, item_type, order_index)
       VALUES (?, ?, ?, ?)
     `;
 
-    db.run(sql, [module_id, item_type, ref_id, order_index], function (err) {
+    db.run(sql, [module_id, item_id, item_type, order_index], function (err) {
       if (err) return reject(err);
-      resolve({ item_id: this.lastID });
+      resolve({ module_item_id: this.lastID });
     });
   });
-};
+};  
 
 exports.updateItem = (item_id, { item_type, ref_id }) => {
   return new Promise((resolve, reject) => {
 
     const sql = `
-      UPDATE module_items
+      UPDATE modules_items
       SET item_type = ?, ref_id = ?
       WHERE item_id = ?
-      AND deleted_at IS NULL
     `;
 
     db.run(sql, [item_type, ref_id, item_id], function (err) {
@@ -36,7 +36,7 @@ exports.reorderItems = (module_id, bulkUpdate) => {
   return new Promise((resolve, reject) => {
 
     const stmt = db.prepare(`
-      UPDATE module_items
+      UPDATE modules_items
       SET order_index = ?
       WHERE item_id = ?
       AND module_id = ?
@@ -59,10 +59,9 @@ exports.removeItem = (item_id) => {
   return new Promise((resolve, reject) => {
 
     const sql = `
-      UPDATE module_items
+      UPDATE modules_items
       SET deleted_at = CURRENT_TIMESTAMP
       WHERE item_id = ?
-      AND deleted_at IS NULL
     `;
 
     db.run(sql, [item_id], function (err) {
@@ -77,10 +76,11 @@ exports.getItemsByModule = (module_id) => {
 
     const sql = `
       SELECT *
-      FROM module_items
+      FROM modules_items
       WHERE module_id = ?
-      AND deleted_at IS NULL
-      ORDER BY order_index ASC
+      ORDER BY 
+        CASE WHEN item_type = 'quiz' THEN 1 ELSE 0 END,
+        order_index ASC
     `;
 
     db.all(sql, [module_id], (err, rows) => {

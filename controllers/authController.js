@@ -34,7 +34,7 @@ exports.postSignUp = async (req, res) => {
   const user = await userModel.createUser(userForm);
 
   req.session.user = {
-    id: user.user_id
+    id: user.user_id,
   };
 
   res.redirect('/');

@@ -1,1 +1,0 @@
-Whicha ja 123

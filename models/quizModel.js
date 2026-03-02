@@ -2,12 +2,12 @@ const db = require('../config/db');
 
 exports.createQuiz = (quiz) => {
   return new Promise((resolve, reject) => {
-    const { course_id, title, description } = quiz;
+    const { module_id, title, description } = quiz;
 
-    const sql = `INSERT INTO quizzes (course_id, title, description) 
+    const sql = `INSERT INTO quizzes (module_id, title, description) 
                  VALUES (?, ?, ?)`;
 
-    db.run(sql, [course_id, title, description], function (err) {
+    db.run(sql, [module_id, title, description], function (err) {
       if (err) return reject(err);
 
       resolve({ quiz_id: this.lastID });
@@ -59,14 +59,14 @@ exports.deleteQuiz = (quiz_id) => {
 };
 
 //ดึง quiz ทั้งหมด ของ course นี้
-exports.getByCourse = (course_id) => {
+exports.getByModule = (module_id) => {
   return new Promise((resolve, reject) => {
 
     const sql = `SELECT * FROM quizzes 
-                 WHERE course_id = ? 
+                 WHERE module_id = ? 
                  ORDER BY created_at ASC`;
 
-    db.all(sql, [course_id], (err, rows) => {
+    db.all(sql, [module_id], (err, rows) => {
       if (err) return reject(err);
       resolve(rows);
     });
