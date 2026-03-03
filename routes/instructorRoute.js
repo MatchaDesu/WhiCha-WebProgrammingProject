@@ -2,64 +2,41 @@ const express = require('express');
 const router = express.Router();
 const instructorController = require('../controllers/instructorController');
 
+// ==========================================
+// Dashboard & Course Creation
+// ==========================================
 router.get('/', instructorController.dashboard);
-
-// หน้า create course
 router.get('/create-course', instructorController.courseCreate);
-
-// สร้าง course
 router.post('/courses/create', instructorController.createCourse);
 
-// หน้าแก้ไข course (รวม lesson / quiz)
+// ==========================================
+// Course Management (Edit, Update, Publish)
+// ==========================================
 router.get('/courses/:id/edit', instructorController.getEditCourse);
-
-// เปิด edit lesson หรือ quiz
-router.get(
-  '/courses/:id/edit/:type/:itemId',
-  instructorController.getEditCourse
-);
-
-// update course detail
+router.get('/courses/:id/edit/:type/:itemId', instructorController.getEditCourse);
 router.post('/courses/:id/update', instructorController.updateCourse);
-
-// publish course
 router.post('/courses/:id/publish', instructorController.publishCourse);
 
-// สร้าง module
-router.post(
-  '/courses/:id/modules/create',
-  instructorController.createModule
-);
+// ==========================================
+// Module Management
+// ==========================================
+router.post('/courses/:id/modules/create', instructorController.createModule);
+router.post('/courses/:id/modules/:moduleId/delete', instructorController.deleteModule);
 
-// ลบ module
-router.post(
-  '/courses/:id/modules/:moduleId/delete',
-  instructorController.deleteModule
-);
+// ==========================================
+// Lesson Management
+// ==========================================
+router.post('/courses/:id/modules/:moduleId/lessons/create', instructorController.createLesson);
+router.post('/courses/:id/lessons/:lessonId/update', instructorController.updateLesson);
 
-// สร้าง lesson
-router.post(
-  '/courses/:id/modules/:moduleId/lessons/create',
-  instructorController.createLesson
-);
+// ==========================================
+// Quiz & Question Management
+// ==========================================
+router.post('/courses/:id/modules/:moduleId/quizzes/create', instructorController.createQuiz);
+router.post('/courses/:id/quizzes/:quizId/update', instructorController.updateQuiz);
 
-// update lesson
-router.post(
-  '/courses/:id/lessons/:lessonId/update',
-  instructorController.updateLesson
-);
-
-// สร้าง quiz
-router.post(
-  '/courses/:id/modules/:moduleId/quizzes/create',
-  instructorController.createQuiz
-);
-
-// update quiz
-router.post(
-  'quizzes/:quiz_id/update',
-  instructorController.updateQuiz
-);
-
+router.post('/courses/:id/quizzes/:quizId/questions/create', instructorController.createQuestion);
+router.post('/courses/:id/quizzes/:quizId/questions/:questionId/update', instructorController.updateQuestion);
+router.post('/courses/:id/quizzes/:quizId/questions/:questionId/delete', instructorController.deleteQuestion);
 
 module.exports = router;

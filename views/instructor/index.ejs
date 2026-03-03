@@ -1,107 +1,98 @@
 <section id="content">
-  <div class="container mx-auto px-6 py-12">
+  <div class="container mx-auto px-6 py-12 flex flex-col gap-8">
 
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-10">
-
+    <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-6 pb-6 border-b">
       <div>
-        <h1 class="text-3xl md:text-4xl">
-          My Courses
+        <h1 class="text-3xl md:text-4xl leading-tight">
+          จัดการ<span class="text-accent">คอร์สเรียน</span>
         </h1>
         <p class="text-gray-600 mt-2 md:text-lg">
-          จัดการคอร์สทั้งหมดของคุณ
+          คอร์สทั้งหมดที่คุณสร้างขึ้นและพร้อมสอน
         </p>
       </div>
 
       <a href="/instructor/create-course"
-         class="px-8 py-3 bg-black text-white hover:opacity-80 transition text-center">
-        + สร้างคอร์ส
+         class="px-8 py-3 bg-black text-white hover:opacity-80 transition shadow-md font-semibold text-center shrink-0">
+        + สร้างคอร์สใหม่
       </a>
-
     </div>
 
     <% if (!courses || courses.length === 0) { %>
 
-      <!-- Empty State -->
-      <div class="border py-20 text-center">
-        <h2 class="text-2xl font-semibold mb-4">
-          ยังไม่มีคอร์ส
+      <div class="flex flex-col items-center justify-center py-20 border-2 border-dashed border-gray-200 bg-gray-50 rounded-2xl">
+        <h2 class="text-2xl font-semibold mb-2">
+          ยังไม่มีคอร์สเรียน
         </h2>
-        <p class="text-gray-600 mb-6">
-          เริ่มสร้างคอร์สแรกของคุณได้เลย
+        <p class="text-gray-500 mb-8 text-center max-w-sm">
+          คุณยังไม่ได้สร้างคอร์สใดๆ เริ่มต้นแบ่งปันความรู้ของคุณโดยการสร้างคอร์สแรกเลยตอนนี้
         </p>
 
         <a href="/instructor/create-course"
-           class="px-8 py-3 bg-black text-white hover:opacity-80 transition">
-          สร้างคอร์สแรก
+           class="px-8 py-3 bg-black text-white hover:opacity-80 transition font-semibold shadow-md">
+          สร้างคอร์สแรกของคุณ
         </a>
       </div>
 
     <% } else { %>
 
-      <!-- Course Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 place-items-start">
 
         <% courses.forEach(course => { %>
 
-        <div class="w-full rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
+          <div class="w-full rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition bg-white flex flex-col h-full">
 
-          <!-- Banner -->
-          <div class="w-full aspect-video">
-            <% if (course.course_image) { %>
-              <img src="<%= course.course_image %>" alt="" class="h-full w-full object-cover">
-            <% } else { %>
-              <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                No Image
+            <div class="w-full aspect-video relative group">
+              <% if (course.course_image) { %>
+                <img src="<%= course.course_image %>" alt="<%= course.course_name %>" class="h-full w-full object-cover">
+              <% } else { %>
+                <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                  <span class="text-sm">ไม่มีรูปภาพปก</span>
+                </div>
+              <% } %>
+              
+              <% 
+                let statusColor = "bg-gray-100 text-gray-600 border-gray-200";
+                if(course.course_status === "published") statusColor = "bg-green-100 text-green-700 border-green-200";
+                if(course.course_status === "draft") statusColor = "bg-yellow-100 text-yellow-700 border-yellow-200";
+                if(course.course_status === "archived") statusColor = "bg-red-100 text-red-700 border-red-200";
+              %>
+              <div class="absolute top-3 right-3 px-3 py-1 text-xs font-semibold rounded-full border <%= statusColor %> capitalize shadow-sm backdrop-blur-sm">
+                <%= course.course_status %>
               </div>
-            <% } %>
-          </div>
+            </div>
 
-          <div class="flex flex-col p-4 gap-3">
+            <div class="flex flex-col p-5 gap-3 flex-1">
 
-            <!-- Name + Status -->
-            <div class="flex justify-between items-start gap-3">
-              <h2 class="text-xl font-semibold line-clamp-2">
+              <h2 class="text-xl font-semibold line-clamp-2 text-gray-800 h-14">
                 <%= course.course_name %>
               </h2>
 
-              <% 
-                let statusColor = "text-gray-500";
-                if(course.course_status === "published") statusColor = "text-green-600";
-                if(course.course_status === "draft") statusColor = "text-yellow-600";
-                if(course.course_status === "archived") statusColor = "text-red-600";
-              %>
+              <p class="text-sm text-gray-500 line-clamp-2 mb-2">
+                <%= course.description || 'ไม่มีคำอธิบายคอร์สเรียน...' %>
+              </p>
 
-              <span class="text-sm font-medium <%= statusColor %>">
-                ● <%= course.course_status %>
-              </span>
-            </div>
+              <div class="mt-auto">
+                <hr class="mb-4">
 
-            <!-- Price -->
-            <span class="text-2xl py-2">
-              ฿ <%= course.course_price %>
-            </span>
+                <div class="text-2xl font-bold text-secondary mb-5">
+                  ฿ <%= course.course_price || 0 %>
+                </div>
 
-            <hr>
-
-            <!-- Actions -->
-            <div class="flex gap-3">
-
-              <a href="/instructor/courses/<%= course.course_id %>/edit"
-                 class="flex-1 text-center px-4 py-2 bg-black text-white hover:opacity-80 transition text-sm">
-                จัดการ
-              </a>
-
-              <a href="/courses/<%= course.course_id %>"
-                 class="flex-1 text-center px-4 py-2 border hover:bg-gray-50 transition text-sm">
-                ดูหน้าเรียน
-              </a>
+                <div class="flex gap-3 mt-auto">
+                  <a href="/instructor/courses/<%= course.course_id %>/edit"
+                     class="flex-1 text-center px-4 py-2.5 bg-black text-white font-semibold hover:opacity-80 transition text-sm shadow-sm">
+                    จัดการคอร์ส
+                  </a>
+                  <a href="/courses/<%= course.course_id %>" target="_blank"
+                     class="flex-1 text-center px-4 py-2.5 border border-gray-300 font-semibold hover:bg-gray-50 transition text-sm">
+                    ดูหน้าเรียน
+                  </a>
+                </div>
+              </div>
 
             </div>
 
           </div>
-
-        </div>
 
         <% }) %>
 

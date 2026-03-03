@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
-//เพิ่ม question ใน quiz
-exports.addQuestion = (question) => {
+//เพิ่ม question
+exports.createQuestion = (question) => {
     return new Promise((resolve, reject) => {
 
         const { quiz_id, question_text, question_type, points, order_index } = question;
@@ -56,7 +56,7 @@ exports.reorderQuestions = (quiz_id, bulkUpdate) => {
 };
 
 //ดึง question ทั้งหมด ของ quiz นี้
-exports.getQuestionsByQuiz = (quiz_id) => {
+exports.getByQuiz = (quiz_id) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM questions 
                  WHERE quiz_id = ? 

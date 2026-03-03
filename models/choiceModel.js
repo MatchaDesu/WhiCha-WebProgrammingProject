@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 //เพิ่ม choice ใน question
-exports.addChoice = (choice) => {
+exports.createChoice = (choice) => {
   return new Promise((resolve, reject) => {
     //is_correct 0 or 1
     const { question_id, choice_text, is_correct } = choice;
@@ -33,7 +33,7 @@ exports.updateChoice = (choice_id, choice) => {
 };
 
 //ดึง choice ทั้งหมด ของ question นี้
-exports.getChoicesByQuestion = (question_id) => {
+exports.getByQuestion = (question_id) => {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM choices WHERE question_id = ?`;
 
@@ -53,6 +53,18 @@ exports.deleteChoice = (choice_id) => {
     db.run(sql, [choice_id], function (err) {
       if (err) return reject(err);
 
+      resolve({ changes: this.changes });
+    });
+  });
+};
+
+exports.deleteByQuestion = (question_id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM choices WHERE question_id = ?`;
+
+    db.run(sql, [question_id], function (err) {
+      if (err) return reject(err);
+      
       resolve({ changes: this.changes });
     });
   });
