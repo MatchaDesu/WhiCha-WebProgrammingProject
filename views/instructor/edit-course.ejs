@@ -1,152 +1,162 @@
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
 <div class="h-14 bg-white border-b flex justify-between items-center px-6 text-sm text-gray-500 font-medium tracking-wide shadow-sm z-20 relative">
-  <div>
-    Student Panel <span class="mx-2 text-gray-300">/</span> Course Viewer
+  <div class="flex items-center gap-3">
+    <button onclick="toggleSidebar()" class="p-2 -ml-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition" title="ซ่อน/แสดง แถบด้านซ้าย">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="9" y1="3" x2="9" y2="21"></line>
+      </svg>
+    </button>
+    <div>
+      Student Panel <span class="mx-2 text-gray-300">/</span> Course Viewer
+    </div>
   </div>
   <a href="/dashboard" class="text-black hover:underline font-semibold">กลับสู่หน้าหลัก</a>
 </div>
 
+<div class="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-gray-50 relative">
 
-<div class="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-gray-50">
+  <div id="sidebar" class="w-1/3 min-w-[320px] max-w-sm border-r border-gray-200 bg-white overflow-hidden shrink-0 transition-all duration-300 ease-in-out relative flex flex-col">
+    
+    <button onclick="toggleSidebar()" class="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition z-10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
 
-  <div class="w-1/3 border-r bg-white px-6 py-8 overflow-y-auto">
+    <div class="w-full min-w-[320px] px-6 py-8 h-full overflow-y-auto flex flex-col">
 
-    <div class="mb-10 pb-6 border-b border-gray-200">
-      <div class="flex justify-between items-start gap-4">
+      <div class="mb-10 pb-6 border-b border-gray-200">
+        <div class="flex flex-col gap-4">
 
-        <div class="flex-1">
-          <h1 class="text-2xl font-semibold leading-tight">
-            <%= course.course_name %>
-          </h1>
-          <div class="flex items-center gap-2 mt-2">
-            <span class="w-2 h-2 rounded-full <%= course.course_status === 'published' ? 'bg-green-500' : 'bg-yellow-500' %>"></span>
-            <p class="text-sm font-medium <%= course.course_status === 'published' ? 'text-green-600' : 'text-yellow-600' %> capitalize">
-              <%= course.course_status %>
-            </p>
+          <div class="flex-1 pr-8"> <h1 class="text-2xl font-semibold leading-tight">
+              <%= course.course_name %>
+            </h1>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="w-2 h-2 rounded-full <%= course.course_status === 'published' ? 'bg-green-500' : 'bg-yellow-500' %>"></span>
+              <p class="text-sm font-medium <%= course.course_status === 'published' ? 'text-green-600' : 'text-yellow-600' %> capitalize">
+                <%= course.course_status %>
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div class="flex flex-col items-end gap-3 shrink-0">
-          <% if (course.course_status !=='published' ) { %>
-          <form action="/instructor/courses/<%= course.course_id %>/publish" method="POST">
-            <button class="px-4 py-2 bg-black text-white text-sm font-semibold hover:opacity-80 transition shadow-sm">
-              Publish Course
+          <div class="flex items-center justify-between mt-2">
+            <button class="text-sm font-medium text-black underline hover:opacity-70 transition" onclick="toggleModal('new_module')">
+              + เพิ่ม Module
             </button>
-          </form>
-          <% } %>
-          <button class="text-sm font-medium text-gray-600 underline hover:text-black transition" onclick="toggleModal('new_module')">
-            + เพิ่ม Module
-          </button>
-        </div>
-
-      </div>
-    </div>
-
-    <div id="new_module" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm transition-all">
-      <div class="bg-white w-full max-w-md p-8 shadow-xl">
-        <h2 class="text-2xl font-semibold mb-6">
-          เพิ่ม Module ใหม่
-        </h2>
-        <form action="/instructor/courses/<%= course.course_id %>/modules/create" method="POST" class="flex flex-col gap-6">
-          <input type="text" name="module_name" placeholder="ตั้งชื่อ Module..." required class="w-full border px-4 py-3 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition">
-          <div class="flex justify-end gap-3 pt-2">
-            <button type="button" onclick="toggleModal('new_module')" class="px-6 py-2 border border-gray-400 font-semibold hover:bg-gray-50 transition">
-              ยกเลิก
-            </button>
-            <button class="px-6 py-2 bg-black text-white font-semibold hover:opacity-80 transition shadow-md">
-              สร้าง Module
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <% if (!modules || modules.length===0) { %>
-    <div class="text-center py-10 border-2 border-dashed border-gray-200 bg-gray-50 mt-4">
-      <p class="text-gray-500 font-medium">ยังไม่มีเนื้อหา</p>
-      <p class="text-sm text-gray-400 mt-1">คลิก "+ เพิ่ม Module" เพื่อเริ่มต้น</p>
-    </div>
-    <% } %>
-
-    <div class="flex flex-col gap-4">
-      <% modules.forEach((module, index)=> { %>
-      <div class="flex flex-col border px-6 py-4 gap-2 rounded-2xl border-gray-200 bg-white shadow-md">
-
-        <div class="flex justify-between items-center bg-gray-50/50">
-          <div>
-            <p class="text-lg font-semibold text-gray-800">
-              <%= module.module_name %>
-            </p>
-          </div>
-          <form action="/instructor/courses/<%= course.course_id %>/modules/<%= module.module_id %>/delete" method="POST">
-            <button class="text-red-500 text-sm font-medium hover:text-red-700 hover:underline transition">
-              ลบ
-            </button>
-          </form>
-        </div>
-
-        <div class="flex flex-col gap-2">
-
-          <div class="flex gap-4 text-sm font-medium">
-            <form action="/instructor/courses/<%= course.course_id %>/modules/<%= module.module_id %>/lessons/create" method="POST">
-              <button class="text-gray-600 hover:text-black hover:underline transition">
-                + เพิ่ม Lesson
+            
+            <% if (course.course_status !=='published' ) { %>
+            <form action="/instructor/courses/<%= course.course_id %>/publish" method="POST">
+              <button class="px-4 py-2 bg-black text-white text-sm font-semibold hover:opacity-80 transition shadow-sm rounded-lg">
+                Publish Course
               </button>
             </form>
-            <span class="text-gray-300">|</span>
-            <form action="/instructor/courses/<%= course.course_id %>/modules/<%= module.module_id %>/quizzes/create" method="POST">
-              <button class="text-gray-600 hover:text-black hover:underline transition">
-                + เพิ่ม Quiz
-              </button>
-            </form>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <% if (module.items && module.items.length> 0) { %>
-            <% module.items.forEach(item=> { %>
-            <a href="/instructor/courses/<%= course.course_id %>/edit/<%= item.type %>/<%= item.data.lesson_id || item.data.quiz_id %>" class="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition rounded-2xl
-              <%= (currentItem && currentItem.type === item.type && (
-              (item.type === 'lesson' && currentItem.data.lesson_id === item.data.lesson_id) || 
-              (item.type === 'quiz' && currentItem.data.quiz_id === item.data.quiz_id)
-            )) 
-            ? 'border-black bg-gray-50' 
-            : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50' %>">
-
-              <span class="text-lg">
-                <%= item.type==='lesson' ? '📘' : '📝' %>
-              </span>
-              <span class="truncate">
-                <%= item.type==='lesson' ? item.data.lesson_name : item.data.title %>
-              </span>
-            </a>
-            <% }) %>
             <% } %>
           </div>
 
         </div>
       </div>
-      <% }) %>
-    </div>
 
+      <div id="new_module" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm transition-all">
+        <div class="bg-white w-full max-w-md p-8 shadow-xl rounded-2xl">
+          <h2 class="text-2xl font-semibold mb-6">เพิ่ม Module ใหม่</h2>
+          <form action="/instructor/courses/<%= course.course_id %>/modules/create" method="POST" class="flex flex-col gap-6">
+            <input type="text" name="module_name" placeholder="ตั้งชื่อ Module..." required class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition">
+            <div class="flex justify-end gap-3 pt-2">
+              <button type="button" onclick="toggleModal('new_module')" class="px-6 py-2 border border-gray-300 font-semibold hover:bg-gray-50 transition rounded-lg">
+                ยกเลิก
+              </button>
+              <button type="submit" class="px-6 py-2 bg-black text-white font-semibold hover:opacity-80 transition shadow-md rounded-lg">
+                สร้าง Module
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <% if (!modules || modules.length===0) { %>
+      <div class="text-center py-10 border-2 border-dashed border-gray-200 bg-gray-50 mt-4 rounded-xl">
+        <p class="text-gray-500 font-medium">ยังไม่มีเนื้อหา</p>
+        <p class="text-sm text-gray-400 mt-1">คลิก "+ เพิ่ม Module" เพื่อเริ่มต้น</p>
+      </div>
+      <% } %>
+
+      <div class="flex flex-col gap-4 pb-10">
+        <% modules.forEach((module, index)=> { %>
+        <div class="flex flex-col border px-6 py-4 gap-2 rounded-2xl border-gray-200 bg-white shadow-sm hover:shadow transition">
+
+          <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+            <p class="text-lg font-semibold text-gray-800">
+              <%= module.module_name %>
+            </p>
+            <form action="/instructor/courses/<%= course.course_id %>/modules/<%= module.module_id %>/delete" method="POST" onsubmit="return confirm('ยืนยันการลบ Module?');">
+              <button class="text-red-500 text-sm font-medium hover:text-red-700 hover:underline transition">
+                ลบ
+              </button>
+            </form>
+          </div>
+
+          <div class="flex flex-col gap-3 mt-2">
+            <div class="flex gap-4 text-sm font-medium">
+              <form action="/instructor/courses/<%= course.course_id %>/modules/<%= module.module_id %>/lessons/create" method="POST">
+                <button class="text-gray-500 hover:text-black hover:underline transition">
+                  + เพิ่ม Lesson
+                </button>
+              </form>
+              <span class="text-gray-300">|</span>
+              <form action="/instructor/courses/<%= course.course_id %>/modules/<%= module.module_id %>/quizzes/create" method="POST">
+                <button class="text-gray-500 hover:text-black hover:underline transition">
+                  + เพิ่ม Quiz
+                </button>
+              </form>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <% if (module.items && module.items.length> 0) { %>
+                <% module.items.forEach(item=> { %>
+                <a href="/instructor/courses/<%= course.course_id %>/edit/<%= item.type %>/<%= item.data.lesson_id || item.data.quiz_id %>" 
+                   class="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition rounded-xl
+                   <%= (currentItem && currentItem.type === item.type && (
+                   (item.type === 'lesson' && currentItem.data.lesson_id === item.data.lesson_id) || 
+                   (item.type === 'quiz' && currentItem.data.quiz_id === item.data.quiz_id)
+                   )) 
+                   ? 'border-black bg-gray-50 shadow-sm' 
+                   : 'border-gray-200 hover:border-black hover:bg-gray-50' %>">
+                  <span class="text-lg">
+                    <%= item.type==='lesson' ? '📘' : '📝' %>
+                  </span>
+                  <span class="truncate">
+                    <%= item.type==='lesson' ? item.data.lesson_name : item.data.title %>
+                  </span>
+                </a>
+                <% }) %>
+              <% } %>
+            </div>
+          </div>
+
+        </div>
+        <% }) %>
+      </div>
+
+    </div>
   </div>
 
-  <div class="w-2/3 flex flex-col h-full bg-white relative">
+  <div class="flex-1 flex flex-col h-full bg-white relative">
 
     <% if (!currentItem) { %>
-    <div class="flex flex-col items-center justify-center h-full text-gray-400">
+    <div class="flex flex-col items-center justify-center h-full text-gray-400 bg-gray-50">
       <div class="text-6xl mb-4">👈</div>
-      <h2 class="text-2xl font-semibold text-gray-500">
+      <h2 class="text-2xl font-semibold text-gray-600">
         เลือก Lesson หรือ Quiz จากด้านซ้าย
       </h2>
-      <p class="mt-2 text-gray-400">เพื่อเริ่มจัดการเนื้อหาคอร์สเรียนของคุณ</p>
+      <p class="mt-2 text-gray-500">เพื่อเริ่มจัดการเนื้อหาคอร์สเรียนของคุณ</p>
     </div>
 
     <% } else if (currentItem.type==="lesson" ) { %>
-
     <form id="lessonForm" action="/instructor/courses/<%= course.course_id %>/lessons/<%= currentItem.data.lesson_id %>/update" method="POST" class="flex flex-col h-full">
 
-      <div class="bg-white border-b px-8 py-5 flex justify-between items-center z-10 shrink-0">
+      <div class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center z-10 shrink-0">
         <div class="flex-1 mr-6">
           <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
             Lesson Editor
@@ -155,10 +165,10 @@
         </div>
 
         <div class="flex gap-3 shrink-0">
-          <a href="/courses/<%= course.course_id %>" class="px-5 py-2 border border-gray-400 text-sm font-semibold hover:bg-gray-50 transition">
+          <a href="/courses/<%= course.course_id %>" class="px-5 py-2 border border-gray-300 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition rounded-lg">
             Preview
           </a>
-          <button class="px-6 py-2 bg-black text-white text-sm font-semibold hover:opacity-80 transition shadow-md">
+          <button type="submit" class="px-6 py-2 bg-black text-white text-sm font-semibold hover:opacity-80 transition shadow-md rounded-lg">
             Save Changes
           </button>
         </div>
@@ -167,8 +177,8 @@
       <input type="hidden" name="content" id="contentInput">
 
       <div class="flex-1 p-8 overflow-hidden bg-gray-50">
-        <div class="bg-white border border-gray-200 shadow-sm h-full flex flex-col">
-          <div class="border-b px-6 py-3 text-sm font-semibold text-gray-600 bg-gray-50/50">
+        <div class="bg-white border border-gray-200 shadow-sm h-full flex flex-col rounded-xl overflow-hidden">
+          <div class="border-b px-6 py-3 text-sm font-semibold text-gray-600 bg-gray-100/50">
             เนื้อหา (Markdown)
           </div>
           <div class="flex-1 overflow-y-auto">
@@ -180,10 +190,9 @@
     </form>
 
     <% } else if (currentItem.type==="quiz" ) { %>
-
     <div class="flex flex-col h-full overflow-hidden bg-gray-50">
 
-      <form action="/instructor/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/update" method="POST" class="bg-white border-b px-8 py-5 flex justify-between items-start z-10 shrink-0 shadow-sm">
+      <form action="/instructor/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/update" method="POST" class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-start z-10 shrink-0 shadow-sm">
         <div class="flex-1 mr-6 flex flex-col gap-3">
           <div>
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
@@ -195,7 +204,7 @@
         </div>
 
         <div class="flex gap-3 shrink-0 mt-4">
-          <button type="submit" class="px-6 py-2 bg-black text-white text-sm font-semibold hover:opacity-80 transition shadow-md">
+          <button type="submit" class="px-6 py-2 bg-black text-white text-sm font-semibold hover:opacity-80 transition shadow-md rounded-lg">
             Save Settings
           </button>
         </div>
@@ -206,7 +215,7 @@
 
           <div class="flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">คำถามทั้งหมด</h3>
-            <button onclick="toggleModal('new_question')" class="px-4 py-2 border border-black text-black text-sm font-semibold hover:bg-black hover:text-white transition shadow-sm rounded-lg">
+            <button onclick="toggleModal('new_question')" class="px-5 py-2 border-2 border-black text-black text-sm font-semibold hover:bg-black hover:text-white transition shadow-sm rounded-lg">
               + เพิ่มคำถาม
             </button>
           </div>
@@ -220,203 +229,79 @@
           </div>
           <% } else { %>
 
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-4 pb-10">
             <% currentItem.data.questions.forEach((q, index)=> { %>
-            <div class="flex flex-col gap-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm relative group">
+            <div class="flex flex-col gap-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow transition relative group">
 
-              <div class="absolute top-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button type="button" onclick="toggleModal('edit_question_<%= q.question_id %>')" class="text-blue-500 text-sm font-medium hover:underline">
+              <div class="absolute top-6 right-6 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white pl-2">
+                <button type="button" onclick="toggleModal('edit_question_<%= q.question_id %>')" class="text-blue-600 text-sm font-medium hover:underline">
                   แก้ไข
                 </button>
-
                 <form action="/instructor/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/questions/<%= q.question_id %>/delete" method="POST" onsubmit="return confirm('คุณแน่ใจหรือไม่ที่จะลบคำถามนี้?');">
                   <button type="submit" class="text-red-500 text-sm font-medium hover:underline">ลบ</button>
                 </form>
               </div>
 
               <div class="flex gap-4">
-                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-semibold text-gray-600">
+                <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-semibold text-gray-600 border border-gray-200">
                   <%= index + 1 %>
                 </div>
                 <div>
-                  <h4 class="font-semibold text-gray-800 text-lg pr-20">
+                  <h4 class="font-semibold text-gray-900 text-lg pr-24">
                     <%= q.question_text %>
                   </h4>
                   <p class="text-xs text-gray-500 mt-1">
-                    ประเภท: <span class="uppercase font-medium">
-                      <%= q.question_type %>
-                    </span> | คะแนน: <%= q.points %>
+                    ประเภท: <span class="uppercase font-medium"><%= q.question_type %></span> | คะแนน: <%= q.points %>
                   </p>
                 </div>
               </div>
 
-              <div class="ml-12 flex flex-col gap-2">
+              <div class="ml-12 flex flex-col gap-2 mt-2">
                 <% if (q.choices && q.choices.length> 0) { %>
-                <% q.choices.forEach(choice=> { %>
-                <div class="flex items-center gap-3 text-sm <%= choice.is_correct ? 'text-green-700 font-medium bg-green-50 border-green-200' : 'text-gray-600 bg-gray-50 border-gray-100' %> border px-4 py-2 rounded-lg">
-                  <span>
-                    <%= choice.is_correct ? '✅' : '⚪' %>
-                  </span>
-                  <%= choice.choice_text %>
-                </div>
-                <% }) %>
+                  <% q.choices.forEach(choice=> { %>
+                  <div class="flex items-center gap-3 text-sm <%= choice.is_correct ? 'text-green-800 font-medium bg-green-50 border-green-200' : 'text-gray-600 bg-gray-50 border-gray-100' %> border px-4 py-2 rounded-lg">
+                    <span>
+                      <%= choice.is_correct ? '✅' : '⚪' %>
+                    </span>
+                    <%= choice.choice_text %>
+                  </div>
+                  <% }) %>
                 <% } %>
               </div>
 
             </div>
 
-            <div id="edit_question_<%= q.question_id %>" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm transition-all overflow-y-auto py-10">
-              <div class="bg-white w-full max-w-2xl p-8 shadow-xl rounded-2xl m-auto">
-
-                <div class="flex justify-between items-center mb-6">
-                  <h2 class="text-2xl font-semibold">แก้ไขคำถามที่ <%= index + 1 %>
-                  </h2>
-                  <button type="button" onclick="toggleModal('edit_question_<%= q.question_id %>')" class="text-gray-400 hover:text-black text-xl">&times;</button>
-                </div>
-
-                <form action="/instructor/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/questions/<%= q.question_id %>/update" method="POST" class="flex flex-col gap-6" onsubmit="updateRadioValues('edit_choices_container_<%= q.question_id %>')">
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">โจทย์คำถาม <span class="text-red-500">*</span></label>
-                    <textarea name="question_text" required class="w-full border px-4 py-3 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition rounded-lg h-24 resize-none"><%= q.question_text %></textarea>
-                  </div>
-
-                  <div class="flex gap-4">
-                    <div class="flex-1">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทคำถาม</label>
-                      <select name="question_type" class="w-full border px-4 py-3 focus:outline-none focus:border-black transition rounded-lg bg-white">
-                        <option value="single" <%=q.question_type==='single' ? 'selected' : '' %>>Single Choice (เลือกข้อเดียว)</option>
-                        <option value="multiple" <%=q.question_type==='multiple' ? 'selected' : '' %>>Multiple Choice (เลือกหลายข้อ)</option>
-                        <option value="true_false" <%=q.question_type==='true_false' ? 'selected' : '' %>>True / False (ถูก/ผิด)</option>
-                      </select>
-                    </div>
-                    <div class="w-1/3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">คะแนน</label>
-                      <input type="number" name="points" value="<%= q.points %>" min="1" required class="w-full border px-4 py-3 focus:outline-none focus:border-black transition rounded-lg">
-                    </div>
-                  </div>
-
-                  <hr class="border-gray-200">
-
-                  <div>
-                    <div class="flex justify-between items-center mb-3">
-                      <label class="block text-sm font-medium text-gray-700">ตัวเลือก (Choices) <span class="text-red-500">*</span></label>
-                      <button type="button" onclick="addChoiceRow('edit_choices_container_<%= q.question_id %>')" class="text-xs font-semibold text-black underline hover:opacity-70">
-                        + เพิ่มตัวเลือก
-                      </button>
-                    </div>
-
-                    <div id="edit_choices_container_<%= q.question_id %>" class="flex flex-col gap-3">
-                      <% if (q.choices && q.choices.length> 0) { %>
-                      <% q.choices.forEach((choice, cIndex)=> { %>
-                      <div class="flex items-center gap-3 <%= cIndex > 1 ? 'mt-3' : '' %>">
-                        <input type="radio" name="correct_choice_index" value="<%= cIndex %>" <%=choice.is_correct ? 'checked' : '' %> class="w-5 h-5 accent-black cursor-pointer" title="เลือกเป็นคำตอบที่ถูกต้อง">
-                        <input type="text" name="choices[]" value="<%= choice.choice_text %>" placeholder="ตัวเลือก..." required class="flex-1 border px-4 py-2 focus:outline-none focus:border-black transition rounded-lg">
-                        <% if (cIndex> 1) { %>
-                        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold hover:opacity-70 px-2">&times;</button>
-                        <% } %>
-                      </div>
-                      <% }) %>
-                      <% } else { %>
-                      <div class="flex items-center gap-3">
-                        <input type="radio" name="correct_choice_index" value="0" checked class="w-5 h-5 accent-black cursor-pointer">
-                        <input type="text" name="choices[]" required class="flex-1 border px-4 py-2 rounded-lg">
-                      </div>
-                      <% } %>
-                    </div>
-                  </div>
-
-                  <div class="flex justify-end gap-3 pt-4 border-t mt-2">
-                    <button type="button" onclick="toggleModal('edit_question_<%= q.question_id %>')" class="px-6 py-2 border border-gray-400 font-semibold hover:bg-gray-50 transition rounded-lg">
-                      ยกเลิก
-                    </button>
-                    <button type="submit" class="px-6 py-2 bg-black text-white font-semibold hover:opacity-80 transition shadow-md rounded-lg">
-                      บันทึกการแก้ไข
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
             <% }) %>
           </div>
+          <% } %>
         </div>
 
-        <% } %>
       </div>
+    </div>
+    <% } %>
 
-      <div id="new_question" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm transition-all overflow-y-auto py-10">
-        <div class="bg-white w-full max-w-2xl p-8 shadow-xl rounded-2xl m-auto">
-
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-semibold">สร้างคำถามใหม่</h2>
-            <button onclick="toggleModal('new_question')" class="text-gray-400 hover:text-black text-xl">&times;</button>
-          </div>
-
-          <form action="/instructor/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/questions/create" method="POST" class="flex flex-col gap-6" onsubmit="updateRadioValues('choices_container')">
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">โจทย์คำถาม <span class="text-red-500">*</span></label>
-              <textarea name="question_text" required class="w-full border px-4 py-3 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition rounded-lg h-24 resize-none" placeholder="พิมพ์คำถามที่นี่..."></textarea>
-            </div>
-
-            <div class="flex gap-4">
-              <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทคำถาม</label>
-                <select name="question_type" class="w-full border px-4 py-3 focus:outline-none focus:border-black transition rounded-lg bg-white">
-                  <option value="single">Single Choice (เลือกข้อเดียว)</option>
-                  <option value="multiple">Multiple Choice (เลือกหลายข้อ)</option>
-                  <option value="true_false">True / False (ถูก/ผิด)</option>
-                </select>
-              </div>
-              <div class="w-1/3">
-                <label class="block text-sm font-medium text-gray-700 mb-1">คะแนน</label>
-                <input type="number" name="points" value="1" min="1" required class="w-full border px-4 py-3 focus:outline-none focus:border-black transition rounded-lg">
-              </div>
-            </div>
-
-            <hr class="border-gray-200">
-
-            <div>
-              <div class="flex justify-between items-center mb-3">
-                <label class="block text-sm font-medium text-gray-700">ตัวเลือก (Choices) <span class="text-red-500">*</span></label>
-                <button type="button" onclick="addChoiceRow('choices_container')" class="text-xs font-semibold text-black underline hover:opacity-70">
-                  + เพิ่มตัวเลือก
-                </button>
-              </div>
-
-              <div id="choices_container" class="flex flex-col gap-3">
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="correct_choice_index" value="0" checked class="w-5 h-5 accent-black cursor-pointer" title="เลือกเป็นคำตอบที่ถูกต้อง">
-                  <input type="text" name="choices[]" placeholder="ตัวเลือกที่ 1..." required class="flex-1 border px-4 py-2 focus:outline-none focus:border-black transition rounded-lg">
-                </div>
-                <div class="flex items-center gap-3">
-                  <input type="radio" name="correct_choice_index" value="1" class="w-5 h-5 accent-black cursor-pointer" title="เลือกเป็นคำตอบที่ถูกต้อง">
-                  <input type="text" name="choices[]" placeholder="ตัวเลือกที่ 2..." required class="flex-1 border px-4 py-2 focus:outline-none focus:border-black transition rounded-lg">
-                </div>
-              </div>
-              <p class="text-xs text-gray-400 mt-3">💡 เลือกปุ่มวงกลมด้านหน้าเพื่อกำหนดว่าตัวเลือกไหนคือ
-                "คำตอบที่ถูกต้อง"</p>
-            </div>
-
-            <div class="flex justify-end gap-3 pt-4 border-t mt-2">
-              <button type="button" onclick="toggleModal('new_question')" class="px-6 py-2 border border-gray-400 font-semibold hover:bg-gray-50 transition rounded-lg">
-                ยกเลิก
-              </button>
-              <button type="submit" class="px-6 py-2 bg-black text-white font-semibold hover:opacity-80 transition shadow-md rounded-lg">
-                บันทึกคำถาม
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-    </div> <% } %>
   </div>
 </div>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
+  // ฟังก์ชันสำหรับเปิดปิด Sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    
+    // ตรวจสอบว่ามีคลาส w-0 (กำลังซ่อนอยู่) หรือไม่
+    if (sidebar.classList.contains('w-0')) {
+      // เอาสถานะ "ซ่อน" ออก เพิ่มสถานะ "แสดง" กลับเข้าไป
+      sidebar.classList.remove('w-0', 'min-w-0', 'border-transparent');
+      sidebar.classList.add('w-1/3', 'min-w-[320px]', 'max-w-sm', 'border-r');
+    } else {
+      // เอาสถานะ "แสดง" ออก เพิ่มสถานะ "ซ่อน" (บีบความกว้างเป็น 0)
+      sidebar.classList.remove('w-1/3', 'min-w-[320px]', 'max-w-sm', 'border-r');
+      sidebar.classList.add('w-0', 'min-w-0', 'border-transparent');
+    }
+  }
+
   function toggleModal(id) {
     const el = document.getElementById(id);
     if (el.classList.contains("hidden")) {
@@ -447,32 +332,24 @@
     }
   });
 
-  // Script สำหรับเพิ่มช่องกรอก Choice แบบระบุ Container
+  // (ส่วนจัดการ Choice คงเดิม)
   function addChoiceRow(containerId) {
     const container = document.getElementById(containerId);
-    if (!container) return; // ป้องกัน Error ถ้าหา Container ไม่เจอ
-
-    // หา index ถัดไปตามจำนวน child ใน DOM
+    if (!container) return;
     const currentIndex = container.children.length; 
-
     const row = document.createElement('div');
-    row.className = 'flex items-center gap-3 mt-3';
-
-    // โครงสร้าง HTML ของ 1 ตัวเลือก
+    row.className = 'flex items-center gap-3 mt-1';
     row.innerHTML = `
       <input type="radio" name="correct_choice_index" value="${currentIndex}" class="w-5 h-5 accent-black cursor-pointer" title="เลือกเป็นคำตอบที่ถูกต้อง">
-      <input type="text" name="choices[]" placeholder="ตัวเลือกใหม่..." required class="flex-1 border px-4 py-2 focus:outline-none focus:border-black transition rounded-lg">
+      <input type="text" name="choices[]" placeholder="ตัวเลือกใหม่..." required class="flex-1 border border-gray-300 px-4 py-2 focus:outline-none focus:border-black transition rounded-lg">
       <button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold hover:opacity-70 px-2">&times;</button>
     `;
-
     container.appendChild(row);
   }
 
-  // ป้องกันบัค: อัปเดต Value ของ Radio Button ใหม่ก่อน Submit (กรณีมีการลบ Choice ตรงกลางออก)
   function updateRadioValues(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
     const radioButtons = container.querySelectorAll('input[type="radio"]');
     radioButtons.forEach((radio, index) => {
       radio.value = index;

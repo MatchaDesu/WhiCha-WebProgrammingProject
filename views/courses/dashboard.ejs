@@ -1,0 +1,46 @@
+<section id="course-header">
+    <div class="container mx-auto flex flex-col items-center md:flex-row px-6 py-12 gap-8">
+        
+        <div class="flex flex-col md:w-2/3">
+            <h1 class="text-3xl text-center font-semibold md:text-4xl md:text-left xl:text-5xl mb-4">
+                <%= course.course_name %>
+            </h1>
+        </div>
+
+    </div>
+</section>
+
+<section id="course-stats">
+    <div class="container mx-auto flex flex-col items-center px-6 py-12 gap-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+
+            <a href="/courses/<%= course.course_id %>/learn" class="flex flex-col p-6 bg-white border border-gray-200 rounded-lg">
+                <h1 class="text-center text-xl font-semibold md:text-left md:text-2xl mb-2">จำนวนบทเรียน</h1>
+                <p class="text-center md:text-left md:text-xl">
+                    <span class="text-4xl font-bold"><%= stats?.moduleCount || 0 %></span> บทเรียน
+                </p>
+            </a>
+
+            <a href="/courses/<%= course.course_id %>/students" class="flex flex-col p-6 bg-white border border-gray-200 rounded-lg">
+                <h1 class="text-center text-xl font-semibold md:text-left md:text-2xl mb-2">จำนวนนักเรียน</h1>
+                <p class="text-center md:text-left md:text-xl">
+                    <span class="text-4xl font-bold"><%= stats?.studentCount || 0 %></span> คน
+                </p>
+            </a>
+
+        </div>
+
+    </div>
+</section>
+
+<section id="course-description">
+    <div class="container mx-auto flex flex-col px-6 py-12 gap-8 max-w-4xl">
+        <h1 class="text-2xl font-semibold md:text-3xl text-center md:text-left">
+            รายละเอียดคอร์ส
+        </h1>
+        <div class="text-gray-700 text-base md:text-lg leading-relaxed md:text-left">
+            <%- course.description || 'ไม่มีรายละเอียดเพิ่มเติมสำหรับคอร์สนี้' %>
+        </div>
+    </div>
+</section>

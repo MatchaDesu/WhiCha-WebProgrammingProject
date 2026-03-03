@@ -2,12 +2,12 @@ const enrollmentModel = require('../models/enrollmentModel');
 
 exports.create = async (req, res) => {
     try {
-        const user_id = req.session.user.id;
-        const course_id = req.params.id;
+        const userId = req.session.user.id;
+        const courseId = req.params.courseId;
 
-        await enrollmentModel.enroll(user_id, course_id);
+        await enrollmentModel.enroll(userId, courseId);
 
-        res.redirect(`/courses/${course_id}`);
+        res.redirect(`/courses/${courseId}`);
 
     } catch (err) {
         res.status(500).send("Server Error");

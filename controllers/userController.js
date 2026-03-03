@@ -2,13 +2,13 @@ const userModel = require('../models/userModel');
 
 exports.getProfile = async (req, res) => {
     try {
-        const user = await userModel.getById(req.params.id);
+        const user = await userModel.getById(req.params.userId);
 
         if (!user) {
             return res.status(404).send("user not found");
         }
 
-        res.render('users', { user });
+        res.render('users/profile', { user });
     } catch (err) {
         res.status(500).send("Server Error");
     }
@@ -16,7 +16,7 @@ exports.getProfile = async (req, res) => {
 
 exports.editProfile = async (req, res) => {
     try {
-        const user = await userModel.getById(req.params.id);
+        const user = await userModel.getById(req.params.userId);
 
         if (!user) {
             return res.status(404).send("user not found");
@@ -24,26 +24,7 @@ exports.editProfile = async (req, res) => {
 
         res.render('users/edit', { user });
     } catch (err) {
+        console.log(err);
         res.status(500).send("Server Error");
     }
-};
-
-exports.uploadProfile = async (req, res) => {
-
-    try {
-        const userId = req.params.id;
-
-        if (!req.file) {
-            return res.status(400).send("No file uploaded");
-        }
-
-        const imagePath = `/uploads/users/${userId}/profile/${req.file.filename}`;
-
-        await userModel.updateProfile(userId, imagePath);
-
-        res.redirect(`/users/${userId}`);
-    } catch (err) {
-        res.status(500).send("Server Error");
-    }
-
 };

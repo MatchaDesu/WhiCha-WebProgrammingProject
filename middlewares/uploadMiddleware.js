@@ -2,94 +2,46 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// helper สร้างโฟลเดอร์
+// Helper สำหรับสร้าง Folder (ย้ายไปไว้ Utility file แยกก็ได้)
 const ensureDir = (dirPath) => {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
     }
 };
 
-const storage = multer.diskStorage({
+// สร้าง Factory Function สำหรับจัดเก็บไฟล์
+const createStorage = (subfolder) => {
+    return multer.diskStorage({
+        destination: (req, file, cb) => {
+            // ดึง ID จาก params หรือ body (กันพลาด)
+            const id = req.params.id || req.body.id;
+            
+            if (!id) return cb(new Error("ID is required for upload"));
 
-    destination: (req, file, cb) => {
-
-        try {
-            const id = req.params.id;
-
-            if (!id) {
-                return cb(new Error("Missing ID parameter"));
-            }
-
-            let uploadPath = "";
-            const url = req.originalUrl;
-
-            // ===== USERS PROFILE =====
-            if (url.includes(`users/${id}/profile`)) {
-
-                uploadPath = path.join(
-                    __dirname,
-                    "..",                // ออกจากโฟลเดอร์ middlewares
-                    "uploads",
-                    "users",
-                    String(id),
-                    "profile"
-                );
-            }
-
-            // ===== COURSES COVER =====
-            else if (url.includes("upload-courses-cover")) {
-
-                uploadPath = path.join(
-                    __dirname,
-                    "..",
-                    "uploads",
-                    "courses",
-                    String(id),
-                    "cover"
-                );
-            }
-
-            else {
-                return cb(new Error("Invalid upload path"));
-            }
-
+            // กำหนดโครงสร้าง Path ให้ชัดเจน
+            const uploadPath = path.join(__dirname, "..", "uploads", subfolder, String(id));
+            
             ensureDir(uploadPath);
-
             cb(null, uploadPath);
-
-        } catch (err) {
-            cb(err);
+        },
+        filename: (req, file, cb) => {
+            const ext = path.extname(file.originalname).toLowerCase();
+            const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+            cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
         }
-    },
+    });
+};
 
-    filename: (req, file, cb) => {
-
-        const ext = path.extname(file.originalname).toLowerCase();
-
-        // ตั้งชื่อไฟล์แบบ unique
-        const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-
-        cb(null, fileName);
-    }
-
-});
-
-const upload = multer({
-    storage,
-
-    limits: {
-        fileSize: 2 * 1024 * 1024 // 2MB
-    },
-
+// Export เป็น function สำหรับเรียกใช้ตามประเภทงาน
+const uploadSource = (folderName) => multer({
+    storage: createStorage(folderName),
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
     fileFilter: (req, file, cb) => {
-
-        // อนุญาตเฉพาะ image
         if (!file.mimetype.startsWith("image/")) {
-            return cb(new Error("Only image files allowed"), false);
+            return cb(new Error("Only images are allowed"), false);
         }
-
         cb(null, true);
     }
 });
 
-module.exports = upload;
+module.exports = uploadSource;

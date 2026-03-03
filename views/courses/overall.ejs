@@ -50,7 +50,7 @@
           <!-- Instuctor -->
           <div class="flex items-center gap-2">
             <div class="h-6 aspect-square rounded-full overflow-hidden shrink-0">
-              <img src="<%= course.instructor_profile %>" alt="" class="h-full w-full object-cover">
+              <img src="<%= course.instructor_profile || '/icon/profile-anonymous.svg' %>" alt="" class="h-full w-full object-cover">
             </div>
             <h3 class="text-lg line-clamp-1">
               <%= course.instructor_name %>

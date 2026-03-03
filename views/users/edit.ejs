@@ -2,7 +2,7 @@
 
 <div class="container max-w-7xl mx-auto flex flex-col items-center px-6 py-6">
 
-    <form class="flex flex-col items-center gap-4" action="/users/<%= user.user_id %>/profile" method="POST"
+    <form class="flex flex-col items-center gap-4" action="/upload/upload-user-profile/<%= user.user_id %>" method="POST"
         enctype="multipart/form-data">
 
         <!-- Profile Image -->
@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <input type="file" id="profileImage" name="profileImage" accept="image/*" class="hidden"
+        <input type="file" id="profileImage" name="profile" accept="image/*" class="hidden"
             onchange="previewImage(event)">
 
         <button type="button" onclick="document.getElementById('profileImage').click()"

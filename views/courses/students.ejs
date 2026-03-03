@@ -1,0 +1,60 @@
+<section id="students-header">
+    <div class="container mx-auto flex flex-col px-6 py-12 gap-4">
+        <h1 class="text-3xl text-center font-semibold md:text-4xl md:text-left xl:text-5xl">
+            เพื่อนร่วมคอร์ส
+        </h1>
+        <p class="text-center text-gray-600 md:text-xl md:text-left">
+            ทำความรู้จักกับผู้เรียนที่กำลังศึกษาคอร์ส "<%= course.course_name %>" ไปพร้อมกับคุณ
+        </p>
+    </div>
+</section>
+
+<section id="students-list">
+    <div class="container mx-auto flex flex-col px-6 py-12 gap-8">
+        
+        <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-semibold md:text-3xl">
+                รายชื่อนักเรียน (<%= enrollments ? enrollments.length : 0 %> คน)
+            </h2>
+        </div>
+
+        <% if (typeof enrollments !== 'undefined' && enrollments.length > 0) { %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                
+                <% enrollments.forEach(student => { %>
+                    <a href="/users/<%= student.user_id %>" class="flex items-center gap-4 p-6 bg-white border border-gray-200 rounded-lg hover:border-black transition">
+                        
+                        <div class="w-16 h-16 shrink-0">
+                            <img src="<%= student.profile_image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.username || 'User') + '&background=random' %>" 
+                                 alt="<%= student.username %>"
+                                 class="w-full h-full rounded-full object-cover border border-gray-200">
+                        </div>
+
+                        <div class="flex flex-col">
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                <%= student.username || 'นักเรียนไม่ระบุชื่อ' %>
+                            </h3>
+                            <p class="text-sm text-gray-500">
+                                เข้าร่วมเมื่อ: <%= student.enrolled_at || 'ไม่ระบุ' %>
+                            </p>
+                        </div>
+
+                    </a>
+                <% }) %>
+
+            </div>
+        <% } else { %>
+            
+            <div class="flex flex-col items-center justify-center py-16 border border-dashed border-gray-300 rounded-lg bg-gray-50">
+                <p class="text-xl text-gray-500 text-center">
+                    ยังไม่มีผู้เรียนในคอร์สนี้
+                </p>
+                <p class="text-gray-400 mt-2 text-center">
+                    คุณคือคนแรก! รีบเข้าไปลุยเนื้อหาได้เลย
+                </p>
+            </div>
+
+        <% } %>
+
+    </div>
+</section>

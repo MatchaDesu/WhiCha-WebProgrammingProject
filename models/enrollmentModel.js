@@ -48,16 +48,16 @@ exports.isEnrolled = (user_id, course_id) => {
 
     db.get(sql, [user_id, course_id], (err, row) => {
       if (err) return reject(err);
-      resolve(!!row); // return true/false
+      resolve(!!row);
     });
   });
 };
 
-exports.getCourseByUser = (user_id) => {
+exports.getByUser = (user_id) => {
   return new Promise((resolve, reject) => {
 
     const sql = `
-      SELECT c.*
+      SELECT e.*, c.*
       FROM enrollments e
       JOIN courses c ON e.course_id = c.course_id
       WHERE e.user_id = ?
@@ -71,11 +71,11 @@ exports.getCourseByUser = (user_id) => {
   });
 };
 
-exports.getStudentByCourse = (course_id) => {
+exports.getByCourse = (course_id) => {
   return new Promise((resolve, reject) => {
 
     const sql = `
-      SELECT u.user_id, u.username, u.email
+      SELECT e.*, u.*
       FROM enrollments e
       JOIN users u ON e.user_id = u.user_id
       WHERE e.course_id = ?

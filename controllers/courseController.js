@@ -10,7 +10,7 @@ const choiceModel = require('../models/choiceModel');
 exports.getPublishedCourses = async (req, res) => {
     try {
         const courses = await courseModel.getAllPublished();
-        res.render('courses', { courses });
+        res.render('courses/overall', { courses });
     } catch (err) {
         res.status(500).send("Server Error");
     }
@@ -18,11 +18,11 @@ exports.getPublishedCourses = async (req, res) => {
 
 exports.getCourse = async (req, res) => {
     try {
-        const course_id = req.params.id
-        const user_id = req.session.user.id;
+        const courseId = req.params.courseId;
+        const userId = req.session.user.id;
 
-        const course = await courseModel.getById(course_id);
-        const isEnrolled = await enrollmentModel.isEnrolled(user_id, course_id)
+        const course = await courseModel.getById(courseId);
+        const isEnrolled = await enrollmentModel.isEnrolled(userId, courseId)
 
         res.render('courses/detail', { course, isEnrolled });
     } catch (err) {
@@ -30,9 +30,48 @@ exports.getCourse = async (req, res) => {
     }
 };
 
-exports.enterCourse = async (req, res) => {
+exports.getDashboard = async (req, res) => {
     try {
-        const courseId = req.params.id;
+        const courseId = req.params.courseId;
+
+        const course = await courseModel.getById(courseId);
+        const modules = await moduleModel.getByCourse(courseId);
+        const enrollments = await enrollmentModel.getByCourse(courseId);
+
+        const moduleCount = modules ? modules.length : 0;
+        const studentCount = enrollments ? enrollments.length : 0;
+
+        res.render('courses/dashboard', {
+            course,
+            stats : { moduleCount, studentCount } 
+        });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Server Error");
+    }
+}
+
+exports.getStudentDashboard = async (req, res) => {
+    try {
+        const courseId = req.params.courseId;
+
+        const course = await courseModel.getById(courseId);
+        const enrollments = await enrollmentModel.getByCourse(courseId);
+
+        res.render('courses/students', {
+            course,
+            enrollments: enrollments || []});
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Server Error");
+    }
+}
+
+exports.learnContent = async (req, res) => {
+    try {
+        const courseId = req.params.courseId;
         const userId = req.session.user.id;
 
         const course = await courseModel.getById(courseId);
@@ -73,7 +112,6 @@ exports.enterCourse = async (req, res) => {
         const { type, itemId } = req.params;
         let currentItem = null;
 
-        // ... โค้ดเดิมข้างบนของคุณ ...
         if (type && itemId) {
             for (let module of modules) {
                 for (let item of module.items) {
