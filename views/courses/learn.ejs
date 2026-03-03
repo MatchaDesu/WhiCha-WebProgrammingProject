@@ -1,95 +1,171 @@
-<!-- Toast UI CSS (ใช้เฉพาะหน้านี้) -->
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
-<div class="flex h-screen bg-gray-50 overflow-hidden">
+<div class="h-14 bg-white border-b flex justify-between items-center px-6 text-sm text-gray-500 font-medium tracking-wide shadow-sm z-20 relative">
+  <div>
+    Student Panel <span class="mx-2 text-gray-300">/</span> Course Viewer
+  </div>
+  <a href="/dashboard" class="text-black hover:underline font-semibold">กลับสู่หน้าหลัก</a>
+</div>
 
-  <!-- ===== SIDEBAR ===== -->
-  <div class="w-1/3 bg-white border-r p-6 overflow-y-auto">
+<div class="flex h-[calc(100vh-3.5rem)] bg-gray-50 overflow-hidden relative">
 
-    <h3 class="text-xl font-bold mb-6">
-      <%= course.course_name %>
-    </h3>
+  <div class="w-1/3 bg-white border-r px-6 py-8 overflow-y-auto">
 
-    <% modules.forEach(module => { %>
+    <div class="mb-8 pb-6 border-b border-gray-200">
+      <h1 class="text-2xl font-semibold leading-tight text-gray-900">
+        <%= course.course_name %>
+      </h1>
+      <p class="text-sm text-gray-500 mt-2">กำลังเรียน...</p>
+    </div>
 
-    <div class="mb-8">
+    <div class="flex flex-col gap-6">
+      <% modules.forEach((module, index) => { %>
+      <div class="flex flex-col gap-3">
+        
+        <div class="flex items-center gap-2 px-2">
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">
+            Chapter <%= module.order_index || (index + 1) %>
+          </p>
+          <span class="h-px bg-gray-200 flex-1"></span>
+        </div>
+        
+        <p class="font-semibold text-lg px-2 text-gray-800 mb-1">
+          <%= module.module_name %>
+        </p>
 
-      <p class="text-sm text-gray-500 uppercase tracking-wide mb-2">
-        Chapter <%= module.order_index %>
-      </p>
-
-      <p class="font-semibold mb-3">
-        <%= module.module_name %>
-      </p>
-
-      <ul class="space-y-2">
-
-        <% module.items.forEach(item => { %>
-        <li>
-
+        <div class="flex flex-col gap-2">
+          <% module.items.forEach(item => { %>
+          
           <% if (item.type === "lesson") { %>
-          <a href="/courses/<%= course.course_id %>/learn/lesson/<%= item.data.lesson_id %>" class="block px-3 py-2 rounded-lg transition
-                                  <%= currentItem && currentItem.type === 'lesson' && currentItem.data.lesson_id === item.data.lesson_id
-                                      ? 'bg-blue-100 text-blue-600 font-medium'
-                                      : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600' %>">
-            📘 <%= item.data.lesson_name %>
+          <a href="/courses/<%= course.course_id %>/learn/lesson/<%= item.data.lesson_id %>" class="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition rounded-2xl
+              <%= (currentItem && currentItem.type === 'lesson' && currentItem.data.lesson_id === item.data.lesson_id)
+                ? 'border-black bg-gray-50 text-black'
+                : 'border-transparent hover:border-gray-200 hover:bg-gray-50 text-gray-600' %>">
+            <span class="text-lg">📘</span> 
+            <span class="truncate"><%= item.data.lesson_name %></span>
           </a>
           <% } %>
 
           <% if (item.type === "quiz") { %>
-          <a href="/courses/<%= course.course_id %>/learn/quiz/<%= item.data.quiz_id %>" class="block px-3 py-2 rounded-lg transition
-                                  <%= currentItem && currentItem.type === 'quiz' && currentItem.data.quiz_id === item.data.quiz_id
-                                      ? 'bg-green-100 text-green-600 font-medium'
-                                      : 'text-gray-700 hover:bg-gray-100 hover:text-green-600' %>">
-            📝 <%= item.data.title %>
+          <a href="/courses/<%= course.course_id %>/learn/quiz/<%= item.data.quiz_id %>" class="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition rounded-2xl
+              <%= (currentItem && currentItem.type === 'quiz' && currentItem.data.quiz_id === item.data.quiz_id)
+                ? 'border-black bg-gray-50 text-black'
+                : 'border-transparent hover:border-gray-200 hover:bg-gray-50 text-gray-600' %>">
+            <span class="text-lg">📝</span> 
+            <span class="truncate"><%= item.data.title %></span>
           </a>
           <% } %>
 
-        </li>
-        <% }) %>
+          <% }) %>
+        </div>
 
-      </ul>
-
+      </div>
+      <% }) %>
     </div>
-
-    <% }) %>
 
   </div>
 
-
-  <!-- ===== RIGHT CONTENT ===== -->
-  <div class="w-2/3 p-10 flex flex-col h-full overflow-hidden">
+  <div class="w-2/3 flex flex-col h-full bg-white relative">
 
     <% if (!currentItem) { %>
-
-    <div class="flex items-center justify-center h-full text-gray-400">
-      <h2 class="text-2xl">
-        กรุณาเลือกบทเรียนจากด้านซ้าย 👈
+    
+    <div class="flex flex-col items-center justify-center h-full text-gray-400">
+      <div class="text-6xl mb-4">👈</div>
+      <h2 class="text-2xl font-semibold text-gray-500">
+        เลือกเนื้อหาบทเรียนจากด้านซ้าย
       </h2>
+      <p class="mt-2 text-gray-400">เพื่อเริ่มต้นการเรียนรู้ของคุณ</p>
     </div>
 
     <% } else if (currentItem.type === "lesson") { %>
 
-    <h2 class="text-3xl font-bold mb-6 shrink-0">
-      <%= currentItem.data.lesson_name %>
-    </h2>
+    <div class="bg-white border-b px-8 py-6 flex justify-between items-center z-10 shrink-0">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
+          Lesson
+        </p>
+        <h2 class="text-2xl font-semibold text-gray-900">
+          <%= currentItem.data.lesson_name %>
+        </h2>
+      </div>
+    </div>
 
-    <!-- ===== SCROLL AREA ===== -->
-    <div class="flex-1 overflow-y-auto bg-white rounded-xl shadow border p-8">
-      <div id="viewer" data-content="<%- currentItem.data.content %>">
+    <div class="flex-1 overflow-y-auto bg-gray-50 p-8">
+      <div class="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-2xl p-8 min-h-full">
+        <div id="viewer" data-content="<%- currentItem.data.content || '' %>"></div>
       </div>
     </div>
 
     <% } else if (currentItem.type === "quiz") { %>
 
-    <h2 class="text-3xl font-bold mb-4 shrink-0">
-      <%= currentItem.data.title %>
-    </h2>
-
-    <div class="flex-1 overflow-y-auto bg-white rounded-xl shadow border p-8">
-      <p class="text-gray-700 text-lg">
-        <%= currentItem.data.description %>
+    <div class="bg-white border-b px-8 py-6 flex flex-col justify-center z-10 shrink-0 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
+        Quiz Assessment
       </p>
+      <h2 class="text-2xl font-semibold text-gray-900">
+        <%= currentItem.data.title %>
+      </h2>
+    </div>
+
+    <div class="flex-1 overflow-y-auto bg-gray-50 p-8">
+      
+      <form action="/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/submit" method="POST" class="max-w-3xl mx-auto flex flex-col gap-6">
+        
+        <% if (currentItem.data.description) { %>
+        <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+          <p class="text-gray-600 text-sm leading-relaxed">
+            <span class="font-semibold text-black">คำชี้แจง:</span> <%= currentItem.data.description %>
+          </p>
+        </div>
+        <% } %>
+
+        <% if (!currentItem.data.questions || currentItem.data.questions.length === 0) { %>
+        <div class="text-center py-16 border-2 border-dashed border-gray-300 bg-white rounded-2xl">
+          <p class="text-gray-500 font-medium">ยังไม่มีคำถามในแบบทดสอบนี้</p>
+        </div>
+        <% } else { %>
+
+        <div class="flex flex-col gap-6">
+          <% currentItem.data.questions.forEach((q, index) => { %>
+          <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+            
+            <div class="flex gap-4">
+              <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-semibold text-gray-600">
+                <%= index + 1 %>
+              </div>
+              <h4 class="font-semibold text-gray-800 text-lg pt-1">
+                <%= q.question_text %>
+              </h4>
+            </div>
+
+            <div class="ml-12 flex flex-col gap-3">
+              <% if (q.choices && q.choices.length > 0) { %>
+                <% q.choices.forEach((choice) => { %>
+                <label class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-black transition group">
+                  <input type="radio" name="answers[<%= q.question_id %>]" value="<%= choice.choice_id %>" required class="w-5 h-5 accent-black">
+                  <span class="text-gray-700 text-sm font-medium group-hover:text-black">
+                    <%= choice.choice_text %>
+                  </span>
+                </label>
+                <% }) %>
+              <% } else { %>
+                <p class="text-sm text-red-500">เกิดข้อผิดพลาด: ไม่พบตัวเลือกสำหรับคำถามนี้</p>
+              <% } %>
+            </div>
+
+          </div>
+          <% }) %>
+        </div>
+
+        <div class="flex justify-end pt-4 pb-10">
+          <button type="submit" class="px-8 py-3 bg-black text-white font-semibold hover:opacity-80 transition shadow-md rounded-xl text-lg">
+            ส่งคำตอบ
+          </button>
+        </div>
+
+        <% } %>
+
+      </form>
     </div>
 
     <% } %>
@@ -98,18 +174,18 @@
 
 </div>
 
-
-<!-- Toast UI JS (ใช้เฉพาะหน้านี้) -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 
 <script>
-  const viewerEl = document.querySelector('#viewer');
+  document.addEventListener("DOMContentLoaded", function() {
+    const viewerEl = document.querySelector('#viewer');
 
-  if (viewerEl) {
-    toastui.Editor.factory({
-      el: viewerEl,
-      viewer: true,
-      initialValue: viewerEl.dataset.content
-    });
-  }
+    if (viewerEl) {
+      toastui.Editor.factory({
+        el: viewerEl,
+        viewer: true,
+        initialValue: viewerEl.dataset.content || ''
+      });
+    }
+  });
 </script>

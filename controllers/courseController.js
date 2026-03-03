@@ -4,6 +4,8 @@ const moduleModel = require('../models/moduleModel');
 const moduleItemModel = require('../models/moduleItemModel');
 const lessonModel = require('../models/lessonModel');
 const quizModel = require('../models/quizModel');
+const questionModel = require('../models/questionModel');
+const choiceModel = require('../models/choiceModel');
 
 exports.getPublishedCourses = async (req, res) => {
     try {
@@ -71,6 +73,7 @@ exports.enterCourse = async (req, res) => {
         const { type, itemId } = req.params;
         let currentItem = null;
 
+        // ... โค้ดเดิมข้างบนของคุณ ...
         if (type && itemId) {
             for (let module of modules) {
                 for (let item of module.items) {
@@ -85,6 +88,22 @@ exports.enterCourse = async (req, res) => {
                     }
                 }
             }
+        }
+
+        // 🟢 เพิ่มโค้ดชุดนี้เข้าไปครับ: ดึงคำถามและตัวเลือก เฉพาะตอนที่ผู้ใช้กำลังเปิดดูหน้า Quiz 🟢
+        if (currentItem && currentItem.type === "quiz") {
+            // ดึงคำถามทั้งหมดของ Quiz นี้
+            const questions = await questionModel.getByQuiz(currentItem.data.quiz_id);
+            
+            // วนลูปดึงตัวเลือก (Choices) ของแต่ละคำถาม
+            if (questions && questions.length > 0) {
+                for (let q of questions) {
+                    q.choices = await choiceModel.getByQuestion(q.question_id);
+                }
+            }
+            
+            // นำคำถามยัดใส่กลับเข้าไปใน currentItem.data เพื่อส่งไปให้ EJS
+            currentItem.data.questions = questions || [];
         }
 
         res.render("courses/learn", {
