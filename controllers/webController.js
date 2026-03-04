@@ -3,5 +3,5 @@ exports.home = (req, res) => {
 };
 
 exports.aboutus = (req, res) => {
-    res.render('pages/aboutus'); 
+    res.render('pages/about-us'); 
 };
