@@ -1,0 +1,113 @@
+<section id="course-dashboard" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <a href="/instructor/courses" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1">
+          <%= course.course_name %>
+        </h1>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-t-lg border-b border-gray-200 px-2 sm:px-6 shadow-sm overflow-x-auto no-scrollbar">
+      <nav class="flex gap-6 min-w-max" aria-label="Tabs">
+        <a href="/instructor/courses/<%= course.course_id %>/edit" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">
+          ตั้งค่าคอร์สเรียน
+        </a>
+        <a href="/instructor/courses/<%= course.course_id %>/modules" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">
+          จัดการเนื้อหา
+        </a>
+        <a href="/instructor/courses/<%= course.course_id %>/students" class="border-b-2 border-black py-4 px-2 text-sm md:text-base font-semibold text-black whitespace-nowrap">
+          รายชื่อนักเรียน
+        </a>
+      </nav>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-sm p-4 sm:p-6 lg:p-8">
+      
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">นักเรียนทั้งหมด</h2>
+          <p class="text-sm text-gray-500 mt-1">
+            มีผู้ลงทะเบียนเรียนคอร์สนี้จำนวน <span class="font-semibold text-black"><%= enrollments ? enrollments.length : 0 %></span> คน
+          </p>
+        </div>
+        
+        <div class="w-full sm:w-64 relative">
+          <input type="text" placeholder="ค้นหาชื่อหรืออีเมล..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-black focus:border-black outline-none transition">
+          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+      </div>
+
+      <% if (!enrollments || enrollments.length === 0) { %>
+        <div class="text-center py-16 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+          <div class="text-gray-400 mb-3 flex justify-center">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-1">ยังไม่มีนักเรียน</h3>
+          <p class="text-gray-500 text-sm">เมื่อมีผู้ลงทะเบียนเรียน ข้อมูลจะปรากฏที่นี่</p>
+        </div>
+      <% } else { %>
+        
+        <div class="overflow-x-auto border border-gray-200 rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-4 font-semibold text-gray-700">ชื่อ - นามสกุล</th>
+                <th scope="col" class="px-6 py-4 font-semibold text-gray-700">วันที่ลงทะเบียน</th>
+                <th scope="col" class="px-6 py-4 font-semibold text-gray-700">ความคืบหน้า</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              
+              <% enrollments.forEach(student => { %>
+                <tr class="hover:bg-gray-50 transition">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0">
+                        <%= student.name ? student.name.charAt(0).toUpperCase() : 'S' %>
+                      </div>
+                      <div>
+                        <div class="font-medium text-gray-900"><%= student.name || 'ไม่ระบุชื่อ' %></div>
+                        <div class="text-gray-500"><%= student.email || 'no-email@example.com' %></div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                    <%= student.enrolled_at ? new Date(student.enrolled_at).toLocaleDateString('th-TH') : '-' %>
+                  </td>
+
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <% const progress = student.progress || 0; %>
+                      <div class="w-full max-w-30 bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-green-500 h-2.5 rounded-full" style="width: <%= progress %>%"></div>
+                      </div>
+                      <span class="text-xs font-medium text-gray-600"><%= progress %>%</span>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+          <p class="text-sm text-gray-500">แสดง 1 ถึง <%= enrollments.length %> จาก <%= enrollments.length %> รายการ</p>
+          <div class="flex gap-2">
+            <button class="px-3 py-1 border border-gray-300 rounded text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>ก่อนหน้า</button>
+            <button class="px-3 py-1 border border-gray-300 rounded text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>ถัดไป</button>
+          </div>
+        </div>
+
+      <% } %>
+
+    </div>
+  </div>
+</section>

@@ -5,6 +5,7 @@ const lessonModel = require('../models/lessonModel');
 const quizModel = require('../models/quizModel');
 const questionModel = require('../models/questionModel');
 const choiceModel = require('../models/choiceModel');
+const enrollmentModel = require('../models/enrollmentModel');
 
 /* =========================
    DASHBOARD
@@ -14,14 +15,14 @@ exports.dashboard = async (req, res) => {
     try {
         const user_id = req.session.user.id;
         const courses = await courseModel.getByInstructor(user_id);
-        res.render('instructor', { courses });
+        res.render('instructor/courses-overview', { courses });
     } catch (err) {
         res.send(err);
     }
 };
 
 /* =========================
-   COURSE
+   COURSE CREATION
 ========================= */
 
 exports.courseCreate = async (req, res) => {
@@ -30,9 +31,7 @@ exports.courseCreate = async (req, res) => {
 
 exports.createCourse = async (req, res) => {
     try {
-
         const instructor_id = req.session.user.id;
-
         const result = await courseModel.createCourse({
             instructor_id,
             category_id: req.body.category_id,
@@ -41,25 +40,47 @@ exports.createCourse = async (req, res) => {
             course_price: req.body.course_price
         });
 
+        // สร้างเสร็จให้ไปหน้าตั้งค่า (Tab 1)
         res.redirect(`/instructor/courses/${result.course_id}/edit`);
-
     } catch (err) {
         console.error(err);
         res.status(500).send("Create Error");
     }
 };
 
-exports.getEditCourse = async (req, res) => {
+/* =========================
+   COURSE DASHBOARD TABS
+========================= */
+
+// [Tab 1] ตั้งค่าคอร์สเรียน
+exports.getCourseSettings = async (req, res) => {
     try {
         const courseId = req.params.id;
+        // ดึงแค่ข้อมูล Course พื้นฐาน
+        const course = await courseModel.getById(courseId); 
+        
+        res.render("instructor/edit-course", { course });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
 
-        const course = await courseModel.getById(courseId);
+// [Tab 2] จัดการเนื้อหา (Modules)
+exports.getCourseModules = async (req, res) => {
+    try {
+        const courseId = req.params.id;
+        
+        // 1. ดึง Course มาเพื่อแสดงชื่อที่ Header
+        const course = await courseModel.getById(courseId); 
+        
+        // 2. ดึง Modules และ Items ทั้งหมดในคอร์ส
         const modules = await moduleModel.getByCourse(courseId);
-
+        
         for (let module of modules) {
             const items = await moduleItemModel.getItemsByModule(module.module_id);
             module.items = [];
-
+            
             for (let item of items) {
                 if (item.item_type === "lesson") {
                     const lesson = await lessonModel.getById(item.item_id);
@@ -70,13 +91,12 @@ exports.getEditCourse = async (req, res) => {
                 } else if (item.item_type === "quiz") {
                     const quiz = await quizModel.getById(item.item_id);
 
-                    // 🌟 [ส่วนที่แก้ไข] ดึงคำถามและตัวเลือกของควิซนี้มาด้วย
+                    // ดึงคำถามและตัวเลือกของควิซนี้มาด้วย
                     const questions = await questionModel.getByQuiz(quiz.quiz_id) || [];
                     for (let q of questions) {
                         q.choices = await choiceModel.getByQuestion(q.question_id) || [];
                     }
-                    quiz.questions = questions; // ยัด questions ใส่เข้าไปใน object quiz
-                    // 🌟 ----------------------------------------------------
+                    quiz.questions = questions; 
 
                     module.items.push({
                         type: "quiz",
@@ -86,9 +106,10 @@ exports.getEditCourse = async (req, res) => {
             }
         }
 
+        // 3. ตรวจสอบว่ากำลังเปิดแก้ไข Lesson หรือ Quiz ตัวไหนอยู่หรือไม่
         const { type, itemId } = req.params;
         let currentItem = null;
-
+        
         if (type && itemId) {
             for (let module of modules) {
                 for (let item of module.items) {
@@ -105,7 +126,7 @@ exports.getEditCourse = async (req, res) => {
             }
         }
 
-        res.render("instructor/edit-course", {
+        res.render("instructor/course-modules", {
             course,
             modules,
             currentItem
@@ -117,17 +138,33 @@ exports.getEditCourse = async (req, res) => {
     }
 };
 
+// [Tab 3] รายชื่อนักเรียน
+exports.getCourseStudents = async (req, res) => {
+    try {
+        const courseId = req.params.id;
+        const course = await courseModel.getById(courseId);
+        
+        const enrollments = await enrollmentModel.getByCourse(courseId);
+
+        res.render("instructor/course-students", { course, enrollments });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+
+/* =========================
+   COURSE ACTIONS
+========================= */
+
 exports.updateCourse = async (req, res) => {
     try {
-
         await courseModel.updateCourse(req.params.id, {
             course_name: req.body.course_name,
             description: req.body.description,
             course_price: req.body.course_price
         });
-
         res.redirect(`/instructor/courses/${req.params.id}/edit`);
-
     } catch (err) {
         res.status(500).send("Update Error");
     }
@@ -143,12 +180,11 @@ exports.publishCourse = async (req, res) => {
 };
 
 /* =========================
-   MODULE
+   MODULE ACTIONS
 ========================= */
 
 exports.createModule = async (req, res) => {
     try {
-
         const course_id = req.params.id;
         const modules = await moduleModel.getByCourse(course_id);
         const nextOrder = modules.length + 1;
@@ -159,8 +195,8 @@ exports.createModule = async (req, res) => {
             order_index: nextOrder
         });
 
-        res.redirect(`/instructor/courses/${course_id}/edit`);
-
+        // Redirect กลับไปหน้าจัดการเนื้อหา (Tab 2)
+        res.redirect(`/instructor/courses/${course_id}/modules`);
     } catch (err) {
         res.status(500).send("Module Error");
     }
@@ -168,24 +204,22 @@ exports.createModule = async (req, res) => {
 
 exports.deleteModule = async (req, res) => {
     try {
-
         const module = await moduleModel.getById(req.params.moduleId);
         await moduleModel.deleteModule(req.params.moduleId);
 
-        res.redirect(`/instructor/courses/${module.course_id}/edit`);
-
+        // Redirect กลับไปหน้าจัดการเนื้อหา (Tab 2)
+        res.redirect(`/instructor/courses/${module.course_id}/modules`);
     } catch (err) {
         res.status(500).send("Delete Error");
     }
 };
 
 /* =========================
-   LESSON
+   LESSON ACTIONS
 ========================= */
 
 exports.createLesson = async (req, res) => {
     try {
-
         const moduleId = req.params.moduleId;
         const module = await moduleModel.getById(moduleId);
 
@@ -205,10 +239,8 @@ exports.createLesson = async (req, res) => {
             order_index: nextOrder
         });
 
-        res.redirect(
-            `/instructor/courses/${module.course_id}/edit/lesson/${lesson.lesson_id}`
-        );
-
+        // Redirect เปิดหน้า Lesson ที่เพิ่งสร้างใหม่
+        res.redirect(`/instructor/courses/${module.course_id}/modules/lesson/${lesson.lesson_id}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Lesson Error");
@@ -217,26 +249,24 @@ exports.createLesson = async (req, res) => {
 
 exports.updateLesson = async (req, res) => {
     try {
-
         await lessonModel.updateLesson(req.params.lessonId, {
             lesson_name: req.body.lesson_name,
             content: req.body.content
         });
 
-        res.redirect(`/instructor/courses/${req.params.id}/edit`);
-
+        // เซฟเสร็จแล้วเปิดหน้าเดิมค้างไว้
+        res.redirect(`/instructor/courses/${req.params.id}/modules/lesson/${req.params.lessonId}`);
     } catch (err) {
         res.status(500).send("Update Lesson Error");
     }
 };
 
 /* =========================
-   QUIZ
+   QUIZ ACTIONS
 ========================= */
 
 exports.createQuiz = async (req, res) => {
     try {
-
         const moduleId = req.params.moduleId;
         const module = await moduleModel.getById(moduleId);
 
@@ -256,10 +286,8 @@ exports.createQuiz = async (req, res) => {
             order_index: nextOrder
         });
 
-        res.redirect(
-            `/instructor/courses/${module.course_id}/edit/quiz/${quiz.quiz_id}`
-        );
-
+        // Redirect เปิดหน้า Quiz ที่เพิ่งสร้างใหม่
+        res.redirect(`/instructor/courses/${module.course_id}/modules/quiz/${quiz.quiz_id}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Quiz Error");
@@ -273,8 +301,8 @@ exports.updateQuiz = async (req, res) => {
             description: req.body.description
         });
 
-        res.redirect(`/instructor/courses/${req.params.id}/edit`);
-
+        // เซฟเสร็จแล้วเปิดหน้าเดิมค้างไว้
+        res.redirect(`/instructor/courses/${req.params.id}/modules/quiz/${req.params.quizId}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Update Quiz Error");
@@ -285,13 +313,11 @@ exports.updateQuiz = async (req, res) => {
    QUESTION & CHOICES (QUIZ)
 ========================= */
 
-// สร้างคำถามและตัวเลือก
 exports.createQuestion = async (req, res) => {
     try {
         const { id, quizId } = req.params;
         const { question_text, question_type, points, choices, correct_choice_index } = req.body;
 
-        // 1. บันทึกคำถามลง Database
         const question = await questionModel.createQuestion({
             quiz_id: quizId,
             question_text: question_text,
@@ -299,52 +325,41 @@ exports.createQuestion = async (req, res) => {
             points: points || 1
         });
 
-        // 2. บันทึกตัวเลือก (Choices) ทั้งหมดที่ถูกส่งมา
         if (choices && choices.length > 0) {
             for (let i = 0; i < choices.length; i++) {
-                // เช็คว่า choice ไหนที่ user ติ๊กให้เป็นข้อที่ถูก (เทียบ index)
                 const is_correct = (i.toString() === correct_choice_index) ? 1 : 0;
-
                 await choiceModel.createChoice({
-                    question_id: question.question_id, // ใช้ ID ของคำถามที่เพิ่งสร้าง
+                    question_id: question.question_id, 
                     choice_text: choices[i],
                     is_correct: is_correct
                 });
             }
         }
 
-        // กลับไปหน้า Edit Course และเปิดหน้า Quiz ตัวเดิมค้างไว้
-        res.redirect(`/instructor/courses/${id}/edit/quiz/${quizId}`);
-
+        // เซฟคำถามเสร็จ กลับไปหน้าแก้ Quiz
+        res.redirect(`/instructor/courses/${id}/modules/quiz/${quizId}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Create Question Error");
     }
 };
 
-// อัปเดตคำถามและตัวเลือก (Edit Question)
 exports.updateQuestion = async (req, res) => {
     try {
         const { id, quizId, questionId } = req.params;
         const { question_text, question_type, points, choices, correct_choice_index } = req.body;
 
-        // 1. อัปเดตข้อมูลตัวคำถาม (Table: questions)
         await questionModel.updateQuestion(questionId, {
             question_text: question_text,
             question_type: question_type || 'single',
             points: points || 1
         });
 
-        // 2. ลบตัวเลือก (Choices) เก่าของคำถามนี้ทิ้งให้หมดก่อน
-        // **หมายเหตุ: อย่าลืมสร้างฟังก์ชัน deleteByQuestion ไว้ใน choiceModel ด้วยนะครับ**
         await choiceModel.deleteByQuestion(questionId);
 
-        // 3. บันทึกตัวเลือกใหม่ (Choices) ที่ผู้ใช้ส่งเข้ามา
         if (choices && choices.length > 0) {
             for (let i = 0; i < choices.length; i++) {
-                // เช็คว่า choice ไหนที่ user ติ๊กให้เป็นข้อที่ถูก (เทียบ index)
                 const is_correct = (i.toString() === correct_choice_index) ? 1 : 0;
-
                 await choiceModel.createChoice({
                     question_id: questionId,
                     choice_text: choices[i],
@@ -353,26 +368,19 @@ exports.updateQuestion = async (req, res) => {
             }
         }
 
-        // 4. กลับไปหน้า Edit Course และเปิดหน้า Quiz ตัวเดิมค้างไว้
-        res.redirect(`/instructor/courses/${id}/edit/quiz/${quizId}`);
-
+        res.redirect(`/instructor/courses/${id}/modules/quiz/${quizId}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Update Question Error");
     }
 };
 
-// ลบคำถาม
 exports.deleteQuestion = async (req, res) => {
     try {
         const { id, quizId, questionId } = req.params;
 
-        // บันทึก: ใน questionModel.deleteQuestion ควรลบ choices ที่ผูกกับคำถามนี้ด้วย 
-        // หรือตั้งค่า ON DELETE CASCADE ไว้ที่ Database
         await questionModel.deleteQuestion(questionId);
-
-        res.redirect(`/instructor/courses/${id}/edit/quiz/${quizId}`);
-
+        res.redirect(`/instructor/courses/${id}/modules/quiz/${quizId}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Delete Question Error");

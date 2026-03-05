@@ -1,46 +1,60 @@
-<section id="course-header">
-    <div class="container mx-auto flex flex-col items-center md:flex-row px-6 py-12 gap-8">
-        
-        <div class="flex flex-col md:w-2/3">
-            <h1 class="text-3xl text-center font-semibold md:text-4xl md:text-left xl:text-5xl mb-4">
-                <%= course.course_name %>
-            </h1>
+<section id="course-overview" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <a href="/courses" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1">
+        <%= course.course_name %>
+      </h1>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
+      
+      <a href="/courses/<%= course.course_id %>/learn" class="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-between shadow-sm hover:border-gray-300 hover:shadow-md transition">
+        <div>
+          <p class="text-sm font-medium text-gray-500 mb-1">จำนวนบทเรียน</p>
+          <div class="flex items-baseline gap-1">
+            <h3 class="text-3xl font-bold text-gray-800"><%= stats?.moduleCount || 0 %></h3>
+            <span class="text-sm font-medium text-gray-500">บทเรียน</span>
+          </div>
         </div>
+        <div class="p-3  text-secondary rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="green" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+      </a>
+
+      <a href="/courses/<%= course.course_id %>/students" class="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-between shadow-sm hover:border-gray-300 hover:shadow-md transition">
+        <div>
+          <p class="text-sm font-medium text-gray-500 mb-1">จำนวนนักเรียน</p>
+          <div class="flex items-baseline gap-1">
+            <h3 class="text-3xl font-bold text-gray-800"><%= stats?.studentCount || 0 %></h3>
+            <span class="text-sm font-medium text-gray-500">คน</span>
+          </div>
+        </div>
+        <div class="p-3  text-blue-500 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="green" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        </div>
+      </a>
 
     </div>
-</section>
 
-<section id="course-stats">
-    <div class="container mx-auto flex flex-col items-center px-6 py-12 gap-8">
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-
-            <a href="/courses/<%= course.course_id %>/learn" class="flex flex-col p-6 bg-white border border-gray-200 rounded-lg">
-                <h1 class="text-center text-xl font-semibold md:text-left md:text-2xl mb-2">จำนวนบทเรียน</h1>
-                <p class="text-center md:text-left md:text-xl">
-                    <span class="text-4xl font-bold"><%= stats?.moduleCount || 0 %></span> บทเรียน
-                </p>
-            </a>
-
-            <a href="/courses/<%= course.course_id %>/students" class="flex flex-col p-6 bg-white border border-gray-200 rounded-lg">
-                <h1 class="text-center text-xl font-semibold md:text-left md:text-2xl mb-2">จำนวนนักเรียน</h1>
-                <p class="text-center md:text-left md:text-xl">
-                    <span class="text-4xl font-bold"><%= stats?.studentCount || 0 %></span> คน
-                </p>
-            </a>
-
-        </div>
-
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 sm:p-8">
+      <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 pb-4 border-b border-gray-100 flex items-center gap-2">
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        รายละเอียดคอร์ส
+      </h2>
+      
+      <div class="text-gray-700 text-sm sm:text-base leading-relaxed">
+        <% if (course.description) { %>
+            <%- course.description %>
+        <% } else { %>
+            <p class="text-gray-400 italic">ไม่มีรายละเอียดเพิ่มเติมสำหรับคอร์สนี้</p>
+        <% } %>
+      </div>
     </div>
-</section>
 
-<section id="course-description">
-    <div class="container mx-auto flex flex-col px-6 py-12 gap-8 max-w-4xl">
-        <h1 class="text-2xl font-semibold md:text-3xl text-center md:text-left">
-            รายละเอียดคอร์ส
-        </h1>
-        <div class="text-gray-700 text-base md:text-lg leading-relaxed md:text-left">
-            <%- course.description || 'ไม่มีรายละเอียดเพิ่มเติมสำหรับคอร์สนี้' %>
-        </div>
-    </div>
+  </div>
 </section>

@@ -9,9 +9,18 @@ const choiceModel = require('../models/choiceModel');
 
 exports.getPublishedCourses = async (req, res) => {
     try {
-        const courses = await courseModel.getAllPublished();
+        const keyword = req.query.search;
+        let courses;
+
+        if (keyword) {
+            courses = await courseModel.getByKeyword(keyword);
+        } else {
+            courses = await courseModel.getAllPublished();
+        }
+
         res.render('courses/overall', { courses });
     } catch (err) {
+        console.log(err);
         res.status(500).send("Server Error");
     }
 };

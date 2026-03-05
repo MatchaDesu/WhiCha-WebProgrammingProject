@@ -1,220 +1,216 @@
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
-<div class="h-14 bg-white border-b flex justify-between items-center px-6 text-sm text-gray-500 font-medium tracking-wide shadow-sm z-20 relative">
+<div class="h-14 bg-white border-b border-gray-200 flex justify-between items-center px-6 text-sm text-gray-600 font-medium shadow-sm z-20 relative">
   <div class="flex items-center gap-3">
-    <button onclick="toggleSidebar()" class="p-2 -ml-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition" title="ซ่อน/แสดง แถบด้านซ้าย">
+    <button onclick="toggleSidebar()" class="p-2 -ml-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-md transition" title="ซ่อน/แสดง สารบัญ">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="9" y1="3" x2="9" y2="21"></line>
       </svg>
     </button>
-    <div>
-      Student Panel <span class="mx-2 text-gray-300">/</span> Course Viewer
-    </div>
   </div>
-  <a href="/dashboard" class="text-black hover:underline font-semibold">กลับสู่หน้าหลัก</a>
+  <a href="/dashboard" class="text-gray-500 hover:text-black hover:bg-gray-50 px-3 py-1.5 rounded-md transition">
+    กลับสู่หน้าหลัก
+  </a>
 </div>
 
 <div class="flex h-[calc(100vh-3.5rem)] bg-gray-50 overflow-hidden relative">
 
-  <div id="sidebar" class="w-1/3 min-w-[320px] max-w-sm border-r border-gray-200 bg-white overflow-hidden shrink-0 transition-all duration-300 ease-in-out relative flex flex-col">
+  <aside id="sidebar" class="w-1/3 min-w-[300px] max-w-sm bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out shrink-0 relative">
     
-    <button onclick="toggleSidebar()" class="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition z-10">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-      </svg>
+    <button onclick="toggleSidebar()" class="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-md transition z-10 md:hidden">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
     </button>
 
-    <div class="w-full min-w-[320px] px-6 py-8 h-full overflow-y-auto flex flex-col">
-
-      <div class="mb-8 pb-6 border-b border-gray-200 pr-8">
-        <h1 class="text-2xl font-semibold leading-tight text-gray-900">
+    <div class="flex-1 overflow-y-auto no-scrollbar p-6">
+      
+      <div class="mb-6 pb-4 border-b border-gray-100">
+        <h1 class="text-xl font-bold text-gray-900 leading-snug pr-6">
           <%= course.course_name %>
         </h1>
-        <p class="text-sm text-gray-500 mt-2">กำลังเรียน...</p>
+        <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+          <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span> กำลังเรียน
+        </p>
       </div>
 
       <div class="flex flex-col gap-6">
         <% modules.forEach((module, index) => { %>
-        <div class="flex flex-col gap-3">
-          
-          <div class="flex items-center gap-2 px-2">
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Chapter <%= module.order_index || (index + 1) %>
-            </p>
-            <span class="h-px bg-gray-200 flex-1"></span>
-          </div>
-          
-          <p class="font-semibold text-lg px-2 text-gray-800 mb-1">
-            <%= module.module_name %>
-          </p>
-
-          <div class="flex flex-col gap-2">
-            <% module.items.forEach(item => { %>
+          <div class="flex flex-col gap-3">
             
-            <% if (item.type === "lesson") { %>
-            <a href="/courses/<%= course.course_id %>/learn/lesson/<%= item.data.lesson_id %>" class="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition rounded-2xl
-                <%= (currentItem && currentItem.type === 'lesson' && currentItem.data.lesson_id === item.data.lesson_id)
-                  ? 'border-black bg-gray-50 text-black shadow-sm'
-                  : 'border-transparent hover:border-gray-200 hover:bg-gray-50 text-gray-600' %>">
-              <span class="text-lg">📘</span> 
-              <span class="truncate"><%= item.data.lesson_name %></span>
-            </a>
-            <% } %>
+            <div class="group cursor-pointer">
+              <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                Chapter <%= module.order_index || (index + 1) %>
+              </p>
+              <h3 class="font-semibold text-gray-800 text-sm md:text-base group-hover:text-black transition">
+                <%= module.module_name %>
+              </h3>
+            </div>
 
-            <% if (item.type === "quiz") { %>
-            <a href="/courses/<%= course.course_id %>/learn/quiz/<%= item.data.quiz_id %>" class="flex items-center gap-3 border px-4 py-3 text-sm font-medium transition rounded-2xl
-                <%= (currentItem && currentItem.type === 'quiz' && currentItem.data.quiz_id === item.data.quiz_id)
-                  ? 'border-black bg-gray-50 text-black shadow-sm'
-                  : 'border-transparent hover:border-gray-200 hover:bg-gray-50 text-gray-600' %>">
-              <span class="text-lg">📝</span> 
-              <span class="truncate"><%= item.data.title %></span>
-            </a>
-            <% } %>
+            <div class="flex flex-col gap-1.5 border-l-2 border-gray-100 pl-3 ml-1">
+              <% module.items.forEach(item => { %>
+                
+                <% if (item.type === "lesson") { %>
+                  <a href="/courses/<%= course.course_id %>/learn/lesson/<%= item.data.lesson_id %>" 
+                     class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition rounded-md
+                     <%= (currentItem && currentItem.type === 'lesson' && currentItem.data.lesson_id === item.data.lesson_id)
+                       ? 'bg-gray-100 text-black shadow-sm border border-gray-200'
+                       : 'bg-transparent text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-200' %>">
+                    <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <span class="truncate"><%= item.data.lesson_name %></span>
+                  </a>
+                <% } %>
 
-            <% }) %>
+                <% if (item.type === "quiz") { %>
+                  <a href="/courses/<%= course.course_id %>/learn/quiz/<%= item.data.quiz_id %>" 
+                     class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition rounded-md
+                     <%= (currentItem && currentItem.type === 'quiz' && currentItem.data.quiz_id === item.data.quiz_id)
+                       ? 'bg-gray-100 text-black shadow-sm border border-gray-200'
+                       : 'bg-transparent text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-200' %>">
+                    <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    <span class="truncate"><%= item.data.title %></span>
+                  </a>
+                <% } %>
+
+              <% }) %>
+            </div>
+
           </div>
-
-        </div>
         <% }) %>
       </div>
 
     </div>
-  </div>
+  </aside>
 
-  <div class="flex-1 flex flex-col h-full bg-white relative transition-all duration-300">
+  <main class="flex-1 flex flex-col bg-gray-50 relative h-full transition-all duration-300 overflow-hidden">
 
     <% if (!currentItem) { %>
-    
-    <div class="flex flex-col items-center justify-center h-full text-gray-400 bg-gray-50">
-      <div class="text-6xl mb-4">👈</div>
-      <h2 class="text-2xl font-semibold text-gray-500">
-        เลือกเนื้อหาบทเรียนจากด้านซ้าย
-      </h2>
-      <p class="mt-2 text-gray-400">เพื่อเริ่มต้นการเรียนรู้ของคุณ</p>
-    </div>
+      <div class="flex flex-col items-center justify-center h-full text-center px-4">
+        <div class="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center shadow-sm mb-4 text-gray-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800">เริ่มการเรียนรู้ของคุณ</h2>
+        <p class="text-gray-500 mt-2 max-w-sm">เลือกบทเรียนหรือแบบทดสอบจากสารบัญด้านซ้ายเพื่อแสดงเนื้อหาที่นี่</p>
+      </div>
 
     <% } else if (currentItem.type === "lesson") { %>
-
-    <div class="bg-white border-b px-8 py-6 flex justify-between items-center z-10 shrink-0 shadow-sm">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-          Lesson
-        </p>
-        <h2 class="text-2xl font-semibold text-gray-900">
-          <%= currentItem.data.lesson_name %>
-        </h2>
+      
+      <div class="bg-white border-b border-gray-200 px-6 sm:px-10 py-5 shrink-0 shadow-sm z-10">
+        <div class="max-w-4xl mx-auto">
+          <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Lesson</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900"><%= currentItem.data.lesson_name %></h2>
+        </div>
       </div>
-    </div>
 
-    <div class="flex-1 overflow-y-auto bg-gray-50 p-8">
-      <div class="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-2xl p-8 min-h-full">
-        <div id="viewer" data-content="<%- currentItem.data.content || '' %>"></div>
+      <div class="flex-1 overflow-y-auto p-4 sm:p-8">
+        <div class="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-xl p-6 sm:p-10 min-h-full">
+          <div id="viewer" data-content="<%- currentItem.data.content || '' %>" class="prose max-w-none"></div>
+        </div>
       </div>
-    </div>
 
     <% } else if (currentItem.type === "quiz") { %>
-
-    <div class="bg-white border-b px-8 py-6 flex flex-col justify-center z-10 shrink-0 shadow-sm">
-      <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-        Quiz Assessment
-      </p>
-      <h2 class="text-2xl font-semibold text-gray-900">
-        <%= currentItem.data.title %>
-      </h2>
-    </div>
-
-    <div class="flex-1 overflow-y-auto bg-gray-50 p-8">
       
-      <form action="/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/submit" method="POST" class="max-w-3xl mx-auto flex flex-col gap-6">
-        
-        <% if (currentItem.data.description) { %>
-        <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
-          <p class="text-gray-600 text-sm leading-relaxed">
-            <span class="font-semibold text-black">คำชี้แจง:</span> <%= currentItem.data.description %>
-          </p>
-        </div>
-        <% } %>
-
-        <% if (!currentItem.data.questions || currentItem.data.questions.length === 0) { %>
-        <div class="text-center py-16 border-2 border-dashed border-gray-300 bg-white rounded-2xl">
-          <p class="text-gray-500 font-medium">ยังไม่มีคำถามในแบบทดสอบนี้</p>
-        </div>
-        <% } else { %>
-
-        <div class="flex flex-col gap-6">
-          <% currentItem.data.questions.forEach((q, index) => { %>
-          <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
-            
-            <div class="flex gap-4">
-              <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center font-semibold text-gray-600">
-                <%= index + 1 %>
-              </div>
-              <h4 class="font-semibold text-gray-800 text-lg pt-1">
-                <%= q.question_text %>
-              </h4>
-            </div>
-
-            <div class="ml-12 flex flex-col gap-3">
-              <% if (q.choices && q.choices.length > 0) { %>
-                <% q.choices.forEach((choice) => { %>
-                <label class="flex items-center gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-black transition group">
-                  <input type="radio" name="answers[<%= q.question_id %>]" value="<%= choice.choice_id %>" required class="w-5 h-5 accent-black">
-                  <span class="text-gray-700 text-sm font-medium group-hover:text-black">
-                    <%= choice.choice_text %>
-                  </span>
-                </label>
-                <% }) %>
-              <% } else { %>
-                <p class="text-sm text-red-500">เกิดข้อผิดพลาด: ไม่พบตัวเลือกสำหรับคำถามนี้</p>
-              <% } %>
-            </div>
-
+      <div class="bg-white border-b border-gray-200 px-6 sm:px-10 py-5 shrink-0 shadow-sm z-10">
+        <div class="max-w-3xl mx-auto flex items-center justify-between">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">Quiz Assessment</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900"><%= currentItem.data.title %></h2>
           </div>
-          <% }) %>
+          <div class="hidden sm:block text-right">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <%= currentItem.data.questions ? currentItem.data.questions.length : 0 %> คำถาม
+            </span>
+          </div>
         </div>
+      </div>
 
-        <div class="flex justify-end pt-4 pb-10">
-          <button type="submit" class="px-8 py-3 bg-black text-white font-semibold hover:opacity-80 transition shadow-md rounded-xl text-lg">
-            ส่งคำตอบ
-          </button>
-        </div>
+      <div class="flex-1 overflow-y-auto p-4 sm:p-8">
+        <form action="/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/submit" method="POST" class="max-w-3xl mx-auto flex flex-col gap-6">
+          
+          <% if (currentItem.data.description) { %>
+            <div class="bg-white border border-gray-200 p-5 sm:p-6 rounded-xl shadow-sm">
+              <h3 class="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                คำชี้แจง
+              </h3>
+              <p class="text-gray-600 text-sm leading-relaxed"><%= currentItem.data.description %></p>
+            </div>
+          <% } %>
 
-        <% } %>
+          <% if (!currentItem.data.questions || currentItem.data.questions.length === 0) { %>
+            <div class="text-center py-16 bg-white border border-gray-200 rounded-xl shadow-sm">
+              <p class="text-gray-500 font-medium">ยังไม่มีคำถามในแบบทดสอบนี้</p>
+            </div>
+          <% } else { %>
 
-      </form>
-    </div>
+            <div class="flex flex-col gap-6">
+              <% currentItem.data.questions.forEach((q, index) => { %>
+                <div class="bg-white border border-gray-200 p-6 sm:p-8 rounded-xl shadow-sm">
+                  
+                  <div class="flex gap-4 mb-5">
+                    <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-700">
+                      <%= index + 1 %>
+                    </div>
+                    <h4 class="font-semibold text-gray-900 text-base sm:text-lg pt-1 leading-snug">
+                      <%= q.question_text %>
+                    </h4>
+                  </div>
+
+                  <div class="ml-0 sm:ml-12 flex flex-col gap-3">
+                    <% if (q.choices && q.choices.length > 0) { %>
+                      <% q.choices.forEach((choice) => { %>
+                        <label class="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition group has-[:checked]:border-black has-[:checked]:bg-gray-50">
+                          <input type="radio" name="answers[<%= q.question_id %>]" value="<%= choice.choice_id %>" required class="w-4 h-4 mt-0.5 text-black border-gray-300 focus:ring-black">
+                          <span class="text-gray-700 text-sm font-medium group-hover:text-black">
+                            <%= choice.choice_text %>
+                          </span>
+                        </label>
+                      <% }) %>
+                    <% } else { %>
+                      <p class="text-sm text-red-500 bg-red-50 p-3 rounded-md border border-red-100">เกิดข้อผิดพลาด: ไม่พบตัวเลือกสำหรับคำถามนี้</p>
+                    <% } %>
+                  </div>
+
+                </div>
+              <% }) %>
+            </div>
+
+            <div class="flex justify-end pt-4 pb-12">
+              <button type="submit" class="px-6 py-2.5 bg-black text-white font-medium hover:bg-gray-800 transition rounded-lg shadow-sm">
+                ส่งคำตอบ
+              </button>
+            </div>
+
+          <% } %>
+
+        </form>
+      </div>
 
     <% } %>
 
-  </div>
-
+  </main>
 </div>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-
 <script>
-  // ฟังก์ชันสำหรับเปิดปิด Sidebar
   function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
+    // ใช้เทคนิคการสลับคลาสแบบง่ายๆ แทน
+    sidebar.classList.toggle('-ml-[100%]'); // เลื่อนหายไปทางซ้ายสุด
+    sidebar.classList.toggle('md:ml-0');    // (ถ้าต้องการจัดการ responsive ด้วย)
     
-    // ตรวจสอบว่ามีคลาส w-0 (กำลังซ่อนอยู่) หรือไม่
-    if (sidebar.classList.contains('w-0')) {
-      // แสดง Sidebar
-      sidebar.classList.remove('w-0', 'min-w-0', 'border-transparent');
-      sidebar.classList.add('w-1/3', 'min-w-[320px]', 'max-w-sm', 'border-r');
+    // แบบที่คุณเขียนมาก็ใช้ได้ ผมปรับนิดหน่อยให้ animation smooth ขึ้น
+    if (sidebar.style.width === '0px' || sidebar.classList.contains('w-0')) {
+      sidebar.classList.remove('w-0', 'min-w-0', 'border-transparent', 'px-0');
+      sidebar.classList.add('w-1/3', 'min-w-[300px]', 'max-w-sm', 'border-r');
     } else {
-      // ซ่อน Sidebar
-      sidebar.classList.remove('w-1/3', 'min-w-[320px]', 'max-w-sm', 'border-r');
-      sidebar.classList.add('w-0', 'min-w-0', 'border-transparent');
+      sidebar.classList.remove('w-1/3', 'min-w-[300px]', 'max-w-sm', 'border-r');
+      sidebar.classList.add('w-0', 'min-w-0', 'border-transparent', 'px-0');
     }
   }
 
   document.addEventListener("DOMContentLoaded", function() {
     const viewerEl = document.querySelector('#viewer');
-
     if (viewerEl) {
-      // render toast UI viewer
       toastui.Editor.factory({
         el: viewerEl,
         viewer: true,

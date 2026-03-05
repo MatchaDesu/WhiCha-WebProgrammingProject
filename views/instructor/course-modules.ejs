@@ -1,0 +1,110 @@
+<section id="course-dashboard" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <a href="/instructor" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1">
+          <%= course.course_name %>
+        </h1>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-t-lg border-b border-gray-200 px-2 sm:px-6 shadow-sm overflow-x-auto no-scrollbar">
+      <nav class="flex gap-6 min-w-max" aria-label="Tabs">
+        <a href="/instructor/courses/<%= course.course_id %>/edit" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">
+          ตั้งค่าคอร์สเรียน
+        </a>
+        <a href="/instructor/courses/<%= course.course_id %>/modules" class="border-b-2 border-black py-4 px-2 text-sm md:text-base font-semibold text-black whitespace-nowrap">
+          จัดการเนื้อหา
+        </a>
+        <a href="/instructor/courses/<%= course.course_id %>/students" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">
+          รายชื่อนักเรียน
+        </a>
+      </nav>
+    </div>
+
+    <div class="bg-white rounded-b-lg shadow-sm p-4 sm:p-6 lg:p-8">
+      
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">โครงสร้างหลักสูตร</h2>
+          <p class="text-sm text-gray-500 mt-1">เพิ่มบทเรียน (Module) และเนื้อหาย่อย (Lesson) ของคุณที่นี่</p>
+        </div>
+        <button class="w-full sm:w-auto px-6 py-2.5 bg-secondary text-white font-semibold rounded-lg shadow-md hover:opacity-80 transition flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          เพิ่มบทเรียนใหม่
+        </button>
+      </div>
+
+      <% if (!modules || modules.length === 0) { %>
+        <div class="text-center py-16 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+          <p class="text-gray-500 mb-4">คอร์สนี้ยังไม่มีเนื้อหา</p>
+          <button class="text-secondary font-semibold hover:underline">คลิกที่นี่เพื่อสร้างบทเรียนแรก</button>
+        </div>
+      <% } else { %>
+        
+        <div class="flex flex-col gap-6">
+          <% modules.forEach((module, index) => { %>
+            <div class="border border-gray-200 rounded-lg overflow-hidden bg-white">
+              
+              <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 flex-1">
+                  <div class="cursor-grab text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                  </div>
+                  <h3 class="font-semibold text-gray-800 text-lg line-clamp-1">
+                    บทที่ <%= index + 1 %>: <%= module.module_name %>
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button class="text-gray-500 hover:text-blue-600 p-1" title="แก้ไขชื่อบท">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  </button>
+                  <button class="text-gray-500 hover:text-red-600 p-1" title="ลบบทเรียน">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-2 sm:p-4">
+                <% if (!module.lessons || module.lessons.length === 0) { %>
+                  <p class="text-sm text-gray-400 text-center py-4">ยังไม่มีเนื้อหาย่อยในบทนี้</p>
+                <% } else { %>
+                  <div class="flex flex-col gap-2">
+                    <% module.lessons.forEach((lesson, l_index) => { %>
+                      <div class="flex items-center justify-between p-3 bg-white border border-gray-100 hover:border-gray-300 hover:shadow-sm transition rounded-md group">
+                        <div class="flex items-center gap-3 flex-1 overflow-hidden">
+                          <div class="text-secondary bg-orange-50 p-2 rounded-md shrink-0">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                          </div>
+                          <span class="text-gray-700 font-medium text-sm sm:text-base truncate">
+                            <%= index + 1 %>.<%= l_index + 1 %> <%= lesson.lesson_name %>
+                          </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 opacity-100 lg:opacity-50 group-hover:opacity-100 transition pl-2">
+                          <button class="text-xs font-semibold px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition">จัดการ</button>
+                        </div>
+                      </div>
+                    <% }) %>
+                  </div>
+                <% } %>
+
+                <button class="mt-3 w-full py-2 border-2 border-dashed border-gray-200 text-gray-500 font-medium text-sm rounded-md hover:border-gray-400 hover:text-gray-700 transition flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                  เพิ่มเนื้อหาย่อย
+                </button>
+              </div>
+
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+</section>

@@ -68,6 +68,26 @@ exports.getById = (course_id) => {
     });
 };
 
+exports.getByKeyword = (keyword) => {
+    return new Promise((resolve, reject) => {
+
+        const sql = `
+            SELECT c.*,
+            u.username AS instructor_name,
+            u.profile_image AS instructor_profile
+            FROM courses c
+            JOIN users u ON c.instructor_id = u.user_id
+            WHERE course_name LIKE ?;
+            AND c.deleted_at IS NULL
+        `;
+
+        db.all(sql, ['%'+keyword+'%'], (err, row) => {
+            if (err) return reject(err);
+            resolve(row);
+        });
+    });
+};
+
 exports.updateCourse = (course_id, course) => {
     return new Promise((resolve, reject) => {
 
