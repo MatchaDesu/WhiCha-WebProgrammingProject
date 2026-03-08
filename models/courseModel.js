@@ -77,11 +77,12 @@ exports.getByKeyword = (keyword) => {
             u.profile_image AS instructor_profile
             FROM courses c
             JOIN users u ON c.instructor_id = u.user_id
-            WHERE course_name LIKE ?;
+            WHERE course_name LIKE ?
             AND c.deleted_at IS NULL
+            AND c.course_status = 'published'
         `;
 
-        db.all(sql, ['%'+keyword+'%'], (err, row) => {
+        db.all(sql, ['%' + keyword + '%'], (err, row) => {
             if (err) return reject(err);
             resolve(row);
         });

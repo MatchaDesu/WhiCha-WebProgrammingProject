@@ -64,8 +64,10 @@ exports.getCourseProgress = (user_id, course_id) => {
       LEFT JOIN lesson_progress lp
         ON l.lesson_id = lp.lesson_id
         AND lp.user_id = ?
-      WHERE l.course_id = ?
-      AND l.deleted_at IS NULL
+      FROM lessons l
+      JOIN modules m ON l.module_id = m.module_id
+      LEFT JOIN lesson_progress lp ON l.lesson_id = lp.lesson_id AND lp.user_id = ?
+      WHERE m.course_id = ?
     `;
 
     db.get(sql, [user_id, course_id], (err, row) => {

@@ -69,20 +69,30 @@ exports.deleteModule = (module_id) => {
 exports.reorderModule = (course_id, bulkUpdate) => {
   return new Promise((resolve, reject) => {
 
-    const stmt = db.prepare(`
-      UPDATE modules
-      SET order_index = ?
-      WHERE module_id = ?
-      AND course_id = ?
-    `);
-
     db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+
+      const stmt = db.prepare(`
+        UPDATE modules
+        SET order_index = ?
+        WHERE module_id = ?
+        AND course_id = ?
+      `);
+
+      let hasError = false;
+
       bulkUpdate.forEach(item => {
-        stmt.run(item.order_index, item.module_id, course_id);
+        stmt.run(item.order_index, item.module_id, course_id, (err) => {
+          if (err) hasError = true;
+        });
       });
 
-      stmt.finalize(err => {
-        if (err) return reject(err);
+      stmt.finalize((err) => {
+        if (err || hasError) {
+          db.run('ROLLBACK');
+          return reject(err || new Error('Reorder failed'));
+        }
+        db.run('COMMIT');
         resolve(true);
       });
     });

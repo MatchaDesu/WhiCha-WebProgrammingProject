@@ -1,60 +1,120 @@
-<section id="students-header">
-    <div class="container mx-auto flex flex-col px-6 py-12 gap-4">
-        <h1 class="text-3xl text-center font-semibold md:text-4xl md:text-left xl:text-5xl">
-            เพื่อนร่วมคอร์ส
-        </h1>
-        <p class="text-center text-gray-600 md:text-xl md:text-left">
-            ทำความรู้จักกับผู้เรียนที่กำลังศึกษาคอร์ส "<%= course.course_name %>" ไปพร้อมกับคุณ
-        </p>
-    </div>
-</section>
+<section class="bg-gray-50 min-h-screen pb-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
-<section id="students-list">
-    <div class="container mx-auto flex flex-col px-6 py-12 gap-8">
-        
-        <div class="flex justify-between items-center">
-            <h2 class="text-2xl font-semibold md:text-3xl">
-                รายชื่อนักเรียน (<%= enrollments ? enrollments.length : 0 %> คน)
-            </h2>
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-1">
+        <a href="/courses/<%= course.course_id %>/dashboard" class="text-sm text-gray-500 hover:text-gray-800 transition font-medium flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+          กลับ
+        </a>
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900">เพื่อนร่วมคอร์ส</h1>
+      <p class="text-gray-500 mt-1.5 text-sm md:text-base">
+        ผู้เรียนที่กำลังศึกษาคอร์ส
+        <span class="font-semibold text-gray-800">"<%= course.course_name %>"</span>
+        ไปพร้อมกับคุณ
+      </p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-4 flex items-center gap-4">
+        <div class="p-2.5 bg-orange-50 rounded-xl text-orange-500 shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </div>
-
-        <% if (typeof enrollments !== 'undefined' && enrollments.length > 0) { %>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                
-                <% enrollments.forEach(student => { %>
-                    <a href="/users/<%= student.user_id %>" class="flex items-center gap-4 p-6 bg-white border border-gray-200 rounded-lg hover:border-black transition">
-                        
-                        <div class="w-16 h-16 shrink-0">
-                            <img src="<%= student.profile_image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.username || 'User') + '&background=random' %>" 
-                                 alt="<%= student.username %>"
-                                 class="w-full h-full rounded-full object-cover border border-gray-200">
-                        </div>
-
-                        <div class="flex flex-col">
-                            <h3 class="text-lg font-semibold text-gray-900">
-                                <%= student.username || 'นักเรียนไม่ระบุชื่อ' %>
-                            </h3>
-                            <p class="text-sm text-gray-500">
-                                เข้าร่วมเมื่อ: <%= student.enrolled_at || 'ไม่ระบุ' %>
-                            </p>
-                        </div>
-
-                    </a>
-                <% }) %>
-
-            </div>
-        <% } else { %>
-            
-            <div class="flex flex-col items-center justify-center py-16 border border-dashed border-gray-300 rounded-lg bg-gray-50">
-                <p class="text-xl text-gray-500 text-center">
-                    ยังไม่มีผู้เรียนในคอร์สนี้
-                </p>
-                <p class="text-gray-400 mt-2 text-center">
-                    คุณคือคนแรก! รีบเข้าไปลุยเนื้อหาได้เลย
-                </p>
-            </div>
-
-        <% } %>
-
+        <div>
+          <p class="text-2xl font-bold text-gray-900"><%= enrollments ? enrollments.length : 0 %></p>
+          <p class="text-xs text-gray-500 font-medium">ผู้เรียนทั้งหมด</p>
+        </div>
+      </div>
     </div>
+
+    <!-- Search -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-3 mb-6">
+      <div class="relative flex items-center">
+        <svg class="w-4 h-4 absolute left-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input
+          type="text"
+          id="student-search"
+          placeholder="ค้นหาชื่อผู้เรียน..."
+          class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition"
+        >
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <% if (!enrollments || enrollments.length === 0) { %>
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-14 text-center">
+        <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-400">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </div>
+        <p class="text-gray-700 font-semibold mb-1">ยังไม่มีผู้เรียน</p>
+        <p class="text-sm text-gray-400">คุณอาจเป็นคนแรกที่ลงทะเบียน!</p>
+      </div>
+
+    <% } else { %>
+      <!-- Students Grid -->
+      <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <% enrollments.forEach(student => { %>
+          <a href="/users/<%= student.user_id %>"
+             data-name="<%= (student.first_name || '') + ' ' + (student.last_name || '') + ' ' + (student.username || '') %>"
+             class="student-card flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-gray-300 transition group">
+
+            <!-- Avatar -->
+            <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-200 border border-gray-100">
+              <img
+                src="<%= student.profile_image %>"
+                alt="<%= student.username %>"
+                class="w-full h-full object-cover"
+              >
+            </div>
+
+            <!-- Info -->
+            <div class="flex flex-col min-w-0">
+              <h3 class="text-sm font-bold text-gray-900 truncate group-hover:text-black transition">
+                <%= (student.first_name && student.last_name) ? (student.first_name + ' ' + student.last_name) : (student.username || 'ไม่ระบุชื่อ') %>
+              </h3>
+              <p class="text-xs text-gray-400 truncate">@<%= student.username || '-' %></p>
+              <p class="text-[11px] text-gray-400 mt-0.5">
+                เข้าร่วม
+                <%= student.enrolled_at ? new Date(student.enrolled_at).toLocaleDateString('th-TH') : '-' %>
+              </p>
+            </div>
+
+          </a>
+        <% }) %>
+      </div>
+
+      <!-- No Result -->
+      <div id="no-result" class="hidden text-center py-12">
+        <p class="text-gray-500 font-medium">ไม่พบผู้เรียนที่ค้นหา</p>
+      </div>
+
+    <% } %>
+
+  </div>
 </section>
+
+<script>
+  const searchInput = document.getElementById('student-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const keyword = this.value.toLowerCase().trim();
+      const cards   = document.querySelectorAll('.student-card');
+      let count = 0;
+
+      cards.forEach(card => {
+        const name = (card.dataset.name || '').toLowerCase();
+        const show = !keyword || name.includes(keyword);
+        card.parentElement.style.display = show ? '' : 'none';
+        if (show) count++;
+      });
+
+      const noResult = document.getElementById('no-result');
+      if (noResult) noResult.classList.toggle('hidden', count > 0);
+    });
+  }
+</script>

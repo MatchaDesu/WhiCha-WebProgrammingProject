@@ -57,8 +57,8 @@ exports.getCourseSettings = async (req, res) => {
     try {
         const courseId = req.params.id;
         // ดึงแค่ข้อมูล Course พื้นฐาน
-        const course = await courseModel.getById(courseId); 
-        
+        const course = await courseModel.getById(courseId);
+
         res.render("instructor/edit-course", { course });
     } catch (err) {
         console.error(err);
@@ -70,71 +70,83 @@ exports.getCourseSettings = async (req, res) => {
 exports.getCourseModules = async (req, res) => {
     try {
         const courseId = req.params.id;
-        
-        // 1. ดึง Course มาเพื่อแสดงชื่อที่ Header
-        const course = await courseModel.getById(courseId); 
-        
-        // 2. ดึง Modules และ Items ทั้งหมดในคอร์ส
-        const modules = await moduleModel.getByCourse(courseId);
-        
-        for (let module of modules) {
-            const items = await moduleItemModel.getItemsByModule(module.module_id);
-            module.items = [];
-            
-            for (let item of items) {
-                if (item.item_type === "lesson") {
-                    const lesson = await lessonModel.getById(item.item_id);
-                    module.items.push({
-                        type: "lesson",
-                        data: lesson
-                    });
-                } else if (item.item_type === "quiz") {
-                    const quiz = await quizModel.getById(item.item_id);
+        const { type, itemId } = req.params;
 
-                    // ดึงคำถามและตัวเลือกของควิซนี้มาด้วย
+        const course  = await courseModel.getById(courseId);
+        const modules = await moduleModel.getByCourse(courseId);
+
+        // Build items for each module
+        for (let module of modules) {
+            const items  = await moduleItemModel.getItemsByModule(module.module_id);
+            module.items = [];
+
+            for (let item of items) {
+                if (item.item_type === 'lesson') {
+                    const lesson = await lessonModel.getById(item.item_id);
+                    module.items.push({ type: 'lesson', data: lesson });
+
+                } else if (item.item_type === 'quiz') {
+                    const quiz      = await quizModel.getById(item.item_id);
                     const questions = await questionModel.getByQuiz(quiz.quiz_id) || [];
+
                     for (let q of questions) {
                         q.choices = await choiceModel.getByQuestion(q.question_id) || [];
                     }
-                    quiz.questions = questions; 
+                    quiz.questions = questions;
 
-                    module.items.push({
-                        type: "quiz",
-                        data: quiz
-                    });
+                    module.items.push({ type: 'quiz', data: quiz });
                 }
             }
         }
 
-        // 3. ตรวจสอบว่ากำลังเปิดแก้ไข Lesson หรือ Quiz ตัวไหนอยู่หรือไม่
-        const { type, itemId } = req.params;
+        // ถ้าไม่มี type/itemId → หน้า module list ปกติ
+        if (!type || !itemId) {
+            return res.render('instructor/course-modules', { course, modules, currentItem: null });
+        }
+
+        // หา currentItem ที่ตรงกับ type + itemId
         let currentItem = null;
-        
-        if (type && itemId) {
-            for (let module of modules) {
-                for (let item of module.items) {
-                    if (
-                        item.type === type &&
-                        (
-                            (type === "lesson" && item.data.lesson_id == itemId) ||
-                            (type === "quiz" && item.data.quiz_id == itemId)
-                        )
-                    ) {
-                        currentItem = item;
-                    }
+        for (let module of modules) {
+            for (let item of module.items) {
+                if (
+                    item.type === type &&
+                    (
+                        (type === 'lesson' && item.data.lesson_id == itemId) ||
+                        (type === 'quiz'   && item.data.quiz_id   == itemId)
+                    )
+                ) {
+                    currentItem = item;
+                    break;
                 }
             }
+            if (currentItem) break;
         }
 
-        res.render("instructor/course-modules", {
-            course,
-            modules,
-            currentItem
-        });
+        // Render ไฟล์ตาม type
+        if (type === 'lesson') {
+            return res.render('instructor/lesson-editor', { course, modules, currentItem });
+        } else if (type === 'quiz') {
+            return res.render('instructor/quiz-editor', { course, modules, currentItem });
+        }
+
+        // fallback
+        return res.render('instructor/course-modules', { course, modules, currentItem });
 
     } catch (err) {
         console.error(err);
-        res.status(500).send("Server Error");
+        res.status(500).send('Server Error');
+    }
+};
+
+
+exports.updateModule = async (req, res) => {
+    try {
+        await moduleModel.updateModule(req.params.moduleId, {
+            module_name: req.body.module_name
+        });
+        res.redirect(`/instructor/courses/${req.params.id}/modules`);
+    } catch (err) {
+        res.status(500).send("Update Module Error");
     }
 };
 
@@ -143,7 +155,7 @@ exports.getCourseStudents = async (req, res) => {
     try {
         const courseId = req.params.id;
         const course = await courseModel.getById(courseId);
-        
+
         const enrollments = await enrollmentModel.getByCourse(courseId);
 
         res.render("instructor/course-students", { course, enrollments });
@@ -225,7 +237,7 @@ exports.createLesson = async (req, res) => {
 
         const lesson = await lessonModel.createLesson({
             module_id: module.module_id,
-            lesson_name: "New Lesson",
+            lesson_name: req.body.lesson_name || "New Lesson",
             content: ""
         });
 
@@ -272,8 +284,8 @@ exports.createQuiz = async (req, res) => {
 
         const quiz = await quizModel.createQuiz({
             module_id: module.module_id,
-            title: "New Quiz",
-            description: ""
+            title: req.body.title || "New Quiz",
+            description: req.body.description || ""
         });
 
         const items = await moduleItemModel.getItemsByModule(moduleId);
@@ -329,7 +341,7 @@ exports.createQuestion = async (req, res) => {
             for (let i = 0; i < choices.length; i++) {
                 const is_correct = (i.toString() === correct_choice_index) ? 1 : 0;
                 await choiceModel.createChoice({
-                    question_id: question.question_id, 
+                    question_id: question.question_id,
                     choice_text: choices[i],
                     is_correct: is_correct
                 });

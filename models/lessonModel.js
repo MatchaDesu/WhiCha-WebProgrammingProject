@@ -47,6 +47,24 @@ exports.getById = (lesson_id) => {
   });
 };
 
+exports.getByCourse = function(courseId) {
+    return new Promise((resolve, reject) => {
+        // ดึงบทเรียนทั้งหมดที่อยู่ใน Modules ของ Course นี้
+        const sql = `
+            SELECT l.lesson_id, l.lesson_name AS name, m.module_name
+            FROM lessons l
+            JOIN modules m ON l.module_id = m.module_id
+            WHERE m.course_id = ?
+            ORDER BY m.order_index ASC, l.lesson_id ASC
+        `;
+        
+        db.all(sql, [courseId], (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows); // จะได้ Array ของบทเรียนกลับไป
+        });
+    });
+};
+
 exports.getByModule = (module_id) => {
   return new Promise((resolve, reject) => {
 

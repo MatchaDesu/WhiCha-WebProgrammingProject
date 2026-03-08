@@ -28,13 +28,21 @@ exports.getPublishedCourses = async (req, res) => {
 exports.getCourse = async (req, res) => {
     try {
         const courseId = req.params.courseId;
-        const userId = req.session.user.id;
 
         const course = await courseModel.getById(courseId);
-        const isEnrolled = await enrollmentModel.isEnrolled(userId, courseId)
+        const lessons = await lessonModel.getByCourse(courseId);
 
-        res.render('courses/detail', { course, isEnrolled });
+        let isEnrolled = false;
+        if (req.session && req.session.user) {
+            const userId = req.session.user.id;
+            isEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
+        }
+
+        // 4. ส่งข้อมูลทั้งหมดไปที่ View (สังเกตว่ามีการส่ง lessons ไปด้วยแล้ว!)
+        res.render('courses/detail', { course, isEnrolled, lessons });
+        
     } catch (err) {
+        console.error("Error in getCourse:", err);
         res.status(500).send("Server Error");
     }
 };

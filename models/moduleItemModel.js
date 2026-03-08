@@ -35,20 +35,30 @@ exports.updateItem = (item_id, { item_type, ref_id }) => {
 exports.reorderItems = (module_id, bulkUpdate) => {
   return new Promise((resolve, reject) => {
 
-    const stmt = db.prepare(`
-      UPDATE modules_items
-      SET order_index = ?
-      WHERE item_id = ?
-      AND module_id = ?
-    `);
-
     db.serialize(() => {
+      db.run('BEGIN TRANSACTION');
+
+      const stmt = db.prepare(`
+        UPDATE modules_items
+        SET order_index = ?
+        WHERE module_item_id = ?
+        AND module_id = ?
+      `);
+
+      let hasError = false;
+
       bulkUpdate.forEach(item => {
-        stmt.run(item.order_index, item.item_id, module_id);
+        stmt.run(item.order_index, item.module_item_id, module_id, (err) => {
+          if (err) hasError = true;
+        });
       });
 
-      stmt.finalize(err => {
-        if (err) return reject(err);
+      stmt.finalize((err) => {
+        if (err || hasError) {
+          db.run('ROLLBACK');
+          return reject(err || new Error('Reorder failed'));
+        }
+        db.run('COMMIT');
         resolve(true);
       });
     });
@@ -59,9 +69,8 @@ exports.removeItem = (item_id) => {
   return new Promise((resolve, reject) => {
 
     const sql = `
-      UPDATE modules_items
-      SET deleted_at = CURRENT_TIMESTAMP
-      WHERE item_id = ?
+      DELETE FROM modules_items
+      WHERE module_item_id = ?
     `;
 
     db.run(sql, [item_id], function (err) {

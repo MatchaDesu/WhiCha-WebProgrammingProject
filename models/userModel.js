@@ -64,6 +64,36 @@ exports.updateProfile = (id, path) => {
   });
 };
 
+exports.updateUserInfo = (id, data) => {
+  return new Promise((resolve, reject) => {
+
+    const { username, first_name, last_name, email, phone } = data;
+
+    const sql = `UPDATE users 
+                 SET username = ?, first_name = ?, last_name = ?, email = ?, phone = ?
+                 WHERE user_id = ?`;
+
+    db.run(sql, [username, first_name, last_name, email, phone, id], function (err) {
+      if (err) return reject(err);
+      resolve({ changes: this.changes });
+    });
+  });
+}
+
+exports.updateUserPassword = (id, password) => {
+  return new Promise((resolve, reject) => {
+
+    const sql = `UPDATE users 
+                 SET password = ?
+                 WHERE user_id = ?`;
+
+    db.run(sql, [password, id], function (err) {
+      if (err) return reject(err);
+      resolve({ changes: this.changes });
+    });
+  });
+}
+
 exports.softDelete = (id) => {
   return new Promise((resolve, reject) => {
 

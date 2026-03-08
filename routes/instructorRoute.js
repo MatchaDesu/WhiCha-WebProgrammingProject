@@ -29,6 +29,7 @@ router.get('/courses/:id/students', instructorController.getCourseStudents);
 // Module Management (API/Action)
 // ==========================================
 router.post('/courses/:id/modules/create', instructorController.createModule);
+router.post('/courses/:id/modules/:moduleId/update', instructorController.updateModule);
 router.post('/courses/:id/modules/:moduleId/delete', instructorController.deleteModule);
 
 // ==========================================

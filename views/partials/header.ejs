@@ -16,9 +16,9 @@
                 <div class="hidden lg:flex gap-2">
                     <a href="/" class="navbar-item">หน้าแรก</a>
                     <a href="/courses" class="navbar-item">เลือกดูคอร์ส</a>
-                    <a href="#" class="navbar-item">การเรียนของฉัน</a>
+                    <a href="/my-learning" class="navbar-item">การเรียนของฉัน</a>
                     <a href="/about-us" class="navbar-item">เกี่ยวกับเรา</a>
-                    <a href="#" class="navbar-item">คู่มือ</a>
+                    <a href="/tutorial" class="navbar-item">คู่มือ</a>
                     <% if (user.role == 'instructor') {%>
                         <a href="/instructor" class="navbar-item text-secondary">หน้าต่างผู้สอน</a>
                     <% } %>
@@ -36,9 +36,9 @@
                         class="dropdown-menu hidden">
                         <a href="/users/<%= user.user_id %>" class="dropdown-item">โปรไฟล์</a>
                         <a href="/courses" class="dropdown-item">เลือกดูคอร์ส</a>
-                        <a href="#" class="dropdown-item">การเรียนของฉัน</a>
+                        <a href="/my-learning" class="dropdown-item">การเรียนของฉัน</a>
                         <a href="/about-us" class="dropdown-item">เกี่ยวกับเรา</a>
-                        <a href="#" class="dropdown-item">คู่มือ</a>
+                        <a href="/tutorial" class="dropdown-item">คู่มือ</a>
 
                         <% if (user.role == 'instructor') {%>
                             <a href="/instructor" class="dropdown-item text-secondary">หน้าต่างสอน</a>

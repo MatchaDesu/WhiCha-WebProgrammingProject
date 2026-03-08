@@ -1,0 +1,500 @@
+<section id="course-dashboard" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <!-- Back + Title -->
+    <div class="mb-6">
+      <a href="/instructor/courses" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1"><%= course.course_name %></h1>
+    </div>
+
+    <!-- Tab Nav -->
+    <div class="bg-white rounded-t-lg border-b border-gray-200 px-2 sm:px-6 shadow-sm overflow-x-auto no-scrollbar">
+      <nav class="flex gap-6 min-w-max">
+        <a href="/instructor/courses/<%= course.course_id %>/edit" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">ตั้งค่าคอร์สเรียน</a>
+        <a href="/instructor/courses/<%= course.course_id %>/modules" class="border-b-2 border-black py-4 px-2 text-sm md:text-base font-semibold text-black whitespace-nowrap">จัดการเนื้อหา</a>
+        <a href="/instructor/courses/<%= course.course_id %>/students" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">รายชื่อนักเรียน</a>
+      </nav>
+    </div>
+
+    <!-- 2-Column Layout -->
+    <div class="flex bg-white rounded-b-lg shadow-sm overflow-hidden">
+
+      <!-- LEFT: Module & Item Navigator -->
+      <div class="w-64 xl:w-72 shrink-0 border-r border-gray-200 hidden md:flex flex-col">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">เนื้อหาคอร์ส</span>
+          <a href="/instructor/courses/<%= course.course_id %>/modules" class="text-xs text-gray-400 hover:text-black transition">จัดการ →</a>
+        </div>
+
+        <div class="flex-1 overflow-y-auto py-2">
+          <% modules.forEach((module, mIdx) => { %>
+            <div class="mb-1">
+              <div class="px-4 py-2">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Module <%= mIdx + 1 %></span>
+              </div>
+              <p class="px-4 pb-2 text-xs font-semibold text-gray-700 leading-snug line-clamp-2"><%= module.module_name %></p>
+
+              <% if (module.items && module.items.length > 0) { %>
+                <% module.items.forEach((item, iIdx) => { %>
+                  <%
+                    const isActive = currentItem && item.type === 'quiz' && currentItem.data && currentItem.data.quiz_id === item.data.quiz_id;
+                    const href = item.type === 'lesson'
+                      ? `/instructor/courses/${course.course_id}/modules/lesson/${item.data.lesson_id}`
+                      : `/instructor/courses/${course.course_id}/modules/quiz/${item.data.quiz_id}`;
+                  %>
+                  <a href="<%= href %>"
+                     class="flex items-center gap-2.5 px-4 py-2 text-xs transition
+                       <%= isActive
+                         ? 'bg-purple-50 border-r-2 border-purple-500 text-purple-700 font-semibold'
+                         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800' %>">
+                    <% if (item.type === 'quiz') { %>
+                      <div class="p-1 rounded <%= isActive ? 'bg-purple-100 text-purple-500' : 'bg-gray-100 text-gray-400' %> shrink-0">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                      </div>
+                    <% } else { %>
+                      <div class="p-1 rounded bg-gray-100 text-gray-400 shrink-0">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                      </div>
+                    <% } %>
+                    <span class="truncate">
+                      <%= mIdx + 1 %>.<%= iIdx + 1 %>
+                      <%= item.type === 'lesson' ? item.data.lesson_name : item.data.title %>
+                    </span>
+                  </a>
+                <% }) %>
+              <% } else { %>
+                <p class="px-4 pb-2 text-xs text-gray-400 italic">ยังไม่มีเนื้อหา</p>
+              <% } %>
+            </div>
+            <% if (mIdx < modules.length - 1) { %><hr class="border-gray-100 mx-4 my-1"><% } %>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- RIGHT: Quiz Editor -->
+      <div class="flex-1 flex flex-col overflow-y-auto min-w-0">
+
+        <% if (!currentItem) { %>
+          <div class="flex flex-col items-center justify-center h-64 text-gray-400 p-8">
+            <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"></path></svg>
+            <p class="font-medium">เลือก Quiz จากเมนูซ้าย</p>
+          </div>
+        <% } else { %>
+          <% const quiz = currentItem.data; %>
+
+          <!-- Quiz Meta Section -->
+          <div class="p-5 sm:p-7 border-b border-gray-100">
+            <form action="/instructor/courses/<%= course.course_id %>/quizzes/<%= quiz.quiz_id %>/update" method="POST">
+              <div class="flex items-start gap-4 mb-4">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-600 rounded-full uppercase tracking-widest">Quiz</span>
+                    <span class="text-xs text-gray-400"><%= quiz.questions ? quiz.questions.length : 0 %> คำถาม</span>
+                  </div>
+                  <input
+                    type="text"
+                    name="title"
+                    value="<%= quiz.title %>"
+                    required
+                    placeholder="ชื่อ Quiz..."
+                    class="w-full text-xl font-bold text-gray-900 bg-transparent border-0 border-b-2 border-gray-200 focus:border-purple-400 outline-none pb-1 transition placeholder-gray-300 mb-3"
+                  >
+                  <textarea
+                    name="description"
+                    rows="2"
+                    placeholder="คำอธิบาย Quiz (ไม่บังคับ)..."
+                    class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 transition resize-none"
+                  ><%= quiz.description || '' %></textarea>
+                </div>
+                <button type="submit" class="shrink-0 px-4 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  บันทึก
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Questions Section -->
+          <div class="p-5 sm:p-7 flex flex-col gap-5">
+
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-gray-800">คำถามทั้งหมด</h3>
+              <button onclick="openAddQuestion()" class="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                เพิ่มคำถาม
+              </button>
+            </div>
+
+            <!-- Existing Questions -->
+            <% if (!quiz.questions || quiz.questions.length === 0) { %>
+              <div class="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-3 text-purple-300">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <p class="text-gray-500 font-medium mb-1">ยังไม่มีคำถาม</p>
+                <p class="text-sm text-gray-400 mb-4">กดปุ่ม "เพิ่มคำถาม" เพื่อเริ่มต้น</p>
+              </div>
+            <% } else { %>
+              <div class="flex flex-col gap-4">
+                <% quiz.questions.forEach((question, qIdx) => { %>
+                  <div class="border border-gray-200 rounded-xl overflow-hidden">
+
+                    <!-- Question Header -->
+                    <div class="flex items-start justify-between gap-3 px-4 py-3 bg-gray-50 border-b border-gray-200">
+                      <div class="flex items-start gap-3 flex-1 min-w-0">
+                        <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                          <%= qIdx + 1 %>
+                        </span>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-semibold text-gray-800"><%= question.question_text %></p>
+                          <div class="flex items-center gap-2 mt-1">
+                            <%
+                              const typeLabel = {
+                                single: 'ตัวเลือกเดียว',
+                                multiple: 'หลายตัวเลือก',
+                                true_false: 'ถูก/ผิด'
+                              };
+                              const typeColor = {
+                                single: 'bg-blue-50 text-blue-600',
+                                multiple: 'bg-teal-50 text-teal-600',
+                                true_false: 'bg-amber-50 text-amber-600'
+                              };
+                            %>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full <%= typeColor[question.question_type] || 'bg-gray-100 text-gray-500' %>">
+                              <%= typeLabel[question.question_type] || question.question_type %>
+                            </span>
+                            <span class="text-xs text-gray-400"><%= question.points %> คะแนน</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-1 shrink-0">
+                        <button
+                          onclick="openEditQuestion(<%= JSON.stringify(question) %>)"
+                          class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                          title="แก้ไข">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </button>
+                        <form action="/instructor/courses/<%= course.course_id %>/quizzes/<%= quiz.quiz_id %>/questions/<%= question.question_id %>/delete" method="POST" class="inline" onsubmit="return confirm('ลบคำถามนี้?')">
+                          <button type="submit" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="ลบ">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+
+                    <!-- Choices -->
+                    <div class="px-4 py-3 flex flex-col gap-2">
+                      <% if (question.choices && question.choices.length > 0) { %>
+                        <% question.choices.forEach((choice) => { %>
+                          <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg <%= choice.is_correct ? 'bg-green-50 border border-green-200' : 'bg-white border border-gray-100' %>">
+                            <% if (choice.is_correct) { %>
+                              <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <% } else { %>
+                              <div class="w-4 h-4 rounded-full border-2 border-gray-300 shrink-0"></div>
+                            <% } %>
+                            <span class="text-sm <%= choice.is_correct ? 'text-green-700 font-medium' : 'text-gray-600' %>">
+                              <%= choice.choice_text %>
+                            </span>
+                            <% if (choice.is_correct) { %>
+                              <span class="ml-auto text-[10px] font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded">ถูก</span>
+                            <% } %>
+                          </div>
+                        <% }) %>
+                      <% } else { %>
+                        <p class="text-xs text-gray-400 italic">ยังไม่มีตัวเลือก</p>
+                      <% } %>
+                    </div>
+
+                  </div>
+                <% }) %>
+              </div>
+            <% } %>
+
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== QUESTION PANEL ===================== -->
+<div id="q-overlay" onclick="closeQuestionPanel()" class="fixed inset-0 bg-black/30 backdrop-blur-[1px] z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+<div id="q-panel" class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
+
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 shrink-0">
+    <div>
+      <h3 id="q-panel-title" class="font-bold text-gray-900 text-base">เพิ่มคำถาม</h3>
+      <p class="text-xs text-gray-400 mt-0.5">กำหนดคำถามและตัวเลือก</p>
+    </div>
+    <button onclick="closeQuestionPanel()" class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto p-5">
+    <form id="question-form" method="POST" class="flex flex-col gap-5">
+
+      <!-- Question Text -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">คำถาม <span class="text-red-500">*</span></label>
+        <textarea
+          name="question_text"
+          id="q-text"
+          rows="3"
+          required
+          placeholder="พิมพ์คำถามที่นี่..."
+          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Type + Points row -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">ประเภทคำถาม</label>
+          <select
+            name="question_type"
+            id="q-type"
+            onchange="handleTypeChange(this.value)"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition bg-white"
+          >
+            <option value="single">ตัวเลือกเดียว (Single)</option>
+            <option value="multiple">หลายตัวเลือก (Multiple)</option>
+            <option value="true_false">ถูก/ผิด (True/False)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">คะแนน</label>
+          <input
+            type="number"
+            name="points"
+            id="q-points"
+            min="1"
+            value="1"
+            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition"
+          >
+        </div>
+      </div>
+
+      <!-- Choices Section -->
+      <div id="choices-section">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-sm font-semibold text-gray-700">ตัวเลือก</label>
+          <button type="button" id="add-choice-btn" onclick="addChoice()" class="text-xs text-purple-600 font-semibold hover:text-purple-800 transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            เพิ่มตัวเลือก
+          </button>
+        </div>
+
+        <div id="true-false-choices" class="hidden flex-col gap-2">
+          <div class="flex items-center gap-2.5 px-3 py-2.5 border border-gray-200 rounded-lg bg-green-50">
+            <input type="radio" name="correct_choice_index" value="0" checked class="accent-green-500">
+            <span class="text-sm font-medium text-gray-700">True (ถูก)</span>
+          </div>
+          <div class="flex items-center gap-2.5 px-3 py-2.5 border border-gray-200 rounded-lg">
+            <input type="radio" name="correct_choice_index" value="1" class="accent-green-500">
+            <span class="text-sm font-medium text-gray-700">False (ผิด)</span>
+          </div>
+          <!-- Hidden inputs for true/false text -->
+          <input type="hidden" name="choices[]" value="True">
+          <input type="hidden" name="choices[]" value="False">
+        </div>
+
+        <div id="dynamic-choices" class="flex flex-col gap-2">
+          <!-- Dynamic choices rendered here -->
+        </div>
+
+        <p id="correct-hint" class="text-xs text-gray-400 mt-2">
+          เลือก <span id="correct-hint-text">radio</span> เพื่อกำหนดคำตอบที่ถูกต้อง
+        </p>
+      </div>
+
+      <!-- Hidden field for edit mode -->
+      <input type="hidden" id="q-editing-id" value="">
+
+      <div class="flex gap-2 pt-2">
+        <button type="button" onclick="closeQuestionPanel()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+          ยกเลิก
+        </button>
+        <button type="submit" class="flex-1 px-4 py-2.5 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition">
+          บันทึกคำถาม
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  const courseId  = '<%= course.course_id %>';
+  <% if (currentItem) { %>
+  const quizId    = '<%= currentItem.data.quiz_id %>';
+  <% } else { %>
+  const quizId    = '';
+  <% } %>
+
+  let choiceCount = 0;
+  let currentMode = 'add'; // 'add' | 'edit'
+
+  // ============ PANEL ============
+  function openAddQuestion() {
+    currentMode = 'add';
+    document.getElementById('q-panel-title').textContent = 'เพิ่มคำถาม';
+    document.getElementById('question-form').action = `/instructor/courses/${courseId}/quizzes/${quizId}/questions/create`;
+
+    // Reset form
+    document.getElementById('q-text').value = '';
+    document.getElementById('q-type').value = 'single';
+    document.getElementById('q-points').value = '1';
+    document.getElementById('q-editing-id').value = '';
+    choiceCount = 0;
+    document.getElementById('dynamic-choices').innerHTML = '';
+    handleTypeChange('single');
+    addChoice(); addChoice(); // Start with 2 choices
+
+    showPanel();
+  }
+
+  function openEditQuestion(question) {
+    currentMode = 'edit';
+    document.getElementById('q-panel-title').textContent = 'แก้ไขคำถาม';
+    document.getElementById('question-form').action = `/instructor/courses/${courseId}/quizzes/${quizId}/questions/${question.question_id}/update`;
+
+    document.getElementById('q-text').value    = question.question_text;
+    document.getElementById('q-type').value    = question.question_type;
+    document.getElementById('q-points').value  = question.points;
+    document.getElementById('q-editing-id').value = question.question_id;
+
+    choiceCount = 0;
+    document.getElementById('dynamic-choices').innerHTML = '';
+    handleTypeChange(question.question_type);
+
+    if (question.question_type === 'true_false') {
+      // Set correct answer radio
+      const correctIdx = question.choices ? question.choices.findIndex(c => c.is_correct) : 0;
+      const radios = document.querySelectorAll('#true-false-choices input[type=radio]');
+      radios.forEach((r, i) => r.checked = (i === correctIdx));
+    } else if (question.choices) {
+      question.choices.forEach((choice, idx) => {
+        addChoice(choice.choice_text, choice.is_correct ? idx : -1);
+      });
+      // Set correct radio
+      const correctIdx = question.choices.findIndex(c => c.is_correct);
+      if (correctIdx >= 0) {
+        const radio = document.querySelector(`input[name="correct_choice_index"][value="${correctIdx}"]`);
+        if (radio) radio.checked = true;
+      }
+    }
+
+    showPanel();
+  }
+
+  function showPanel() {
+    const panel   = document.getElementById('q-panel');
+    const overlay = document.getElementById('q-overlay');
+    overlay.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      overlay.classList.remove('opacity-0');
+      panel.classList.remove('translate-x-full');
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeQuestionPanel() {
+    const panel   = document.getElementById('q-panel');
+    const overlay = document.getElementById('q-overlay');
+    panel.classList.add('translate-x-full');
+    overlay.classList.add('opacity-0');
+    setTimeout(() => overlay.classList.add('hidden'), 300);
+    document.body.style.overflow = '';
+  }
+
+  // ============ QUESTION TYPE HANDLER ============
+  function handleTypeChange(type) {
+    const tfSection      = document.getElementById('true-false-choices');
+    const dynSection     = document.getElementById('dynamic-choices');
+    const addBtn         = document.getElementById('add-choice-btn');
+    const hintText       = document.getElementById('correct-hint-text');
+
+    if (type === 'true_false') {
+      tfSection.classList.remove('hidden');
+      tfSection.classList.add('flex');
+      dynSection.classList.add('hidden');
+      addBtn.classList.add('hidden');
+      hintText.textContent = 'radio';
+    } else {
+      tfSection.classList.add('hidden');
+      tfSection.classList.remove('flex');
+      dynSection.classList.remove('hidden');
+      addBtn.classList.remove('hidden');
+      hintText.textContent = type === 'multiple' ? 'checkbox ทุกข้อที่ถูก' : 'radio ข้อที่ถูก';
+
+      // Rebuild existing choices' input type
+      const inputType = type === 'multiple' ? 'checkbox' : 'radio';
+      document.querySelectorAll('#dynamic-choices .correct-selector').forEach(input => {
+        input.type = inputType;
+      });
+    }
+  }
+
+  // ============ DYNAMIC CHOICES ============
+  function addChoice(text = '', isCorrect = false) {
+    const type       = document.getElementById('q-type').value;
+    const inputType  = type === 'multiple' ? 'checkbox' : 'radio';
+    const container  = document.getElementById('dynamic-choices');
+    const idx        = choiceCount++;
+
+    const div = document.createElement('div');
+    div.className = 'flex items-center gap-2.5 p-2 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition';
+    div.dataset.idx = idx;
+
+    div.innerHTML = `
+      <input
+        type="${inputType}"
+        name="correct_choice_index"
+        value="${idx}"
+        class="correct-selector accent-purple-600 shrink-0 w-4 h-4"
+        ${isCorrect ? 'checked' : ''}
+      >
+      <input
+        type="text"
+        name="choices[]"
+        value="${text}"
+        placeholder="ตัวเลือกที่ ${idx + 1}"
+        required
+        class="flex-1 text-sm border-0 outline-none bg-transparent text-gray-700 placeholder-gray-300"
+      >
+      <button type="button" onclick="removeChoice(this)" class="p-1 text-gray-300 hover:text-red-500 transition shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    `;
+
+    container.appendChild(div);
+  }
+
+  function removeChoice(btn) {
+    const container = document.getElementById('dynamic-choices');
+    if (container.children.length <= 2) {
+      alert('ต้องมีตัวเลือกอย่างน้อย 2 ข้อ');
+      return;
+    }
+    btn.closest('[data-idx]').remove();
+    // Re-index values and placeholders
+    Array.from(container.children).forEach((div, i) => {
+      const radio = div.querySelector('.correct-selector');
+      const input = div.querySelector('input[name="choices[]"]');
+      radio.value = i;
+      input.placeholder = `ตัวเลือกที่ ${i + 1}`;
+    });
+    choiceCount = container.children.length;
+  }
+
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeQuestionPanel();
+  });
+</script>
