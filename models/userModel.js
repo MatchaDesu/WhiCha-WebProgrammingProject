@@ -1,15 +1,24 @@
 const db = require('../config/db');
 
-const anonymous_profile = '/icon/profile-anonymous.svg';
+exports.getAll = () => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM users`;
+
+    db.all(sql, [], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+};
 
 exports.createUser = (user) => {
   return new Promise((resolve, reject) => {
 
     const { username, first_name, last_name, email, phone, password } = user;
-    const sql = `INSERT INTO users (username, password, first_name, last_name, email, phone, profile_image)
-                  VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO users (username, password, first_name, last_name, email, phone)
+                  VALUES (?, ?, ?, ?, ?, ?)`;
 
-    db.run(sql, [username, password, first_name, last_name, email, phone, anonymous_profile], function (err) {
+    db.run(sql, [username, password, first_name, last_name, email, phone], function (err) {
       if (err) return reject(err);
       resolve({ user_id: this.lastID });
     });

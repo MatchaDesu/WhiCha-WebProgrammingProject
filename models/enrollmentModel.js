@@ -1,5 +1,34 @@
 const db = require('../config/db');
 
+exports.getAll = () => {
+  return new Promise((resolve, reject) => {
+
+    const sql = `SELECT * FROM enrollments`;
+
+    db.all(sql, [], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+};
+
+exports.getAllWithDetails = () => {
+    return new Promise((resolve, reject) => {
+        db.all(`
+            SELECT e.*, 
+                   u.first_name || ' ' || u.last_name AS student_name,
+                   u.email, u.profile_image,
+                   c.course_name, c.course_id,
+                   i.first_name || ' ' || i.last_name AS instructor_name
+            FROM enrollments e
+            JOIN users u ON u.user_id = e.user_id
+            JOIN courses c ON c.course_id = e.course_id
+            JOIN users i ON i.user_id = c.instructor_id
+            ORDER BY e.enrolled_at DESC
+        `, [], (err, rows) => err ? reject(err) : resolve(rows));
+    });
+};
+
 exports.enroll = (user_id, course_id) => {
   return new Promise((resolve, reject) => {
 
@@ -49,24 +78,6 @@ exports.isEnrolled = (user_id, course_id) => {
     db.get(sql, [user_id, course_id], (err, row) => {
       if (err) return reject(err);
       resolve(!!row);
-    });
-  });
-};
-
-exports.getByUser = (user_id) => {
-  return new Promise((resolve, reject) => {
-
-    const sql = `
-      SELECT e.*, c.*
-      FROM enrollments e
-      JOIN courses c ON e.course_id = c.course_id
-      WHERE e.user_id = ?
-      AND c.deleted_at IS NULL
-    `;
-
-    db.all(sql, [user_id], (err, rows) => {
-      if (err) return reject(err);
-      resolve(rows);
     });
   });
 };

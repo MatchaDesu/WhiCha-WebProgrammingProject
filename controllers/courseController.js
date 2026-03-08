@@ -1,4 +1,5 @@
 const courseModel = require('../models/courseModel');
+const categoryModel = require('../models/categoryModel');
 const enrollmentModel = require('../models/enrollmentModel');
 const moduleModel = require('../models/moduleModel');
 const moduleItemModel = require('../models/moduleItemModel');
@@ -20,12 +21,16 @@ exports.getPublishedCourses = async (req, res) => {
             courses = await courseModel.getAllPublished();
         }
 
-        res.render('courses/overall', { courses });
+        const categories = await categoryModel.getAll();
+
+        res.render('courses/overall', { courses, categories });
     } catch (err) {
         console.log(err);
         res.status(500).send("Server Error");
     }
 };
+
+
 
 exports.getCourse = async (req, res) => {
     try {
@@ -227,11 +232,8 @@ exports.submitQuiz = async (req, res) => {
             }
         }
 
-        // ผ่านถ้าได้ >= 60%
-        const passed = totalPoints > 0 && (score / totalPoints) >= 0.6 ? 1 : 0;
-
         // บันทึกลง quiz_attempts
-        await quizAttemptModel.saveAttempt(userId, quizId, score, totalPoints, passed);
+        await quizAttemptModel.saveAttempt(userId, quizId, score, totalPoints,);
 
         // redirect กลับไปหน้า quiz (จะแสดงผลลัพธ์ให้อัตโนมัติ)
         res.redirect(`/courses/${courseId}/learn/quiz/${quizId}`);

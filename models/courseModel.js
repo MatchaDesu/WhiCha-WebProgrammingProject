@@ -28,6 +28,18 @@ exports.createCourse = (course) => {
     });
 };
 
+exports.getAllCourse = () => {
+    return new Promise((resolve, reject) => {
+        db.all(`
+            SELECT c.*, u.username AS instructor_name
+            FROM courses c
+            JOIN users u ON u.user_id = c.instructor_id
+            WHERE c.deleted_at IS NULL
+            ORDER BY c.created_at DESC
+        `, [], (err, rows) => err ? reject(err) : resolve(rows));
+    });
+};
+
 exports.getAllPublished = () => {
     return new Promise((resolve, reject) => {
 
@@ -120,6 +132,16 @@ exports.updateCourse = (course_id, course) => {
     });
 };
 
+exports.updateCourseImage = (courseId, imagePath) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE courses SET course_image = ? WHERE course_id = ?`,
+            [imagePath, courseId],
+            (err) => err ? reject(err) : resolve()
+        );
+    });
+};
+
 exports.publishCourse = (course_id) => {
     return new Promise((resolve, reject) => {
 
@@ -138,17 +160,35 @@ exports.publishCourse = (course_id) => {
     });
 };
 
-exports.archiveCourse = (course_id) => {
+exports.pendingCourse = (course_id) => {
     return new Promise((resolve, reject) => {
 
         const sql = `
             UPDATE courses
-            SET course_status = 'archived'
+            SET course_status = 'pending'
             WHERE course_id = ?
             AND deleted_at IS NULL
         `;
 
         db.run(sql, [course_id], function (err) {
+            if (err) return reject(err);
+            resolve({ changes: this.changes });
+        });
+    });
+};
+
+exports.rejectCourse = (course_id, rejection_reason) => {
+    return new Promise((resolve, reject) => {
+
+        const sql = `
+            UPDATE courses
+            SET course_status = 'rejected',
+                rejection_reason = ?
+            WHERE course_id = ?
+            AND deleted_at IS NULL
+        `;
+
+        db.run(sql, [rejection_reason, course_id], function (err) {
             if (err) return reject(err);
             resolve({ changes: this.changes });
         });
@@ -169,6 +209,19 @@ exports.getByInstructor = (instructor_id) => {
             if (err) return reject(err);
             resolve(rows);
         });
+    });
+};
+
+exports.getByIdWithInstructor = (courseId) => {
+    return new Promise((resolve, reject) => {
+        db.get(`
+            SELECT c.*,
+                   u.username        AS instructor_name,
+                   u.profile_image   AS instructor_image
+            FROM courses c
+            JOIN users u ON u.user_id = c.instructor_id
+            WHERE c.course_id = ?
+        `, [courseId], (err, row) => err ? reject(err) : resolve(row || null));
     });
 };
 

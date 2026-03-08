@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel');
 const courseModel = require('../models/courseModel');
 
-exports.uploadProfile = async (req, res) => {
+exports.updateProfile = async (req, res) => {
     try {
         const userId = req.params.id;
         
@@ -30,23 +30,25 @@ exports.uploadProfile = async (req, res) => {
     }
 };
 
-exports.uploadCourseCover = async (req, res) => {
-
+exports.updateCourse = async (req, res) => {
     try {
         const courseId = req.params.id;
 
-        if (!req.file) {
-            return res.status(400).send("No file uploaded");
+        if (req.file) {
+            const imagePath = `/uploads/courses/${courseId}/${req.file.filename}`;
+            await courseModel.updateCourseImage(courseId, imagePath);
         }
 
-        const imagePath = `/uploads/courses/${courseId}/${req.file.filename}`;
+        await courseModel.updateCourse(courseId, {
+            course_name:  req.body.name,
+            description:  req.body.description,
+            course_price: req.body.price,
+            category_id:  req.body.category,
+        });
 
-        await courseModel.updateProfile(courseId, imagePath);
-
-        res.redirect(`/courses/${courseId}`);
+        res.redirect(`/instructor/courses/${courseId}/edit`);
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).send("Server Error");
     }
-
 };

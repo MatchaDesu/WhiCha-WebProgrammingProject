@@ -22,6 +22,9 @@
                     <% if (user.role == 'instructor') {%>
                         <a href="/instructor" class="navbar-item text-secondary">หน้าต่างผู้สอน</a>
                     <% } %>
+                    <% if (user.role == 'manager') {%>
+                        <a href="/manager" class="navbar-item text-secondary">หน้าต่างผู้จัดการ</a>
+                    <% } %>
                 </div>
 
                 <!-- Profile -->
@@ -42,6 +45,10 @@
 
                         <% if (user.role == 'instructor') {%>
                             <a href="/instructor" class="dropdown-item text-secondary">หน้าต่างสอน</a>
+                        <% } %>
+
+                        <% if (user.role == 'manager') {%>
+                            <a href="/manager" class="navbar-item text-secondary">หน้าต่างผู้จัดการ</a>
                         <% } %>
 
                         <hr>

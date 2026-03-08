@@ -1,4 +1,5 @@
 const courseModel = require('../models/courseModel');
+const categoryModel = require('../models/categoryModel');
 const moduleModel = require('../models/moduleModel');
 const moduleItemModel = require('../models/moduleItemModel');
 const lessonModel = require('../models/lessonModel');
@@ -26,7 +27,8 @@ exports.dashboard = async (req, res) => {
 ========================= */
 
 exports.courseCreate = async (req, res) => {
-    res.render('instructor/create-course');
+    const categories = await categoryModel.getAll();
+    res.render('instructor/create-course', { categories });
 };
 
 exports.createCourse = async (req, res) => {
@@ -40,7 +42,6 @@ exports.createCourse = async (req, res) => {
             course_price: req.body.course_price
         });
 
-        // สร้างเสร็จให้ไปหน้าตั้งค่า (Tab 1)
         res.redirect(`/instructor/courses/${result.course_id}/edit`);
     } catch (err) {
         console.error(err);
@@ -56,10 +57,10 @@ exports.createCourse = async (req, res) => {
 exports.getCourseSettings = async (req, res) => {
     try {
         const courseId = req.params.id;
-        // ดึงแค่ข้อมูล Course พื้นฐาน
         const course = await courseModel.getById(courseId);
+        const categories = await categoryModel.getAll();
 
-        res.render("instructor/edit-course", { course });
+        res.render("instructor/edit-course", { course, categories });
     } catch (err) {
         console.error(err);
         res.status(500).send("Server Error");
@@ -188,6 +189,15 @@ exports.publishCourse = async (req, res) => {
         res.redirect(`/instructor/courses/${req.params.id}/edit`);
     } catch (err) {
         res.status(500).send("Publish Error");
+    }
+};
+
+exports.pendingCourse = async (req, res) => {
+    try {
+        await courseModel.pendingCourse(req.params.id);
+        res.redirect(`/instructor/courses/${req.params.id}/edit`);
+    } catch (err) {
+        res.status(500).send("Pending Error");
     }
 };
 

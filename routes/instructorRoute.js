@@ -16,7 +16,7 @@ router.post('/courses/create', instructorController.createCourse);
 // [Tab 1] ตั้งค่าคอร์ส (Course Settings)
 router.get('/courses/:id/edit', instructorController.getCourseSettings);
 router.post('/courses/:id/update', instructorController.updateCourse);
-router.post('/courses/:id/publish', instructorController.publishCourse);
+router.post('/courses/:id/pending', instructorController.pendingCourse);
 
 // [Tab 2] จัดการเนื้อหา (Modules, Lessons, Quizzes)
 router.get('/courses/:id/modules', instructorController.getCourseModules);

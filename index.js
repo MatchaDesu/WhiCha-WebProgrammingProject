@@ -36,28 +36,28 @@ app.set("layout", "layouts/main");
 // เอาไว้ใช้ในการกำหนดแบ่ง route ให้เป็นระเบียบ
 
 // หน้า signin / signup
-const authRoutes = require("./routes/authRoute");
-app.use("/", authRoutes);
+const authRoute = require("./routes/authRoute");
+app.use("/", authRoute);
 
 // หน้าเว็บทั่วไป
-const webRoutes = require("./routes/webRoute");
-app.use("/", webRoutes);
+const webRoute = require("./routes/webRoute");
+app.use("/", webRoute);
 
 // หน้าคอร์ส + หน้าเรียน
-const courseRoutes = require("./routes/courseRoute");
-app.use("/courses", courseRoutes);
+const courseRoute = require("./routes/courseRoute");
+app.use("/courses", courseRoute);
 
 // หน้าผู้ใช้
-const userRoutes = require("./routes/userRoute");
-app.use("/users", userRoutes);
+const userRoute = require("./routes/userRoute");
+app.use("/users", userRoute);
 
 // หน้า instructor
-const instructorRoutes = require("./routes/instructorRoute");
-app.use("/instructor", instructorRoutes);
+const instructorRoute = require("./routes/instructorRoute");
+app.use("/instructor", instructorRoute);
 
 // หน้า admin (manager)
-const adminRoutes = require("./routes/adminRoute");
-app.use("/admin", adminRoutes);
+const managerRoute = require("./routes/managerRoute");
+app.use("/manager", managerRoute);
 
 const uploadRoute = require("./routes/uploadRoute")
 app.use('/upload', uploadRoute);

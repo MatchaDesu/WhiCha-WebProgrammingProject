@@ -219,7 +219,6 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     user_id      INTEGER NOT NULL,
     score        INTEGER DEFAULT 0,
     total_points INTEGER DEFAULT 0,
-    passed       INTEGER DEFAULT 0,
     started_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     submitted_at TIMESTAMP NULL,
 

@@ -7,13 +7,14 @@ const uploadController = require('../controllers/uploadController');
 router.post(
     '/upload-user-profile/:id', 
     uploadSource('users').single('profile'),
-    uploadController.uploadProfile
+    uploadController.updateProfile
 );
 
 // สำหรับ Course Cover
 router.post(
     '/upload-courses-cover/:id', 
-    uploadSource('courses').single('cover')
+    uploadSource('courses').single('course_image'),
+    uploadController.updateCourse
 );
 
 module.exports = router;

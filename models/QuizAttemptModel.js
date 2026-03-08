@@ -22,18 +22,17 @@ exports.startAttempt = ({ quiz_id, user_id }) => {
 };
 
 // upsert — ถ้าเคยทำแล้ว update, ถ้ายังไม่เคยทำ insert
-exports.saveAttempt = (userId, quizId, score, totalPoints, passed) => {
+exports.saveAttempt = (userId, quizId, score, totalPoints) => {
     return new Promise((resolve, reject) => {
         db.run(`
-            INSERT INTO quiz_attempts (user_id, quiz_id, score, total_points, passed, submitted_at)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            INSERT INTO quiz_attempts (user_id, quiz_id, score, total_points, submitted_at)
+            VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
             ON CONFLICT(user_id, quiz_id)
             DO UPDATE SET
                 score        = excluded.score,
                 total_points = excluded.total_points,
-                passed       = excluded.passed,
                 submitted_at = CURRENT_TIMESTAMP
-        `, [userId, quizId, score, totalPoints, passed],
+        `, [userId, quizId, score, totalPoints],
         function (err) {
             if (err) return reject(err);
             resolve({ attempt_id: this.lastID });

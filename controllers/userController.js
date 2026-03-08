@@ -1,4 +1,6 @@
 const userModel = require('../models/userModel');
+const enrollmentModel = require('../models/enrollmentModel');
+const courseModel     = require('../models/courseModel');
 
 exports.getProfile = async (req, res) => {
     try {
@@ -8,7 +10,13 @@ exports.getProfile = async (req, res) => {
             return res.status(404).send("user not found");
         }
 
-        res.render('users/profile', { user });
+        const enrolledCourses = await enrollmentModel.getByUserWithProgress(req.params.userId);
+
+        const teachingCourses = user.role === 'instructor'
+            ? await courseModel.getByInstructor(req.params.userId)
+            : [];
+
+        res.render('users/profile', { user, enrolledCourses, teachingCourses });
     } catch (err) {
         res.status(500).send("Server Error");
     }

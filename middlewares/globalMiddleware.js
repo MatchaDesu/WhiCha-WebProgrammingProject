@@ -11,10 +11,6 @@ exports.loadGlobalData = async (req, res, next) => {
       res.locals.user = null;
     }
 
-    // CATEGORIES
-    const categories = await categoryModel.getAll();
-    res.locals.categories = categories;
-
     next();
   } catch (err) {
     next(err);
