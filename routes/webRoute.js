@@ -8,5 +8,7 @@ router.get('/my-learning', webController.mylearning);
 
 router.get('/about-us', webController.aboutus);
 
+router.get('/guide', webController.guide);
+
 
 module.exports = router;

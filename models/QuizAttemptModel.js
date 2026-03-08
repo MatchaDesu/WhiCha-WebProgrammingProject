@@ -21,22 +21,24 @@ exports.startAttempt = ({ quiz_id, user_id }) => {
   });
 };
 
-//บันทึกคะแนนกับเวลาส่ง
-exports.submitAttempt = (attempt_id, score) => {
-  return new Promise((resolve, reject) => {
-
-    const sql = `
-      UPDATE quiz_attempts
-      SET score = ?, submitted_at = CURRENT_TIMESTAMP
-      WHERE attempt_id = ?
-      AND submitted_at IS NULL
-    `;
-
-    db.run(sql, [score, attempt_id], function (err) {
-      if (err) return reject(err);
-      resolve({ changes: this.changes });
+// upsert — ถ้าเคยทำแล้ว update, ถ้ายังไม่เคยทำ insert
+exports.saveAttempt = (userId, quizId, score, totalPoints, passed) => {
+    return new Promise((resolve, reject) => {
+        db.run(`
+            INSERT INTO quiz_attempts (user_id, quiz_id, score, total_points, passed, submitted_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(user_id, quiz_id)
+            DO UPDATE SET
+                score        = excluded.score,
+                total_points = excluded.total_points,
+                passed       = excluded.passed,
+                submitted_at = CURRENT_TIMESTAMP
+        `, [userId, quizId, score, totalPoints, passed],
+        function (err) {
+            if (err) return reject(err);
+            resolve({ attempt_id: this.lastID });
+        });
     });
-  });
 };
 
 exports.getMaxScore = (quiz_id) => {
@@ -55,21 +57,14 @@ exports.getMaxScore = (quiz_id) => {
   });
 };
 
-//ดึง Attemp ทั้งหมด ของ user คนนี้ใน quiz นี้
-exports.getAttemptByUser = (quiz_id, user_id) => {
-  return new Promise((resolve, reject) => {
-
-    const sql = `
-      SELECT *
-      FROM quiz_attempts
-      WHERE quiz_id = ? AND user_id = ?
-    `;
-
-    db.get(sql, [quiz_id, user_id], (err, row) => {
-      if (err) return reject(err);
-      resolve(row);
+exports.getByUserAndQuiz = (userId, quizId) => {
+    return new Promise((resolve, reject) => {
+        db.get(
+            `SELECT * FROM quiz_attempts WHERE user_id = ? AND quiz_id = ?`,
+            [userId, quizId],
+            (err, row) => err ? reject(err) : resolve(row || null)
+        );
     });
-  });
 };
 
 exports.resetAttempt = (attempt_id) => {

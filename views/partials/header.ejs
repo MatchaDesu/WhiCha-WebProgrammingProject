@@ -18,7 +18,7 @@
                     <a href="/courses" class="navbar-item">เลือกดูคอร์ส</a>
                     <a href="/my-learning" class="navbar-item">การเรียนของฉัน</a>
                     <a href="/about-us" class="navbar-item">เกี่ยวกับเรา</a>
-                    <a href="/tutorial" class="navbar-item">คู่มือ</a>
+                    <a href="/guide" class="navbar-item">คู่มือ</a>
                     <% if (user.role == 'instructor') {%>
                         <a href="/instructor" class="navbar-item text-secondary">หน้าต่างผู้สอน</a>
                     <% } %>
@@ -28,7 +28,7 @@
                 <button class="relative flex justify-center" onclick="toggleDropdown(this)">
 
                     <div class="rounded-full overflow-hidden w-10 h-10">
-                        <img src="<%= user.profile_image || '/icon/profile-anonymous.svg'%>" alt="" class="hidden w-full h-full object-cover lg:block">
+                        <img src="<%= user.profile_image %>" alt="" class="hidden w-full h-full object-cover lg:block">
                         <img src="/icon/hamburger-menu.svg" alt="" class="h-full lg:hidden">
                     </div>
 
@@ -38,7 +38,7 @@
                         <a href="/courses" class="dropdown-item">เลือกดูคอร์ส</a>
                         <a href="/my-learning" class="dropdown-item">การเรียนของฉัน</a>
                         <a href="/about-us" class="dropdown-item">เกี่ยวกับเรา</a>
-                        <a href="/tutorial" class="dropdown-item">คู่มือ</a>
+                        <a href="/guide" class="dropdown-item">คู่มือ</a>
 
                         <% if (user.role == 'instructor') {%>
                             <a href="/instructor" class="dropdown-item text-secondary">หน้าต่างสอน</a>

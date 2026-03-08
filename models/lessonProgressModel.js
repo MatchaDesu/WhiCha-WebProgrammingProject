@@ -1,87 +1,45 @@
 const db = require('../config/db');
 
-exports.markCompleted = (user_id, lesson_id) => {
-  return new Promise((resolve, reject) => {
-
-    const sql = `
-      INSERT INTO lesson_progress (user_id, lesson_id, completed_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `;
-
-    db.run(sql, [user_id, lesson_id], function (err) {
-
-      if (err) {
-        if (err.code === 'SQLITE_CONSTRAINT') {
-          return resolve({ message: 'Already completed' });
-        }
-        return reject(err);
-      }
-
-      resolve({ progress_id: this.lastID });
+exports.getByUserAndLesson = (userId, lessonId) => {
+    return new Promise((resolve, reject) => {
+        db.get(
+            `SELECT * FROM lesson_progress WHERE user_id = ? AND lesson_id = ?`,
+            [userId, lessonId],
+            (err, row) => err ? reject(err) : resolve(row || null)
+        );
     });
-  });
 };
 
-exports.unmark = (user_id, lesson_id) => {
-  return new Promise((resolve, reject) => {
-
-    const sql = `
-      DELETE FROM lesson_progress
-      WHERE user_id = ? AND lesson_id = ?
-    `;
-
-    db.run(sql, [user_id, lesson_id], function (err) {
-      if (err) return reject(err);
-      resolve({ changes: this.changes });
+exports.markComplete = (userId, lessonId) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `INSERT INTO lesson_progress (user_id, lesson_id, is_completed, completed_at)
+             VALUES (?, ?, 1, CURRENT_TIMESTAMP)
+             ON CONFLICT(user_id, lesson_id)
+             DO UPDATE SET is_completed = 1, completed_at = CURRENT_TIMESTAMP`,
+            [userId, lessonId],
+            (err) => err ? reject(err) : resolve()
+        );
     });
-  });
 };
 
-exports.getProgressByUser = (user_id) => {
-  return new Promise((resolve, reject) => {
-
-    const sql = `
-      SELECT *
-      FROM lesson_progress
-      WHERE user_id = ?
-    `;
-
-    db.all(sql, [user_id], (err, rows) => {
-      if (err) return reject(err);
-      resolve(rows);
+exports.markIncomplete = (userId, lessonId) => {
+    return new Promise((resolve, reject) => {
+        db.run(
+            `UPDATE lesson_progress SET is_completed = 0, completed_at = NULL
+             WHERE user_id = ? AND lesson_id = ?`,
+            [userId, lessonId],
+            (err) => err ? reject(err) : resolve()
+        );
     });
-  });
 };
 
-exports.getCourseProgress = (user_id, course_id) => {
-  return new Promise((resolve, reject) => {
-
-    const sql = `
-      SELECT 
-        COUNT(DISTINCT l.lesson_id) as total_lessons,
-        COUNT(DISTINCT lp.lesson_id) as completed_lessons
-      FROM lessons l
-      LEFT JOIN lesson_progress lp
-        ON l.lesson_id = lp.lesson_id
-        AND lp.user_id = ?
-      FROM lessons l
-      JOIN modules m ON l.module_id = m.module_id
-      LEFT JOIN lesson_progress lp ON l.lesson_id = lp.lesson_id AND lp.user_id = ?
-      WHERE m.course_id = ?
-    `;
-
-    db.get(sql, [user_id, course_id], (err, row) => {
-      if (err) return reject(err);
-
-      const percent = row.total_lessons === 0
-        ? 0
-        : Math.round((row.completed_lessons / row.total_lessons) * 100);
-
-      resolve({
-        total: row.total_lessons,
-        completed: row.completed_lessons,
-        percent
-      });
+exports.getCourseProgress = (userId, courseId) => {
+    return new Promise((resolve, reject) => {
+        db.get(
+            `SELECT * FROM course_progress_view WHERE user_id = ? AND course_id = ?`,
+            [userId, courseId],
+            (err, row) => err ? reject(err) : resolve(row || null)
+        );
     });
-  });
 };

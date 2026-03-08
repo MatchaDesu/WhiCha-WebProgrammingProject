@@ -17,5 +17,9 @@ exports.mylearning = async (req, res) => {
 }
 
 exports.aboutus = (req, res) => {
-   res.render('pages/about-us');
+   res.render('pages/about');
+}
+
+exports.guide = (req, res) => {
+   res.render('pages/guide');
 }

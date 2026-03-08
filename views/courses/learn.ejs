@@ -1,275 +1,370 @@
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
 <!-- Top Bar -->
-<div
-  class="bg-white border-b border-gray-200 px-4 py-4 sm:px-6 text-sm text-gray-600 font-medium shadow-sm z-20">
-  <div class="flex items-center gap-3">
+<div class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 shadow-sm z-30 relative">
+  <div class="flex items-center gap-3 min-w-0">
     <button onclick="toggleSidebar()"
-      class="p-2 -ml-1 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition" title="ซ่อน/แสดง สารบัญ">
+      class="p-2 -ml-1 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition shrink-0"
+      title="ซ่อน/แสดง สารบัญ">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none">
-        </rect>
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"></rect>
         <line x1="9" y1="3" x2="9" y2="21" stroke="currentColor" stroke-width="2"></line>
       </svg>
     </button>
-    <a href="/courses/<%= course.course_id%>/dashboard" class="text-gray-700 font-semibold hidden sm:block truncate max-w-xs underline">
+    <a href="/courses/<%= course.course_id %>/dashboard"
+      class="text-gray-700 font-semibold truncate max-w-[160px] sm:max-w-xs text-sm underline underline-offset-2">
       <%= course.course_name %>
     </a>
   </div>
+
+  <% if (typeof progressPercent !== 'undefined') { %>
+    <div class="hidden sm:flex items-center gap-2 shrink-0">
+      <div class="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-black rounded-full" style="width: <%= progressPercent %>%"></div>
+      </div>
+      <span class="text-xs font-semibold text-gray-600"><%= progressPercent %>%</span>
+    </div>
+  <% } %>
 </div>
 
+<!-- Mobile Backdrop -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-20 hidden lg:hidden" onclick="closeSidebar()"></div>
+
 <!-- Main Layout -->
-<div class="flex overflow-hidden" style="height: calc(100vh - 3.5rem);">
+<div class="flex overflow-hidden relative" style="height: calc(100vh - 3.5rem);">
 
   <!-- Sidebar -->
   <aside id="sidebar"
-    class="w-72 shrink-0 bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out overflow-hidden">
+    class="fixed lg:relative inset-y-0 left-0 z-20 w-72 shrink-0 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0"
+    style="top: 3.5rem; height: calc(100vh - 3.5rem);">
 
     <div class="flex-1 overflow-y-auto py-4 px-3 no-scrollbar">
 
-      <!-- Course Name -->
+      <!-- Course Name + Progress -->
       <div class="mb-5 px-2 pb-4 border-b border-gray-100">
         <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1.5">กำลังเรียน</p>
-        <h1 class="text-sm font-bold text-gray-900 leading-snug">
-          <%= course.course_name %>
-        </h1>
-        <div class="flex items-center gap-1.5 mt-2">
-          <span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
-          <span class="text-xs text-gray-500">Active</span>
-        </div>
+        <h1 class="text-sm font-bold text-gray-900 leading-snug"><%= course.course_name %></h1>
+        <% if (typeof progressPercent !== 'undefined') { %>
+          <div class="mt-3">
+            <div class="flex justify-between mb-1">
+              <span class="text-[10px] text-gray-400 font-semibold">ความคืบหน้า</span>
+              <span class="text-[10px] font-bold text-gray-700"><%= progressPercent %>%</span>
+            </div>
+            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full bg-black rounded-full" style="width: <%= progressPercent %>%"></div>
+            </div>
+          </div>
+        <% } %>
       </div>
 
       <!-- Module List -->
       <div class="flex flex-col gap-5">
-        <% modules.forEach((module, mIdx)=> { %>
+        <% modules.forEach((module, mIdx) => { %>
           <div>
-            <!-- Module Header -->
             <div class="px-2 mb-2">
               <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
                 Chapter <%= module.order_index || (mIdx + 1) %>
               </p>
-              <h3 class="text-xs font-bold text-gray-700 leading-snug">
-                <%= module.module_name %>
-              </h3>
+              <h3 class="text-xs font-bold text-gray-700 leading-snug"><%= module.module_name %></h3>
             </div>
 
-            <!-- Items -->
             <div class="flex flex-col gap-0.5 border-l-2 border-gray-100 ml-3 pl-2">
-              <% module.items.forEach(item=> { %>
+              <% module.items.forEach(item => { %>
 
-                <% if (item.type==='lesson' ) { %>
-                  <% const isActive=currentItem && currentItem.type==='lesson' &&
-                    currentItem.data.lesson_id===item.data.lesson_id; %>
-                    <a href="/courses/<%= course.course_id %>/learn/lesson/<%= item.data.lesson_id %>"
-                      class="flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium rounded-lg transition
-                       <%= isActive ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-transparent' %>">
-                      <div
-                        class="p-1 rounded shrink-0 <%= isActive ? 'bg-orange-100 text-orange-500' : 'bg-gray-100 text-gray-400' %>">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z">
-                          </path>
+                <% if (item.type === 'lesson') { %>
+                  <%
+                    const isActive = currentItem && currentItem.type === 'lesson'
+                      && currentItem.data.lesson_id === item.data.lesson_id;
+                    const isDone = item.data.is_completed == 1;
+                  %>
+                  <a href="/courses/<%= course.course_id %>/learn/lesson/<%= item.data.lesson_id %>"
+                    onclick="closeSidebar()"
+                    class="flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium rounded-lg transition
+                      <%= isActive ? 'bg-orange-50 text-orange-700 border border-orange-200'
+                                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-transparent' %>">
+                    <div class="p-1 rounded shrink-0
+                      <%= isDone ? 'bg-green-100 text-green-500'
+                        : isActive ? 'bg-orange-100 text-orange-500'
+                        : 'bg-gray-100 text-gray-400' %>">
+                      <% if (isDone) { %>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                         </svg>
-                      </div>
-                      <span class="truncate">
-                        <%= item.data.lesson_name %>
-                      </span>
-                    </a>
+                      <% } else { %>
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
+                        </svg>
+                      <% } %>
+                    </div>
+                    <span class="truncate flex-1"><%= item.data.lesson_name %></span>
+                    <% if (isDone) { %>
+                      <span class="shrink-0 text-[9px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded border border-green-200">เสร็จ</span>
                     <% } %>
+                  </a>
+                <% } %>
 
-                      <% if (item.type==='quiz' ) { %>
-                        <% const isActive=currentItem && currentItem.type==='quiz' &&
-                          currentItem.data.quiz_id===item.data.quiz_id; %>
-                          <a href="/courses/<%= course.course_id %>/learn/quiz/<%= item.data.quiz_id %>"
-                            class="flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium rounded-lg transition
-                       <%= isActive ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-transparent' %>">
-                            <div
-                              class="p-1 rounded shrink-0 <%= isActive ? 'bg-purple-100 text-purple-500' : 'bg-gray-100 text-gray-400' %>">
-                              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-                                </path>
-                              </svg>
-                            </div>
-                            <span class="truncate">
-                              <%= item.data.title %>
-                            </span>
-                          </a>
-                          <% } %>
+                <% if (item.type === 'quiz') { %>
+                  <%
+                    const isActive = currentItem && currentItem.type === 'quiz'
+                      && currentItem.data.quiz_id === item.data.quiz_id;
+                    const isDone = item.data.submitted_at != null;
+                  %>
+                  <a href="/courses/<%= course.course_id %>/learn/quiz/<%= item.data.quiz_id %>"
+                    onclick="closeSidebar()"
+                    class="flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium rounded-lg transition
+                      <%= isActive ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-transparent' %>">
+                    <div class="p-1 rounded shrink-0
+                      <%= isDone ? 'bg-green-100 text-green-500'
+                        : isActive ? 'bg-purple-100 text-purple-500'
+                        : 'bg-gray-100 text-gray-400' %>">
+                      <% if (isDone) { %>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                      <% } else { %>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                      <% } %>
+                    </div>
+                    <span class="truncate flex-1"><%= item.data.title %></span>
+                    <% if (isDone) { %>
+                      <span class="shrink-0 text-[9px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded border border-green-200">เสร็จ</span>
+                    <% } %>
+                  </a>
+                <% } %>
 
-                            <% }) %>
+              <% }) %>
             </div>
           </div>
-          <% }) %>
+        <% }) %>
       </div>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 flex flex-col bg-gray-50 overflow-hidden">
+  <main class="flex-1 flex flex-col bg-gray-50 overflow-hidden min-w-0">
 
-    <!-- Empty State -->
+    <!-- ── Empty State ── -->
     <% if (!currentItem) { %>
       <div class="flex flex-col items-center justify-center h-full text-center px-6">
-        <div
-          class="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center shadow-sm mb-5 text-gray-400">
+        <div class="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex items-center justify-center shadow-sm mb-5 text-gray-400">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-            </path>
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
           </svg>
         </div>
         <h2 class="text-xl font-bold text-gray-800 mb-2">เริ่มการเรียนรู้</h2>
-        <p class="text-gray-500 text-sm max-w-sm leading-relaxed">
-          เลือกบทเรียนหรือแบบทดสอบจากสารบัญด้านซ้ายเพื่อเริ่มเรียน</p>
+        <p class="text-gray-500 text-sm max-w-sm leading-relaxed">เลือกบทเรียนหรือแบบทดสอบจากสารบัญด้านซ้าย</p>
+        <button onclick="openSidebar()"
+          class="mt-5 lg:hidden px-4 py-2 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">
+          ดูสารบัญ
+        </button>
       </div>
 
-      <!-- Lesson View -->
-      <% } else if (currentItem.type==='lesson' ) { %>
+    <!-- ── Lesson View ── -->
+    <% } else if (currentItem.type === 'lesson') { %>
+      <% const alreadyCompleted = currentItem.data.is_completed == 1; %>
 
-        <!-- Lesson Header -->
-        <div class="bg-white border-b border-gray-200 px-6 sm:px-10 py-5 shrink-0 shadow-sm z-10">
-          <div class="max-w-4xl mx-auto">
-            <div class="flex items-center gap-2 mb-1">
-              <span
-                class="text-[10px] font-bold px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full uppercase tracking-widest">Lesson</span>
+      <!-- Header -->
+      <div class="bg-white border-b border-gray-200 px-4 sm:px-10 py-4 sm:py-5 shrink-0 shadow-sm">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <span class="text-[10px] font-bold px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full uppercase tracking-widest">Lesson</span>
+            <% if (alreadyCompleted) { %>
+              <span class="text-[10px] font-bold px-2 py-0.5 bg-green-100 text-green-600 rounded-full uppercase tracking-widest">✓ เรียนจบแล้ว</span>
+            <% } %>
+          </div>
+          <h2 class="text-lg sm:text-2xl font-bold text-gray-900"><%= currentItem.data.lesson_name %></h2>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-8">
+        <div class="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-xl p-5 sm:p-10">
+          <div id="viewer" data-content="<%- currentItem.data.content || '' %>" class="prose max-w-none"></div>
+
+          <!-- Mark Complete -->
+          <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-between gap-4 flex-wrap">
+            <p class="text-sm text-gray-400">
+              <% if (alreadyCompleted) { %>คุณเรียนบทเรียนนี้จบแล้ว<% } else { %>กดปุ่มเพื่อทำเครื่องหมายว่าเรียนจบแล้ว<% } %>
+            </p>
+            <% if (alreadyCompleted) { %>
+              <form action="/courses/<%= course.course_id %>/lessons/<%= currentItem.data.lesson_id %>/incomplete" method="POST">
+                <button type="submit"
+                  class="flex items-center gap-2 px-5 py-2.5 bg-green-50 text-green-700 border border-green-200 text-sm font-semibold rounded-lg hover:bg-green-100 transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                  เรียนจบแล้ว
+                </button>
+              </form>
+            <% } else { %>
+              <form action="/courses/<%= course.course_id %>/lessons/<%= currentItem.data.lesson_id %>/complete" method="POST">
+                <button type="submit"
+                  class="flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  เรียนจบบทเรียนนี้แล้ว
+                </button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+    <!-- ── Quiz View ── -->
+    <% } else if (currentItem.type === 'quiz') { %>
+      <% const attempted = currentItem.data.submitted_at != null; %>
+
+      <!-- Header -->
+      <div class="bg-white border-b border-gray-200 px-4 sm:px-10 py-4 sm:py-5 shrink-0 shadow-sm">
+        <div class="max-w-3xl mx-auto flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 mb-1 flex-wrap">
+              <span class="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-600 rounded-full uppercase tracking-widest">Quiz</span>
+              <% if (attempted) { %>
+                <span class="text-[10px] font-bold px-2 py-0.5 bg-green-100 text-green-600 rounded-full uppercase tracking-widest">✓ ทำแล้ว</span>
+              <% } %>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
-              <%= currentItem.data.lesson_name %>
-            </h2>
+            <h2 class="text-lg sm:text-2xl font-bold text-gray-900"><%= currentItem.data.title %></h2>
           </div>
+          <span class="shrink-0 text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg">
+            <%= currentItem.data.questions ? currentItem.data.questions.length : 0 %> ข้อ
+          </span>
         </div>
+      </div>
 
-        <!-- Lesson Content -->
-        <div class="flex-1 overflow-y-auto p-4 sm:p-8">
-          <div class="max-w-4xl mx-auto bg-white border border-gray-200 shadow-sm rounded-xl p-6 sm:p-10 min-h-full">
-            <div id="viewer" data-content="<%- currentItem.data.content || '' %>" class="prose max-w-none"></div>
-          </div>
-        </div>
-
-        <!-- Quiz View -->
-        <% } else if (currentItem.type==='quiz' ) { %>
-
-          <!-- Quiz Header -->
-          <div class="bg-white border-b border-gray-200 px-6 sm:px-10 py-5 shrink-0 shadow-sm z-10">
-            <div class="max-w-3xl mx-auto flex items-center justify-between gap-4">
-              <div>
-                <div class="flex items-center gap-2 mb-1">
-                  <span
-                    class="text-[10px] font-bold px-2 py-0.5 bg-purple-100 text-purple-600 rounded-full uppercase tracking-widest">Quiz</span>
-                </div>
-                <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
-                  <%= currentItem.data.title %>
-                </h2>
+      <div class="flex-1 overflow-y-auto p-4 sm:p-8">
+        <% if (attempted) { %>
+          <!-- Already Attempted -->
+          <div class="max-w-3xl mx-auto">
+            <div class="bg-white border border-gray-200 rounded-xl p-8 sm:p-12 text-center shadow-sm">
+              <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
               </div>
-              <span class="shrink-0 text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg">
-                <%= currentItem.data.questions ? currentItem.data.questions.length : 0 %> ข้อ
-              </span>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">คุณทำแบบทดสอบนี้แล้ว</h3>
+              <% if (currentItem.data.score != null) { %>
+                <p class="text-gray-500 text-sm mb-4">
+                  คะแนนที่ได้:
+                  <span class="font-bold text-gray-900 text-lg">
+                    <%= currentItem.data.score %> / <%= currentItem.data.total_points %>
+                  </span>
+                </p>
+                <% if (currentItem.data.passed == 1) { %>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-sm font-bold rounded-full border border-green-200">✓ ผ่าน</span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 text-sm font-bold rounded-full border border-red-200">✗ ไม่ผ่าน</span>
+                <% } %>
+              <% } %>
             </div>
           </div>
 
+        <% } else { %>
           <!-- Quiz Form -->
-          <div class="flex-1 overflow-y-auto p-4 sm:p-8">
-            <form action="/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/submit" method="POST"
-              class="max-w-3xl mx-auto flex flex-col gap-5">
+          <form action="/courses/<%= course.course_id %>/quizzes/<%= currentItem.data.quiz_id %>/submit"
+            method="POST" class="max-w-3xl mx-auto flex flex-col gap-5">
 
-              <!-- Description -->
-              <% if (currentItem.data.description) { %>
-                <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 flex items-start gap-3">
-                  <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <p class="text-blue-700 text-sm leading-relaxed">
-                    <%= currentItem.data.description %>
-                  </p>
-                </div>
-                <% } %>
+            <% if (currentItem.data.description) { %>
+              <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 flex items-start gap-3">
+                <svg class="w-4 h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-blue-700 text-sm leading-relaxed"><%= currentItem.data.description %></p>
+              </div>
+            <% } %>
 
-                  <!-- No Questions -->
-                  <% if (!currentItem.data.questions || currentItem.data.questions.length===0) { %>
-                    <div class="bg-white border border-gray-200 rounded-xl p-12 text-center">
-                      <p class="text-gray-500 font-medium">ยังไม่มีคำถามในแบบทดสอบนี้</p>
+            <% if (!currentItem.data.questions || currentItem.data.questions.length === 0) { %>
+              <div class="bg-white border border-gray-200 rounded-xl p-12 text-center">
+                <p class="text-gray-500 font-medium">ยังไม่มีคำถามในแบบทดสอบนี้</p>
+              </div>
+            <% } else { %>
+              <div class="flex flex-col gap-5">
+                <% currentItem.data.questions.forEach((q, idx) => { %>
+                  <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-7">
+                    <div class="flex gap-4 mb-5">
+                      <div class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-700">
+                        <%= idx + 1 %>
+                      </div>
+                      <p class="font-semibold text-gray-900 text-sm sm:text-base pt-1 leading-snug flex-1">
+                        <%= q.question_text %>
+                      </p>
                     </div>
-
-                    <% } else { %>
-                      <!-- Questions -->
-                      <div class="flex flex-col gap-5">
-                        <% currentItem.data.questions.forEach((q, idx)=> { %>
-                          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-7">
-
-                            <!-- Question -->
-                            <div class="flex gap-4 mb-5">
-                              <div
-                                class="w-8 h-8 shrink-0 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-700">
-                                <%= idx + 1 %>
-                              </div>
-                              <p class="font-semibold text-gray-900 text-sm sm:text-base pt-1 leading-snug flex-1">
-                                <%= q.question_text %>
-                              </p>
-                            </div>
-
-                            <!-- Choices -->
-                            <div class="flex flex-col gap-2.5 sm:ml-12">
-                              <% if (q.choices && q.choices.length> 0) { %>
-                                <% q.choices.forEach((choice)=> { %>
-                                  <label
-                                    class="flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition group has-[:checked]:border-black has-[:checked]:bg-gray-50">
-                                    <input type="radio" name="answers[<%= q.question_id %>]"
-                                      value="<%= choice.choice_id %>" required
-                                      class="w-4 h-4 text-black border-gray-300 accent-black">
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                                      <%= choice.choice_text %>
-                                    </span>
-                                  </label>
-                                  <% }) %>
-                                    <% } else { %>
-                                      <p
-                                        class="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-lg border border-red-100">
-                                        ไม่พบตัวเลือกสำหรับคำถามนี้</p>
-                                      <% } %>
-                            </div>
-
-                          </div>
-                          <% }) %>
-                      </div>
-
-                      <!-- Submit -->
-                      <div class="flex justify-end pt-2 pb-10">
-                        <button type="submit"
-                          class="px-8 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition shadow-sm">
-                          ส่งคำตอบ →
-                        </button>
-                      </div>
-
+                    <div class="flex flex-col gap-2.5 sm:ml-12">
+                      <% if (q.choices && q.choices.length > 0) { %>
+                        <% q.choices.forEach((choice) => { %>
+                          <label class="flex items-center gap-3 px-4 py-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-gray-300 transition group has-[:checked]:border-black has-[:checked]:bg-gray-50">
+                            <input type="radio" name="answers[<%= q.question_id %>]"
+                              value="<%= choice.choice_id %>" required
+                              class="w-4 h-4 accent-black border-gray-300">
+                            <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                              <%= choice.choice_text %>
+                            </span>
+                          </label>
+                        <% }) %>
+                      <% } else { %>
+                        <p class="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-lg border border-red-100">
+                          ไม่พบตัวเลือกสำหรับคำถามนี้
+                        </p>
                       <% } %>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
 
-            </form>
-          </div>
+              <div class="flex justify-end pt-2 pb-10">
+                <button type="submit"
+                  class="px-8 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition shadow-sm">
+                  ส่งคำตอบ →
+                </button>
+              </div>
+            <% } %>
+          </form>
+        <% } %>
+      </div>
 
-          <% } %>
+    <% } %>
   </main>
 </div>
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script>
+  const sidebar  = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const isLg     = () => window.innerWidth >= 1024;
 
-  let sidebarOpen = true;
+  function openSidebar() {
+    sidebar.classList.remove('-translate-x-full');
+    if (!isLg()) backdrop.classList.remove('hidden');
+  }
+  function closeSidebar() {
+    if (!isLg()) {
+      sidebar.classList.add('-translate-x-full');
+      backdrop.classList.add('hidden');
+    }
+  }
   function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebarOpen = !sidebarOpen;
-    if (sidebarOpen) {
-      sidebar.style.width = '18rem';
-      sidebar.style.minWidth = '18rem';
+    if (isLg()) {
+      // Desktop: collapse by width
+      const collapsed = sidebar.style.width === '0px';
+      sidebar.style.width    = collapsed ? '18rem' : '0px';
+      sidebar.style.minWidth = collapsed ? '18rem' : '0px';
+      sidebar.style.opacity  = collapsed ? '1'     : '0';
     } else {
-      sidebar.style.width = '0';
-      sidebar.style.minWidth = '0';
+      sidebar.classList.contains('-translate-x-full') ? openSidebar() : closeSidebar();
     }
   }
 
-  // Toast UI Viewer
-  document.addEventListener('DOMContentLoaded', function () {
+  window.addEventListener('resize', () => {
+    if (isLg()) {
+      backdrop.classList.add('hidden');
+      sidebar.classList.remove('-translate-x-full');
+      if (!sidebar.style.width || sidebar.style.width === '0px') return;
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
     const viewerEl = document.getElementById('viewer');
     if (viewerEl) {
       toastui.Editor.factory({
