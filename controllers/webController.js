@@ -4,6 +4,7 @@ exports.home = (req, res) => {
    res.render('pages/home');
 };
 
+<<<<<<< HEAD
 exports.mylearning = async (req, res) => {
    try {
       const userId = req.session.user.id;
@@ -23,3 +24,8 @@ exports.aboutus = (req, res) => {
 exports.guide = (req, res) => {
    res.render('pages/guide');
 }
+=======
+exports.aboutus = (req, res) => {
+    res.render('pages/about-us'); 
+};
+>>>>>>> 810e767a9f412bc4fa205befb84efba68a086ad2

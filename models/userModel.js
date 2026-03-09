@@ -117,3 +117,34 @@ exports.softDelete = (id) => {
   });
 }
 
+exports.getEnrolledCourses = (userId) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT c.course_id, c.course_name, c.course_image 
+            FROM enrollments e
+            JOIN courses c ON e.course_id = c.course_id
+            WHERE e.user_id = ?
+            ORDER BY e.enrolled_at DESC
+        `;
+        db.all(sql, [userId], (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows);
+        });
+    });
+};
+
+//updateUser
+exports.updateUser = (userId, data) => {
+    return new Promise((resolve, reject) => {
+        const { first_name, last_name } = data;
+        const sql = `
+            UPDATE users 
+            SET first_name = ?, last_name = ? 
+            WHERE user_id = ?
+        `;
+        db.run(sql, [first_name, last_name, userId], function (err) {
+            if (err) return reject(err);
+            resolve({ changes: this.changes });
+        });
+    });
+};

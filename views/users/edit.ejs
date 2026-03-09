@@ -1,5 +1,6 @@
 <div class="w-full h-40 bg-amber-100"></div>
 
+<<<<<<< HEAD
 <div class="container max-w-7xl mx-auto flex flex-col items-center px-6 py-6 pb-20">
 
     <form class="flex flex-col w-full max-w-3xl gap-8" action="/upload/upload-user-profile/<%= user.user_id %>" method="POST" enctype="multipart/form-data">
@@ -68,13 +69,155 @@
             </a>
             <button type="submit" class="px-6 py-2 bg-secondary text-white rounded-md">
                 บันทึกการเปลี่ยนแปลง
-            </button>
+=======
+
+
+<div class="container max-w-7xl mx-auto flex flex-col items-center px-6 py-6">
+
+
+
+    <form class="flex flex-col items-center gap-4" action="/upload/upload-user-profile/<%= user.user_id %>" method="POST"
+
+        enctype="multipart/form-data">
+
+
+
+        <!-- Profile Image -->
+
+        <div class="-mt-15 flex flex-col justify-center">
+
+            <div class="h-50 aspect-square md:h-40 rounded-full overflow-hidden bg-white">
+
+                <img id="imagePreview" src="<%= user.profile_image || '/icon/profile-anonymous.svg' %>"
+
+                    class="w-full h-full object-cover">
+
+            </div>
+
         </div>
+
+
+
+        <input type="file" id="profileImage" name="profile" accept="image/*" class="hidden"
+
+            onchange="previewImage(event)">
+
+
+
+        <button type="button" onclick="document.getElementById('profileImage').click()"
+
+            class="px-6 py-2 bg-secondary text-white rounded-md">
+
+            เปลี่ยนรูปโปรไฟล์
+
+        </button>
+
+
+
+        <!-- <div>
+
+            <label class="block text-sm md:text-lg font-medium">ชื่อผู้ใช้</label>
+
+            <input type="text" name="username" required
+
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+
+        </div>
+
+
+
+        <div>
+
+            <label class="block text-sm md:text-lg font-medium">ชื่อจริง</label>
+
+            <input type="text" name="first_name" required
+
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+
+        </div>
+
+
+
+        <div>
+
+            <label class="block text-sm md:text-lg font-medium">นามสกุล</label>
+
+            <input type="text" name="last_name" required
+
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+
+        </div>
+
+
+
+        <div>
+
+            <label class="block text-sm md:text-lg font-medium">อีเมล</label>
+
+            <input type="email" name="email" required
+
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+
+        </div>
+
+
+
+        <div>
+
+            <label class="block text-sm md:text-lg font-medium">เบอร์โทร</label>
+
+            <input type="tel" name="phone" required
+
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+
+        </div>
+
+
+
+        <div>
+
+            <label class="block text-sm md:text-lg font-medium">รหัสผ่าน</label>
+
+            <input type="password" name="password" required
+
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+
+        </div>
+
+
+
+        <div>
+
+            <label class="block text-sm md:text-lg font-medium">ยืนยันรหัสผ่าน</label>
+
+            <input type="password" name="confirm_password" required
+
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+
+        </div> -->
+
+
+
+        <div class="h-12 flex items-center mt-3">
+
+            <button type="submit" class="px-6 py-2 bg-secondary text-white rounded-md">
+
+                ยืนยัน
+
+>>>>>>> 810e767a9f412bc4fa205befb84efba68a086ad2
+            </button>
+
+        </div>
+
+
 
     </form>
 
+
+
 </div>
 
+<<<<<<< HEAD
 <script src="/js/scripts.js"></script>
 <script>
     function previewImage(event) {
@@ -88,3 +231,8 @@
         }
     }
 </script>
+=======
+
+
+<script src="/js/scripts.js"></script>
+>>>>>>> 810e767a9f412bc4fa205befb84efba68a086ad2
