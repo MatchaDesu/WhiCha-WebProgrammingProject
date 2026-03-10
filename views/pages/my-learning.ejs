@@ -11,19 +11,12 @@
       <div class="flex flex-col gap-6">
 
         <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 gap-4">
-          <form action="/my-learning" method="get" class="w-full sm:flex-1 relative">
-            <div class="relative flex items-center">
-              <svg class="w-5 h-5 absolute left-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-              
-              <input type="text" name="search" placeholder="ค้นหาคอร์สที่คุณกำลังเรียน..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition">
-
-              <button type="submit" class="absolute right-2 px-3 py-1.5 bg-black text-white text-xs font-medium rounded-md hover:bg-gray-800 transition">
-                ค้นหา
-              </button>
-            </div>
-          </form>
+          <div class="relative flex items-center">
+            <svg class="w-5 h-5 absolute left-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input id="search-input" type="text" placeholder="ค้นหาคอร์สที่คุณกำลังเรียน..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition">
+          </div>
         </div>
 
         <% if (!enrolledCourses || enrolledCourses.length === 0) { %>
@@ -32,10 +25,12 @@
             <a href="/courses" class="px-5 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">ไปหาคอร์สเรียนกันเลย</a>
           </div>
         <% } else { %>
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div id="courses-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
 
             <% enrolledCourses.forEach(course => { %>
-            <a href="/courses/<%= course.course_id %>/dashboard" class="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-gray-300 transition-all duration-300 flex flex-col h-full relative">
+            <a href="/courses/<%= course.course_id %>/dashboard" 
+              class="course-card group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-gray-300 transition-all duration-300 flex flex-col h-full relative"
+              data-name="<%= (course.course_name + ' ' + (course.username || '')).toLowerCase() %>">
 
               <% if (course.progress === 100) { %>
                 <div class="absolute top-3 right-3 z-10">
@@ -94,6 +89,11 @@
             <% }); %>
 
           </div>
+
+          <div id="empty-state" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm p-12 text-center flex flex-col items-center justify-center">
+            <p class="text-gray-500">ไม่พบคอร์สที่ค้นหา</p>
+          </div>
+
         <% } %>
 
       </div>
@@ -101,3 +101,21 @@
     </div>
   </div>
 </section>
+
+<script>
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const keyword = this.value.toLowerCase();
+      const cards = document.querySelectorAll('.course-card');
+      let visible = 0;
+      cards.forEach(card => {
+        const match = card.dataset.name.includes(keyword);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      document.getElementById('empty-state').classList.toggle('hidden', visible > 0);
+      document.getElementById('courses-grid').classList.toggle('hidden', visible === 0);
+    });
+  }
+</script>

@@ -2,8 +2,10 @@
   <div class="container mx-auto px-4 sm:px-6 py-8">
 
     <div class="mb-6">
-      <a href="/instructor/courses" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      <a href="/instructor" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
         กลับหน้ารวมคอร์ส
       </a>
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -13,19 +15,7 @@
       </div>
     </div>
 
-    <div class="bg-white rounded-t-lg border-b border-gray-200 px-2 sm:px-6 shadow-sm overflow-x-auto no-scrollbar">
-      <nav class="flex gap-6 min-w-max" aria-label="Tabs">
-        <a href="/instructor/courses/<%= course.course_id %>/edit" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">
-          ตั้งค่าคอร์สเรียน
-        </a>
-        <a href="/instructor/courses/<%= course.course_id %>/modules" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">
-          จัดการเนื้อหา
-        </a>
-        <a href="/instructor/courses/<%= course.course_id %>/students" class="border-b-2 border-black py-4 px-2 text-sm md:text-base font-semibold text-black whitespace-nowrap">
-          รายชื่อนักเรียน
-        </a>
-      </nav>
-    </div>
+    <%- include('../partials/course-nav.ejs')%>
 
     <div class="bg-white rounded-b-lg shadow-sm p-4 sm:p-6 lg:p-8">
       
@@ -38,7 +28,7 @@
         </div>
         
         <div class="w-full sm:w-64 relative">
-          <input type="text" placeholder="ค้นหาชื่อหรืออีเมล..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-black focus:border-black outline-none transition">
+          <input id="search-input" type="text" placeholder="ค้นหาชื่อหรืออีเมล..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-black focus:border-black outline-none transition">
           <svg class="w-4 h-4 text-gray-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
         </div>
       </div>
@@ -65,7 +55,8 @@
             <tbody class="divide-y divide-gray-200 bg-white">
               
               <% enrollments.forEach(student => { %>
-                <tr class="hover:bg-gray-50 transition">
+                <tr class="student-row hover:bg-gray-50 transition"
+                  data-name="<%= ((student.first_name || '') + ' ' + (student.last_name || '') + ' ' + (student.email || '')).toLowerCase() %>">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0">
@@ -103,7 +94,7 @@
         </div>
 
         <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
-          <p class="text-sm text-gray-500">แสดง 1 ถึง <%= enrollments.length %> จาก <%= enrollments.length %> รายการ</p>
+          <p class="text-sm text-gray-500">แสดง <span id="visible-count"><%= enrollments.length %></span> จาก <%= enrollments.length %> รายการ</p>
           <div class="flex gap-2">
             <button class="px-3 py-1 border border-gray-300 rounded text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>ก่อนหน้า</button>
             <button class="px-3 py-1 border border-gray-300 rounded text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>ถัดไป</button>
@@ -115,3 +106,21 @@
     </div>
   </div>
 </section>
+
+<script>
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const keyword = this.value.toLowerCase();
+      const rows = document.querySelectorAll('.student-row');
+      let visible = 0;
+      rows.forEach(row => {
+        const match = row.dataset.name.includes(keyword);
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      const countEl = document.getElementById('visible-count');
+      if (countEl) countEl.textContent = visible;
+    });
+  }
+</script>

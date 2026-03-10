@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
 
 <!-- Top Bar -->
-<div class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 shadow-sm z-30 relative">
+<div class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 shadow-sm z-30  border">
   <div class="flex items-center gap-3 min-w-0">
     <button onclick="toggleSidebar()"
       class="p-2 -ml-1 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition shrink-0"
@@ -35,8 +35,7 @@
 
   <!-- Sidebar -->
   <aside id="sidebar"
-    class="fixed lg:relative inset-y-0 left-0 z-20 w-72 shrink-0 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0"
-    style="top: 3.5rem; height: calc(100vh - 3.5rem);">
+    class="fixed lg:relative inset-y-0 left-0 z-20 w-72 shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0">
 
     <div class="flex-1 overflow-y-auto py-4 px-3 no-scrollbar">
 
@@ -341,11 +340,11 @@
   }
   function toggleSidebar() {
     if (isLg()) {
-      // Desktop: collapse by width
+      // Desktop: collapse by width + opacity
       const collapsed = sidebar.style.width === '0px';
       sidebar.style.width    = collapsed ? '18rem' : '0px';
-      sidebar.style.minWidth = collapsed ? '18rem' : '0px';
-      sidebar.style.opacity  = collapsed ? '1'     : '0';
+      sidebar.style.minWidth = collapsed ? '' : '0px';
+      sidebar.style.opacity  = collapsed ? '1' : '0';
     } else {
       sidebar.classList.contains('-translate-x-full') ? openSidebar() : closeSidebar();
     }
@@ -353,9 +352,15 @@
 
   window.addEventListener('resize', () => {
     if (isLg()) {
+      // กลับ desktop — reset inline style ให้ sidebar แสดงปกติ
       backdrop.classList.add('hidden');
       sidebar.classList.remove('-translate-x-full');
-      if (!sidebar.style.width || sidebar.style.width === '0px') return;
+      sidebar.style.width    = '';
+      sidebar.style.minWidth = '';
+      sidebar.style.opacity  = '';
+    } else {
+      // กลับ mobile — ซ่อน sidebar
+      sidebar.classList.add('-translate-x-full');
     }
   });
 

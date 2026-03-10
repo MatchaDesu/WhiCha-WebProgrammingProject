@@ -13,4 +13,6 @@ router.get('/courses/:courseId',managerController.getCourseDetail);
 router.post('/courses/:courseId/approve', managerController.approveCourse);
 router.post('/courses/:courseId/reject', managerController.rejectCourse);
 
+router.post('/:userId/roles/change', managerController.changeRole);
+
 module.exports = router;

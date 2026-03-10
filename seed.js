@@ -39,7 +39,7 @@ async function seed() {
   // ── 0. Clear existing data ──────────────────────────────────
   const tables = [
     'reviews',
-    'announcements', 'bookmarks', 'orders',
+    'announcements', 'bookmarks',
     'quiz_attempts', 'choices', 'questions', 'quizzes',
     'lesson_progress', 'content_medias', 'lessons',
     'modules_items', 'modules',
@@ -476,14 +476,14 @@ async function seed() {
   // ──────────────────────────────────────────────────────────
   if (wp.module1QuizIds.length > 0) {
     await run(
-      `INSERT INTO quiz_attempts (quiz_id, user_id, score, total_points, passed, submitted_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [wp.module1QuizIds[0], userIds['student01'], 3, 3, 1, now]
+      `INSERT INTO quiz_attempts (quiz_id, user_id, score, total_points, submitted_at)
+       VALUES (?, ?, ?, ?, ?)`,
+      [wp.module1QuizIds[0], userIds['student01'], 3, 3, now]
     );
     await run(
-      `INSERT INTO quiz_attempts (quiz_id, user_id, score, total_points, passed, submitted_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [wp.module1QuizIds[0], userIds['student02'], 1, 3, 0, now]
+      `INSERT INTO quiz_attempts (quiz_id, user_id, score, total_points, submitted_at)
+       VALUES (?, ?, ?, ?, ?)`,
+      [wp.module1QuizIds[0], userIds['student02'], 1, 3, now]
     );
   }
   console.log('✅ Quiz Attempts');
@@ -507,24 +507,7 @@ async function seed() {
   console.log(`✅ Bookmarks (${bookmarks.length})`);
 
   // ──────────────────────────────────────────────────────────
-  // 9. ORDERS
-  // ──────────────────────────────────────────────────────────
-  const orders = [
-    { user: 'student01', course: 'nodejs', amount: 499, status: 'completed' },
-    { user: 'student02', course: 'database', amount: 299, status: 'completed' },
-    { user: 'student04', course: 'database', amount: 299, status: 'completed' },
-    { user: 'student03', course: 'nodejs', amount: 499, status: 'pending' },
-  ];
-  for (const o of orders) {
-    await run(
-      `INSERT INTO orders (user_id, course_id, amount, status) VALUES (?, ?, ?, ?)`,
-      [userIds[o.user], courseIds[o.course], o.amount, o.status]
-    );
-  }
-  console.log(`✅ Orders (${orders.length})`);
-
-  // ──────────────────────────────────────────────────────────
-  // 10. ANNOUNCEMENTS
+  // 9. ANNOUNCEMENTS
   // ──────────────────────────────────────────────────────────
   const announcements = [
     {
@@ -557,24 +540,24 @@ async function seed() {
   console.log(`✅ Announcements (${announcements.length})`);
 
   // ──────────────────────────────────────────────────────────
-  // 11. REVIEWS
+  // 10. REVIEWS
   // เฉพาะ student ที่ enroll แล้วเท่านั้น
   // ──────────────────────────────────────────────────────────
   const reviews = [
-    // webprog reviews
-    { user: 'student01', course: 'webprog', rating: 5, comment: 'คอร์สดีมากครับ เนื้อหาเข้าใจง่าย เหมาะสำหรับมือใหม่มากๆ' },
-    { user: 'student02', course: 'webprog', rating: 4, comment: 'เนื้อหาครบดี แต่อยากให้มีตัวอย่างเพิ่มขึ้นอีกหน่อย' },
-    { user: 'student03', course: 'webprog', rating: 5, comment: 'ชอบมากเลยค่ะ อธิบายชัดเจนมาก' },
-    // nodejs reviews
-    { user: 'student01', course: 'nodejs', rating: 4, comment: 'เนื้อหาดี แต่ค่อนข้างเร็วสำหรับผู้เริ่มต้น' },
-    // database reviews
-    { user: 'student02', course: 'database', rating: 5, comment: 'สอน SQL ได้ดีมากค่ะ เข้าใจ normalization ขึ้นเยอะเลย' },
-    { user: 'student04', course: 'database', rating: 3, comment: 'พอใช้ได้ครับ อยากให้มีการสอน index และ optimization เพิ่ม' },
+    // webprog — แนะนำทั้งหมด
+    { user: 'student01', course: 'webprog', is_recommended: 1, comment: 'คอร์สดีมากครับ เนื้อหาเข้าใจง่าย เหมาะสำหรับมือใหม่มากๆ' },
+    { user: 'student02', course: 'webprog', is_recommended: 1, comment: 'เนื้อหาครบดี แต่อยากให้มีตัวอย่างเพิ่มขึ้นอีกหน่อย' },
+    { user: 'student03', course: 'webprog', is_recommended: 1, comment: 'ชอบมากเลยค่ะ อธิบายชัดเจนมาก' },
+    // nodejs
+    { user: 'student01', course: 'nodejs',   is_recommended: 1, comment: 'เนื้อหาดี แต่ค่อนข้างเร็วสำหรับผู้เริ่มต้น' },
+    // database
+    { user: 'student02', course: 'database', is_recommended: 1, comment: 'สอน SQL ได้ดีมากค่ะ เข้าใจ normalization ขึ้นเยอะเลย' },
+    { user: 'student04', course: 'database', is_recommended: 0, comment: 'พอใช้ได้ครับ อยากให้มีการสอน index และ optimization เพิ่ม' },
   ];
   for (const r of reviews) {
     await run(
-      `INSERT INTO reviews (course_id, user_id, rating, comment) VALUES (?, ?, ?, ?)`,
-      [courseIds[r.course], userIds[r.user], r.rating, r.comment]
+      `INSERT INTO reviews (course_id, user_id, is_recommended, comment) VALUES (?, ?, ?, ?)`,
+      [courseIds[r.course], userIds[r.user], r.is_recommended, r.comment]
     );
   }
   console.log(`✅ Reviews (${reviews.length})`);
@@ -596,7 +579,6 @@ async function seed() {
     SELECT 'lesson_progress',      COUNT(*)       FROM lesson_progress UNION ALL
     SELECT 'quiz_attempts',        COUNT(*)       FROM quiz_attempts UNION ALL
     SELECT 'bookmarks',            COUNT(*)       FROM bookmarks     UNION ALL
-    SELECT 'orders',               COUNT(*)       FROM orders        UNION ALL
     SELECT 'announcements',        COUNT(*)       FROM announcements UNION ALL
     SELECT 'reviews',              COUNT(*)       FROM reviews
   `);

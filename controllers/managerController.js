@@ -61,6 +61,20 @@ exports.getUsers = async (req, res) => {
     }
 };
 
+exports.changeRole = async (req, res) => {
+    try {
+        const role = req.body.role;
+        const userId = req.params.userId;
+        await userModel.updateUserRole(userId, role);
+
+        const users = await userModel.getAll();
+
+        res.render('manager/users', { users });
+    } catch (err) {
+        res.status(500).send('Server Error');
+    }
+};
+
 exports.getCourses = async (req, res) => {
     try {
         const courses = await courseModel.getAllCourse();

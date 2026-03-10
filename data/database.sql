@@ -66,12 +66,12 @@ CREATE TABLE IF NOT EXISTS courses (
 );
 
 CREATE TABLE IF NOT EXISTS reviews (
-    review_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    course_id   INTEGER NOT NULL,
-    user_id     INTEGER NOT NULL,
-    rating      INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
-    comment     TEXT,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    review_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    course_id      INTEGER NOT NULL,
+    user_id        INTEGER NOT NULL,
+    is_recommended INTEGER NOT NULL CHECK(is_recommended IN (0, 1)),
+    comment        TEXT,
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE(user_id, course_id),
 
@@ -245,22 +245,6 @@ CREATE TABLE IF NOT EXISTS bookmarks (
 );
 
 -- ------------------------------------------------------------
--- orders
--- บันทึกการซื้อคอร์ส (รองรับคอร์สมีราคา)
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS orders (
-    order_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id    INTEGER NOT NULL,
-    course_id  INTEGER NOT NULL,
-    amount     INTEGER NOT NULL,
-    status     TEXT CHECK(status IN ('pending', 'completed', 'refunded')) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (user_id)   REFERENCES users(user_id)     ON DELETE RESTRICT,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE RESTRICT
-);
-
--- ------------------------------------------------------------
 -- announcements
 -- ประกาศจาก instructor ถึงผู้เรียนในคอร์ส
 -- ------------------------------------------------------------
@@ -331,3 +315,31 @@ LEFT JOIN quiz_attempts qa
     AND mi.item_type = 'quiz'
 
 GROUP BY e.user_id, e.course_id;
+
+-- ============================================================
+--  VIEW: course_reviews_view
+--  รวม review + ข้อมูลผู้รีวิว สำหรับแสดงในหน้า detail
+-- ============================================================
+
+CREATE VIEW IF NOT EXISTS course_reviews_view AS
+SELECT
+    r.review_id,
+    r.course_id,
+    r.user_id,
+    r.is_recommended,
+    r.comment,
+    r.created_at,
+    u.first_name || ' ' || u.last_name AS reviewer_name,
+    u.profile_image
+FROM reviews r
+JOIN users u ON u.user_id = r.user_id;
+
+CREATE VIEW IF NOT EXISTS course_review_summary_view AS
+SELECT
+    course_id,
+    COUNT(*)                                              AS total,
+    SUM(is_recommended)                                   AS recommend_count,
+    ROUND(SUM(is_recommended) * 100.0 / COUNT(*), 0)     AS recommend_pct
+FROM reviews
+GROUP BY course_id;
+

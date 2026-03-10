@@ -52,3 +52,18 @@ exports.updateCourse = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
+exports.uploadLessonImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const url = `/uploads/lessons/${req.file.filename}`;
+        res.json({ url });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Upload failed' });
+    }
+};

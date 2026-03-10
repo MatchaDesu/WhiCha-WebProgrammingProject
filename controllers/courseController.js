@@ -8,7 +8,8 @@ const quizModel = require('../models/quizModel');
 const questionModel = require('../models/questionModel');
 const choiceModel = require('../models/choiceModel');
 const lessonProgressModel = require('../models/lessonProgressModel');
-const quizAttemptModel    = require('../models/quizAttemptModel');
+const quizAttemptModel = require('../models/quizAttemptModel');
+const reviewModel = require('../models/reviewModel');
 
 exports.getPublishedCourses = async (req, res) => {
     try {
@@ -30,29 +31,97 @@ exports.getPublishedCourses = async (req, res) => {
     }
 };
 
-
-
-exports.getCourse = async (req, res) => {
+exports.getDetail = async (req, res) => {
     try {
         const courseId = req.params.courseId;
 
-        const course = await courseModel.getById(courseId);
+        const course  = await courseModel.getById(courseId);
         const lessons = await lessonModel.getByCourse(courseId);
+        const modules = await moduleModel.getByCourse(courseId);
 
-        let isEnrolled = false;
+        let isEnrolled    = false;
+        let userReview    = null;
+        let reviews       = [];
+        let reviewSummary = null;
+
         if (req.session && req.session.user) {
             const userId = req.session.user.id;
             isEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
+
+            // รีวิวของ user คนนี้ (ใช้เช็คว่ารีวิวไปแล้วหรือยัง)
+            userReview = await reviewModel.getByUserAndCourse(userId, courseId);
         }
 
-        // 4. ส่งข้อมูลทั้งหมดไปที่ View (สังเกตว่ามีการส่ง lessons ไปด้วยแล้ว!)
-        res.render('courses/detail', { course, isEnrolled, lessons });
-        
+        // รายการรีวิวทั้งหมด + สรุป % แนะนำ
+        reviews       = await reviewModel.getByCourse(courseId);
+        reviewSummary = await reviewModel.getSummaryByCourse(courseId);
+
+        res.render('courses/detail', {
+            course,
+            isEnrolled,
+            lessons,
+            modules,
+            reviews,
+            reviewSummary,
+            userReview,
+        });
+
     } catch (err) {
         console.error("Error in getCourse:", err);
         res.status(500).send("Server Error");
     }
 };
+
+exports.getCheckout = async (req, res) => {
+    try {
+        const courseId = req.params.courseId;
+
+        // ต้อง login ก่อน
+        if (!req.session || !req.session.user) {
+            return res.redirect(`/signin`);
+        }
+
+        const userId = req.session.user.id;
+
+        const course = await courseModel.getById(courseId);
+        if (!course) return res.status(404).send('Not found');
+
+        // ถ้า enroll ไปแล้ว ไม่ต้องผ่าน checkout — กลับหน้า detail เลย
+        const alreadyEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
+        if (alreadyEnrolled) return res.redirect(`/courses/${courseId}`);
+
+        res.render('courses/checkout', { course });
+
+    } catch (err) {
+        console.error('Error in getCheckout:', err);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.submitReview = async (req, res) => {
+    try {
+        const courseId = req.params.courseId;
+        const userId   = req.session.user.id;
+        const { is_recommended, comment } = req.body;
+
+        // ตรวจว่า enroll อยู่ก่อน
+        const enrolled = await enrollmentModel.isEnrolled(userId, courseId);
+        if (!enrolled) return res.status(403).send('Forbidden');
+
+        // ตรวจ is_recommended ต้องเป็น 0 หรือ 1
+        const thumb = Number(is_recommended);
+        if (thumb !== 0 && thumb !== 1) return res.status(400).send('Bad Request');
+
+        await reviewModel.upsert(courseId, userId, thumb, comment);
+
+        res.redirect(`/courses/${courseId}`);
+
+    } catch (err) {
+        console.error('Error in submitReview:', err);
+        res.status(500).send('Server Error');
+    }
+};
+
 
 exports.getDashboard = async (req, res) => {
     try {

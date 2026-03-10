@@ -51,8 +51,8 @@
             <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">ผู้ใช้</th>
             <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">อีเมล</th>
             <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell">เบอร์โทร</th>
-            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Role</th>
             <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell">สมัครเมื่อ</th>
+            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">ยศ</th>
           </tr>
         </thead>
         <tbody id="users-table" class="divide-y divide-gray-100">
@@ -73,16 +73,18 @@
               </td>
               <td class="px-5 py-3.5 text-xs text-gray-600 hidden sm:table-cell"><%= u.email %></td>
               <td class="px-5 py-3.5 text-xs text-gray-600 hidden md:table-cell"><%= u.phone || '-' %></td>
-              <td class="px-5 py-3.5">
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border
-                  <%= u.role === 'instructor' ? 'bg-blue-50 text-blue-700 border-blue-200'
-                    : u.role === 'manager'    ? 'bg-purple-50 text-purple-700 border-purple-200'
-                    : 'bg-gray-50 text-gray-600 border-gray-200' %>">
-                  <%= u.role %>
-                </span>
-              </td>
               <td class="px-5 py-3.5 text-xs text-gray-400 hidden lg:table-cell">
                 <%= new Date(u.created_at).toLocaleDateString('th-TH') %>
+              </td>
+              <td class="px-5 py-3.5">
+                <form method="POST" action="/manager/<%= u.user_id %>/roles/change">
+                  <select name="role" onchange="this.form.submit()"
+                    class="text-xs font-semibold border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition cursor-pointer hover:bg-gray-50">
+                    <option value="student"    <%= u.role === 'student'    ? 'selected' : '' %>>Student</option>
+                    <option value="instructor" <%= u.role === 'instructor' ? 'selected' : '' %>>Instructor</option>
+                    <option value="manager"    <%= u.role === 'manager'    ? 'selected' : '' %>>Manager</option>
+                  </select>
+                </form>
               </td>
             </tr>
           <% }) %>

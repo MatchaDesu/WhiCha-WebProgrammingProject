@@ -103,6 +103,20 @@ exports.updateUserPassword = (id, password) => {
   });
 }
 
+exports.updateUserRole = (id, role) => {
+  return new Promise((resolve, reject) => {
+
+    const sql = `UPDATE users 
+                 SET role = ?
+                 WHERE user_id = ?`;
+
+    db.run(sql, [role, id], function (err) {
+      if (err) return reject(err);
+      resolve({ changes: this.changes });
+    });
+  });
+}
+
 exports.softDelete = (id) => {
   return new Promise((resolve, reject) => {
 

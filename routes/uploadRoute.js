@@ -17,4 +17,11 @@ router.post(
     uploadController.updateCourse
 );
 
+router.post(
+    '/upload/lesson-image',
+    uploadSource('lessons').single('image'),
+    uploadController.uploadLessonImage
+);
+
+
 module.exports = router;

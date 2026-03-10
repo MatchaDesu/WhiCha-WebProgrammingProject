@@ -109,7 +109,7 @@
       cards.forEach(card => {
         const name = (card.dataset.name || '').toLowerCase();
         const show = !keyword || name.includes(keyword);
-        card.parentElement.style.display = show ? '' : 'none';
+        card.style.display = show ? '' : 'none';
         if (show) count++;
       });
 

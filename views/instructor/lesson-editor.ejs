@@ -4,20 +4,16 @@
   <div class="container mx-auto px-4 sm:px-6 py-8">
 
     <div class="mb-6">
-      <a href="/instructor/courses" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      <a href="/instructor" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
         กลับหน้ารวมคอร์ส
       </a>
       <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1"><%= course.course_name %></h1>
     </div>
 
-    <div class="bg-white rounded-t-lg border-b border-gray-200 px-2 sm:px-6 shadow-sm overflow-x-auto no-scrollbar">
-      <nav class="flex gap-6 min-w-max">
-        <a href="/instructor/courses/<%= course.course_id %>/edit" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">ตั้งค่าคอร์สเรียน</a>
-        <a href="/instructor/courses/<%= course.course_id %>/modules" class="border-b-2 border-black py-4 px-2 text-sm md:text-base font-semibold text-black whitespace-nowrap">จัดการเนื้อหา</a>
-        <a href="/instructor/courses/<%= course.course_id %>/students" class="border-b-2 border-transparent py-4 px-2 text-sm md:text-base font-medium text-gray-500 hover:border-gray-300 hover:text-gray-800 whitespace-nowrap transition">รายชื่อนักเรียน</a>
-      </nav>
-    </div>
+    <%- include('../partials/course-nav.ejs')%>
 
     <div class="flex gap-0 bg-white rounded-b-lg shadow-sm overflow-hidden">
 
@@ -135,10 +131,26 @@
     if (editorElement && hiddenContent) {
       const editor = new toastui.Editor({
         el: editorElement,
-        height: '600px', // ปรับความสูงได้ตามต้องการ
-        initialEditType: 'markdown', // หรือ 'wysiwyg' 
-        previewStyle: 'vertical', // 'vertical' สำหรับแบ่งครึ่งจอซ้ายขวา (Desktop) หรือ 'tab' สำหรับหน้าจอเล็ก
-        initialValue: hiddenContent.value // ดึงค่าเดิมจาก DB มาแสดง
+        height: '600px',
+        initialEditType: 'markdown',
+        previewStyle: 'vertical',
+        initialValue: hiddenContent.value,
+
+        hooks: {
+          addImageBlobHook: async (blob, callback) => {
+            const formData = new FormData();
+            formData.append('image', blob);
+
+            try {
+              const res  = await fetch('/upload/lesson-image', { method: 'POST', body: formData });
+              const data = await res.json();
+              callback(data.url, blob.name || 'image');
+            } catch (err) {
+              console.error('Image upload failed:', err);
+              callback('', 'upload failed');
+            }
+          }
+        }
       });
 
       // ดักจับจังหวะก่อนฟอร์มถูก Submit เพื่ออัปเดตค่าจาก Editor ลงใน Hidden Input
