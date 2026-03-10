@@ -1,0 +1,94 @@
+<section id="course-dashboard" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <a href="/instructor" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1">
+          <%= course.course_name %>
+        </h1>
+        <% if (course.course_status==='published' ) { %>
+        <span class="...bg-green-100 text-green-700...">เผยแพร่แล้ว</span>
+        <% } else if (course.course_status==='pending' ) { %>
+        <span class="...bg-yellow-100 text-yellow-700...">รอการอนุมัติ</span>
+        <% } else { %>
+        <form action="/instructor/courses/<%= course.course_id %>/pending" method="POST" class="inline">
+          <span class="...bg-gray-100 text-gray-600...">ฉบับร่าง</span>
+          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition">
+            ส่งขออนุมัติ / Publish
+          </button>
+        </form>
+        
+        <% } %>
+      </div>
+    </div>
+
+    <%- include('../partials/course-nav.ejs')%>
+
+    <div class="bg-white rounded-b-lg shadow-sm p-4 sm:p-6 lg:p-8">
+      <form action="/upload/upload-courses-cover/<%= course.course_id %>" method="POST" enctype="multipart/form-data">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          <div class="lg:col-span-2 flex flex-col gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">ชื่อคอร์สเรียน</label>
+              <input type="text" name="name" value="<%= course.course_name %>" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-black focus:border-black outline-none transition" required>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">คำอธิบายคอร์ส (Description)</label>
+              <textarea name="description" rows="5" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-black focus:border-black outline-none transition"><%= course.description %></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">ราคา (บาท)</label>
+                <input type="number" name="price" value="<%= course.course_price %>" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-black focus:border-black outline-none transition">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">หมวดหมู่</label>
+                <select name="category" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-black focus:border-black outline-none transition bg-white">
+                  <% categories.forEach(category=> { %>
+                  <option value="<%= category.category_id %>" <%=course.category_id===category.category_id
+                      ? 'selected' : '' %>>
+                    <%= category.category_name %>
+                  </option>
+                  <% }) %>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-6">
+            <div class="p-5 border border-gray-200 rounded-lg bg-gray-50">
+              <label class="block text-sm font-semibold text-gray-700 mb-3">รูปภาพหน้าปกคอร์ส</label>
+
+              <div class="aspect-video w-full bg-gray-200 rounded-md mb-4 overflow-hidden relative border border-gray-300">
+                <% if (course.course_image) { %>
+                <img src="<%= course.course_image %>" class="w-full h-full object-cover">
+                <% } %>
+              </div>
+
+              <input type="file" name="course_image" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-200 file:text-gray-700 hover:file:bg-gray-300 cursor-pointer">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+          <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-secondary text-white font-semibold rounded-lg shadow-md hover:opacity-80 transition">
+            บันทึกการเปลี่ยนแปลง
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,121 @@
+<section id="my-learning" class="bg-gray-50 min-h-screen pb-16">
+  <div class="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-7xl">
+
+    <div class="mb-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900">การเรียนของฉัน</h1>
+      <p class="text-gray-500 mt-2 text-sm md:text-base">ติดตามความคืบหน้าและเรียนต่อในคอร์สของคุณ</p>
+    </div>
+
+    <div class="grid gap-6 lg:gap-8 items-start">
+
+      <div class="flex flex-col gap-6">
+
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-3 sm:p-4 gap-4">
+          <div class="relative flex items-center">
+            <svg class="w-5 h-5 absolute left-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input id="search-input" type="text" placeholder="ค้นหาคอร์สที่คุณกำลังเรียน..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition">
+          </div>
+        </div>
+
+        <% if (!enrolledCourses || enrolledCourses.length === 0) { %>
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-12 text-center flex flex-col items-center justify-center">
+            <p class="text-gray-500 mb-4">คุณยังไม่ได้ลงทะเบียนเรียนคอร์สใดๆ</p>
+            <a href="/courses" class="px-5 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition">ไปหาคอร์สเรียนกันเลย</a>
+          </div>
+        <% } else { %>
+          <div id="courses-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            <% enrolledCourses.forEach(course => { %>
+            <a href="/courses/<%= course.course_id %>/dashboard" 
+              class="course-card group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-gray-300 transition-all duration-300 flex flex-col h-full relative"
+              data-name="<%= (course.course_name + ' ' + (course.username || '')).toLowerCase() %>">
+
+              <% if (course.progress === 100) { %>
+                <div class="absolute top-3 right-3 z-10">
+                  <span class="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded border border-green-200 shadow-sm">
+                    เรียนจบแล้ว
+                  </span>
+                </div>
+              <% } %>
+
+              <div class="w-full aspect-video bg-gray-100 relative overflow-hidden shrink-0 border-b border-gray-100">
+                <% if (course.course_image) { %>
+                  <img src="<%= course.course_image %>" alt="<%= course.course_name %>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 <% if (course.progress === 100) { %> opacity-90 <% } %>">
+                <% } %>
+              </div>
+
+              <div class="flex flex-col p-5 flex-1">
+                
+                <h2 class="text-lg font-bold text-gray-900 line-clamp-2 mb-4 group-hover:text-black transition">
+                  <%= course.course_name %>
+                </h2>
+
+                <div class="flex items-center gap-2.5 mb-2">
+                  <div class="w-6 h-6 rounded-full overflow-hidden shrink-0 bg-gray-200 border border-gray-200">
+                    <img src="<%= course.profile_image %>" alt="" class="h-full w-full object-cover">
+                  </div>
+                  <h3 class="text-xs font-semibold text-gray-500 line-clamp-1">
+                    <%= course.username %>
+                  </h3>
+                </div>
+
+                <div class="mt-auto pt-4 border-t border-gray-100 flex flex-col gap-3">
+                  
+                  <div class="flex justify-between items-center text-[12px] font-semibold text-gray-700">
+                    <span>ความคืบหน้า</span>
+                    <span><%= course.progress || '0' %>%</span>
+                  </div>
+                  
+                  <div class="w-full bg-gray-100 rounded-full h-1.5">
+                    <div class="bg-secondary h-1.5 rounded-full" style="width: <%= course.progress %>% "></div>
+                  </div>
+
+                  <div class="flex justify-end mt-1">
+                    <span class="text-[11px] font-bold uppercase text-secondary  ">
+                      <% if (course.progress === 100) { %>
+                        ทบทวนเนื้อหา
+                      <% } else { %>
+                        เรียนต่อ
+                      <% } %>
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
+            </a>
+            <% }); %>
+
+          </div>
+
+          <div id="empty-state" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm p-12 text-center flex flex-col items-center justify-center">
+            <p class="text-gray-500">ไม่พบคอร์สที่ค้นหา</p>
+          </div>
+
+        <% } %>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const keyword = this.value.toLowerCase();
+      const cards = document.querySelectorAll('.course-card');
+      let visible = 0;
+      cards.forEach(card => {
+        const match = card.dataset.name.includes(keyword);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      document.getElementById('empty-state').classList.toggle('hidden', visible > 0);
+      document.getElementById('courses-grid').classList.toggle('hidden', visible === 0);
+    });
+  }
+</script>

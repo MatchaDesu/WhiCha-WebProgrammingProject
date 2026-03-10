@@ -1,0 +1,177 @@
+<section class="bg-gray-50 min-h-screen pb-16">
+  <div class="container mx-auto px-4 sm:px-6 py-10 max-w-7xl">
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900">สำรวจคอร์สเรียน</h1>
+      <p class="text-gray-500 mt-1.5 text-sm md:text-base">ค้นหาและเลือกเรียนคอร์สที่ใช่สำหรับคุณ</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
+
+      <!-- Sidebar Filter -->
+      <aside class="hidden lg:flex flex-col col-span-1 gap-4">
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sticky">
+          <h2 class="text-sm font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100 uppercase tracking-widest">
+            หมวดหมู่
+          </h2>
+          <ul class="flex flex-col gap-1.5">
+            <li>
+              <button onclick="filterCategory('all')" data-cat="all"
+                class="cat-btn w-full text-left px-3 py-2 text-sm font-semibold rounded-lg border transition
+                       border-black bg-black text-white">
+                ทั้งหมด
+              </button>
+            </li>
+            <% categories.forEach(category => { %>
+            <li>
+              <button onclick="filterCategory('<%= category.category_id %>')" data-cat="<%= category.category_id %>"
+                class="cat-btn w-full text-left px-3 py-2 text-sm font-medium rounded-lg border transition
+                       border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-black">
+                <%= category.category_name %>
+              </button>
+            </li>
+            <% }); %>
+          </ul>
+        </div>
+      </aside>
+
+
+      <!-- Main Content -->
+      <div class="col-span-1 lg:col-span-3 flex flex-col gap-5">
+
+        <!-- Search Bar -->
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-3">
+          <div class="relative flex items-center">
+            <svg class="w-4 h-4 absolute left-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input
+              id="search-input"
+              type="text"
+              placeholder="ค้นหาชื่อคอร์สเรียน, ผู้สอน..."
+              class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:bg-white focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition"
+            >
+          </div>
+        </div>
+
+        <!-- Course Count -->
+        <% if (courses && courses.length > 0) { %>
+          <p id="course-count" class="text-sm text-gray-500 -mb-1">พบ <span id="count-num" class="font-semibold text-gray-900"><%= courses.length %></span> คอร์ส</p>
+        <% } %>
+
+        <!-- Empty State -->
+        <% if (!courses || courses.length === 0) { %>
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-14 text-center">
+            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+            <p class="text-gray-700 font-semibold mb-1">ไม่พบคอร์สเรียน</p>
+            <p class="text-sm text-gray-400">ลองเปลี่ยนคำค้นหาหรือเลือกหมวดหมู่อื่น</p>
+          </div>
+
+        <% } else { %>
+          <!-- Course Grid -->
+          <div id="courses-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+            <% courses.forEach(course => { %>
+              <a href="/courses/<%= course.course_id %>" 
+                class="course-card group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md hover:border-gray-300 transition-all duration-300 flex flex-col h-full"
+                data-name="<%= (course.course_name + ' ' + (course.instructor_name || '') + ' ' + (course.description || '')).toLowerCase() %>"
+                data-category="<%= course.category_id %>">
+
+                <!-- Thumbnail -->
+                <div class="w-full aspect-video bg-gray-100 relative overflow-hidden shrink-0 border-b border-gray-100">
+                  <% if (course.course_image) { %>
+                    <img src="<%= course.course_image %>" alt="<%= course.course_name %>" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  <% } else { %>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-300 bg-gray-50">
+                      <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                      <span class="text-xs font-medium">ไม่มีรูปภาพ</span>
+                    </div>
+                  <% } %>
+                </div>
+
+                <!-- Info -->
+                <div class="flex flex-col p-5 flex-1">
+                  <h2 class="text-base font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-black transition leading-snug">
+                    <%= course.course_name %>
+                  </h2>
+                  <p class="text-sm text-gray-500 line-clamp-2 mb-4 leading-relaxed flex-1">
+                    <%= course.description || 'ไม่มีคำอธิบายคอร์ส' %>
+                  </p>
+
+                  <!-- Instructor -->
+                  <div class="flex items-center gap-2 mb-4">
+                    <div class="w-6 h-6 rounded-full overflow-hidden shrink-0 bg-gray-200 border border-gray-100">
+                      <img src="<%= course.instructor_profile || '/icon/profile-anonymous.svg' %>" alt="" class="h-full w-full object-cover">
+                    </div>
+                    <span class="text-xs font-medium text-gray-500 truncate"><%= course.instructor_name || 'ไม่ระบุผู้สอน' %></span>
+                  </div>
+
+                  <!-- Price Row -->
+                  <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <span class="text-lg font-bold text-gray-900">
+                      <% if (course.course_price == 0) { %>ฟรี<% } else { %>฿<%= course.course_price %><% } %>
+                    </span>
+                    <span class="font-bold text-secondary px-2.5 py-1 rounded-md">
+                      ดูรายละเอียด
+                    </span>
+                  </div>
+                </div>
+
+              </a>
+            <% }); %>
+          </div>
+
+          <div id="empty-state" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm p-14 text-center">
+            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4 text-gray-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+            <p class="text-gray-700 font-semibold mb-1">ไม่พบคอร์สเรียน</p>
+            <p class="text-sm text-gray-400">ลองเปลี่ยนคำค้นหาหรือเลือกหมวดหมู่อื่น</p>
+          </div>
+
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  let currentCat = 'all';
+
+  function filterCategory(catId) {
+    currentCat = String(catId);
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      const active = String(btn.dataset.cat) === currentCat;
+      btn.classList.toggle('bg-black',      active);
+      btn.classList.toggle('text-white',    active);
+      btn.classList.toggle('border-black',  active);
+      btn.classList.toggle('text-gray-600', !active);
+      btn.classList.toggle('border-gray-200', !active);
+    });
+    applyFilters();
+  }
+
+  document.getElementById('search-input').addEventListener('input', applyFilters);
+
+  function applyFilters() {
+    const keyword = document.getElementById('search-input').value.toLowerCase();
+    const cards   = document.querySelectorAll('.course-card');
+    let visible   = 0;
+
+    cards.forEach(card => {
+      const matchCat  = currentCat === 'all' || String(card.dataset.category) === currentCat;
+      const matchName = card.dataset.name.includes(keyword);
+      const show      = matchCat && matchName;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const countEl = document.getElementById('count-num');
+    if (countEl) countEl.textContent = visible;
+    document.getElementById('empty-state').classList.toggle('hidden', visible > 0);
+    document.getElementById('courses-grid').classList.toggle('hidden', visible === 0);
+  }
+</script>

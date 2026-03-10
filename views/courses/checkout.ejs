@@ -1,0 +1,118 @@
+<section class="bg-gray-50 min-h-screen pb-16">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+    <!-- Back -->
+    <div class="mb-6">
+      <a href="/courses/<%= course.course_id %>" class="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-black transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        กลับไปหน้าคอร์ส
+      </a>
+    </div>
+
+    <h1 class="text-2xl font-extrabold text-gray-900 mb-6">สรุปคำสั่งซื้อ</h1>
+
+    <!-- Order Card -->
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-4">
+
+      <!-- Course Row -->
+      <div class="flex gap-4 p-5">
+        <div class="w-28 h-18 rounded-lg overflow-hidden bg-gray-100 shrink-0 border border-gray-100" style="height:4.5rem;">
+          <% if (course.course_image) { %>
+            <img src="<%= course.course_image %>" class="w-full h-full object-cover" alt="<%= course.course_name %>">
+          <% } else { %>
+            <div class="w-full h-full flex items-center justify-center text-gray-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          <% } %>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h2 class="font-bold text-gray-900 text-sm leading-snug mb-1 line-clamp-2"><%= course.course_name %></h2>
+          <p class="text-xs text-gray-400">โดย <span class="font-medium text-gray-600"><%= course.instructor_name || 'ไม่ระบุ' %></span></p>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Price Breakdown -->
+      <div class="px-5 py-4 flex flex-col gap-2">
+        <div class="flex items-center justify-between text-sm text-gray-600">
+          <span>ราคาคอร์ส</span>
+          <span class="font-medium">
+            <% if (course.course_price == 0) { %>ฟรี<% } else { %>฿<%= course.course_price.toLocaleString() %><% } %>
+          </span>
+        </div>
+        <% if (course.course_price > 0) { %>
+          <div class="flex items-center justify-between text-sm text-gray-600">
+            <span>ส่วนลด</span>
+            <span class="font-medium text-green-600">-฿0</span>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Total -->
+      <div class="border-t border-gray-100 px-5 py-4 flex items-center justify-between">
+        <span class="font-bold text-gray-900">รวมทั้งหมด</span>
+        <span class="text-2xl font-extrabold text-gray-900">
+          <% if (course.course_price == 0) { %>ฟรี<% } else { %>฿<%= course.course_price.toLocaleString() %><% } %>
+        </span>
+      </div>
+    </div>
+
+    <!-- Payment Method (ราคา > 0) -->
+    <% if (course.course_price > 0) { %>
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 mb-4">
+        <h3 class="text-sm font-bold text-gray-700 uppercase tracking-widest mb-4">วิธีชำระเงิน</h3>
+        <div class="flex flex-col gap-2">
+          <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-black transition has-[:checked]:border-black has-[:checked]:bg-gray-50">
+            <input type="radio" name="payment" value="credit" checked class="accent-black">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              </svg>
+              <span class="text-sm font-medium text-gray-700">บัตรเครดิต / เดบิต</span>
+            </div>
+          </label>
+          <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-black transition has-[:checked]:border-black has-[:checked]:bg-gray-50">
+            <input type="radio" name="payment" value="promptpay" class="accent-black">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+              </svg>
+              <span class="text-sm font-medium text-gray-700">พร้อมเพย์ (QR Code)</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Free note -->
+    <% if (course.course_price == 0) { %>
+      <div class="flex items-center gap-2.5 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 text-sm text-green-700">
+        <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        คอร์สนี้ฟรี ไม่มีค่าใช้จ่าย เพียงยืนยันเพื่อเริ่มเรียนได้เลย
+      </div>
+    <% } %>
+
+    <!-- Confirm Button -->
+    <form action="/courses/<%= course.course_id %>/enroll" method="POST">
+      <button type="submit"
+        class="w-full py-3.5 bg-black text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition shadow-sm">
+        <% if (course.course_price == 0) { %>
+          ยืนยันลงทะเบียนเรียน (ฟรี)
+        <% } else { %>
+          ยืนยันชำระเงิน ฿<%= course.course_price.toLocaleString() %>
+        <% } %>
+      </button>
+    </form>
+
+    <p class="text-center text-xs text-gray-400 mt-3">การลงทะเบียนถือว่าคุณยอมรับเงื่อนไขการใช้งาน</p>
+
+  </div>
+</section>

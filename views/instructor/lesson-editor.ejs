@@ -1,0 +1,158 @@
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+
+<section id="course-dashboard" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <a href="/instructor" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1"><%= course.course_name %></h1>
+    </div>
+
+    <%- include('../partials/course-nav.ejs')%>
+
+    <div class="flex gap-0 bg-white rounded-b-lg shadow-sm overflow-hidden">
+
+      <div class="w-64 xl:w-72 shrink-0 border-r border-gray-200 flex flex-col hidden md:flex">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+          <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">เนื้อหาคอร์ส</span>
+          <a href="/instructor/courses/<%= course.course_id %>/modules" class="text-xs text-gray-400 hover:text-black transition">จัดการ →</a>
+        </div>
+
+        <div class="flex-1 overflow-y-auto py-2">
+          <% modules.forEach((module, mIdx) => { %>
+            <div class="mb-1">
+              <div class="px-4 py-2 flex items-center gap-2">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Module <%= mIdx + 1 %></span>
+              </div>
+              <p class="px-4 pb-2 text-xs font-semibold text-gray-700 leading-snug line-clamp-2"><%= module.module_name %></p>
+
+              <% if (module.items && module.items.length > 0) { %>
+                <% module.items.forEach((item, iIdx) => { %>
+                  <% 
+                    const isActive = currentItem && item.type === 'lesson' && currentItem.data && currentItem.data.lesson_id === item.data.lesson_id;
+                    const href = item.type === 'lesson'
+                      ? `/instructor/courses/${course.course_id}/modules/lesson/${item.data.lesson_id}`
+                      : `/instructor/courses/${course.course_id}/modules/quiz/${item.data.quiz_id}`;
+                  %>
+                  <a href="<%= href %>"
+                     class="flex items-center gap-2.5 px-4 py-2 text-xs transition
+                        <%= isActive
+                          ? 'bg-orange-50 border-r-2 border-orange-500 text-orange-700 font-semibold'
+                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800' %>">
+                    <% if (item.type === 'lesson') { %>
+                      <div class="p-1 rounded <%= isActive ? 'bg-orange-100 text-orange-500' : 'bg-gray-100 text-gray-400' %> shrink-0">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                      </div>
+                    <% } else { %>
+                      <div class="p-1 rounded bg-gray-100 text-gray-400 shrink-0">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                      </div>
+                    <% } %>
+                    <span class="truncate">
+                      <%= mIdx + 1 %>.<%= iIdx + 1 %> 
+                      <%= item.type === 'lesson' ? item.data.lesson_name : item.data.title %>
+                    </span>
+                  </a>
+                <% }) %>
+              <% } else { %>
+                <p class="px-4 pb-2 text-xs text-gray-400 italic">ยังไม่มีเนื้อหา</p>
+              <% } %>
+            </div>
+            <% if (mIdx < modules.length - 1) { %><hr class="border-gray-100 mx-4 my-1"><% } %>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="flex-1 p-5 sm:p-7 overflow-y-auto min-w-0">
+
+        <% if (!currentItem) { %>
+          <div class="flex flex-col items-center justify-center h-64 text-gray-400">
+            <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"></path></svg>
+            <p class="font-medium">เลือก Lesson จากเมนูซ้าย</p>
+          </div>
+        <% } else { %>
+          <% const lesson = currentItem.data; %>
+
+          <form id="lesson-form" action="/instructor/courses/<%= course.course_id %>/lessons/<%= lesson.lesson_id %>/update" method="POST" class="flex flex-col gap-5 h-full">
+
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-[10px] font-bold px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full uppercase tracking-widest">Lesson</span>
+                  <span class="text-xs text-gray-400">ID: <%= lesson.lesson_id %></span>
+                </div>
+                <input
+                  type="text"
+                  name="lesson_name"
+                  value="<%= lesson.lesson_name %>"
+                  required
+                  placeholder="ชื่อ Lesson..."
+                  class="w-full text-xl font-bold text-gray-900 bg-transparent border-0 border-b-2 border-gray-200 focus:border-orange-400 outline-none pb-1 transition placeholder-gray-300"
+                >
+              </div>
+              <button type="submit" class="shrink-0 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                บันทึก
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-2 flex-1 mt-2">
+              <label class="text-sm font-semibold text-gray-700">เนื้อหาบทเรียน</label>
+              <div id="toast-editor" class="bg-white rounded-lg shadow-sm border border-gray-200"></div>
+              <textarea id="hidden-content" name="content" style="display: none;"><%= lesson.content || '' %></textarea>
+            </div>
+
+          </form>
+        <% } %>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const editorElement = document.querySelector('#toast-editor');
+    const hiddenContent = document.getElementById('hidden-content');
+    const lessonForm    = document.getElementById('lesson-form');
+    const lessonId      = '<%= currentItem ? currentItem.data.lesson_id : "" %>';
+
+    if (editorElement && hiddenContent) {
+      const editor = new toastui.Editor({
+        el: editorElement,
+        height: '600px',
+        initialEditType: 'markdown',
+        previewStyle: 'vertical',
+        initialValue: hiddenContent.value,
+
+        hooks: {
+          addImageBlobHook: async (blob, callback) => {
+            const formData = new FormData();
+            formData.append('image', blob);
+
+            try {
+              const res  = await fetch(`/upload/lesson-image/${lessonId}`, { method: 'POST', body: formData });
+              const data = await res.json();
+              callback(data.url, blob.name || 'image');
+            } catch (err) {
+              console.error('Image upload failed:', err);
+              callback('', 'upload failed');
+            }
+          }
+        }
+      });
+
+      if (lessonForm) {
+        lessonForm.addEventListener('submit', function () {
+          hiddenContent.value = editor.getMarkdown();
+        });
+      }
+    }
+  });
+</script>

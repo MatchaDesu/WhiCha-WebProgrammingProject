@@ -1,0 +1,447 @@
+<section id="course-dashboard" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <a href="/instructor" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1">
+          <%= course.course_name %>
+        </h1>
+      </div>
+    </div>
+
+    <!-- Tab Nav -->
+    <%- include('../partials/course-nav.ejs')%>
+
+    <!-- Main Content -->
+    <div class="bg-white rounded-b-lg shadow-sm p-4 sm:p-6 lg:p-8">
+
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">โครงสร้างหลักสูตร</h2>
+          <p class="text-sm text-gray-500 mt-1">เพิ่มบทเรียน (Module) และเนื้อหาย่อย (Lesson / Quiz) ของคุณที่นี่</p>
+        </div>
+        <button onclick="openPanel('module')" class="w-full sm:w-auto px-6 py-2.5 bg-black text-white font-semibold rounded-lg shadow-sm hover:bg-gray-800 transition flex items-center justify-center gap-2 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          เพิ่ม Module ใหม่
+        </button>
+      </div>
+
+      <% if (!modules || modules.length === 0) { %>
+        <div class="text-center py-20 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+          <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-400">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          </div>
+          <p class="text-gray-500 font-medium mb-1">คอร์สนี้ยังไม่มีเนื้อหา</p>
+          <p class="text-sm text-gray-400 mb-5">เริ่มต้นด้วยการเพิ่ม Module แรก</p>
+          <button onclick="openPanel('module')" class="text-sm font-semibold text-black underline underline-offset-2 hover:text-gray-600 transition">
+            + เพิ่ม Module แรก
+          </button>
+        </div>
+      <% } else { %>
+
+        <div class="flex flex-col gap-5">
+          <% modules.forEach((module, index) => { %>
+            <div class="border border-gray-200 rounded-xl bg-white shadow-sm">
+
+              <!-- Module Header -->
+              <div class="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <div class="text-gray-300 shrink-0 cursor-grab active:cursor-grabbing">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                  </div>
+                  <span class="text-xs font-bold text-gray-400 uppercase tracking-widest shrink-0">Module <%= index + 1 %></span>
+                  <h3 class="font-semibold text-gray-800 text-base truncate"><%= module.module_name %></h3>
+                </div>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <!-- Edit Module -->
+                  <button
+                    onclick="openPanel('edit-module', { moduleId: '<%= module.module_id %>', moduleName: '<%= module.module_name.replace(/'/g, "\\'") %>' })"
+                    class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    title="แก้ไขชื่อ Module">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  </button>
+                  <!-- Delete Module -->
+                  <button
+                    onclick="confirmDeleteModule('<%= module.module_id %>')"
+                    class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                    title="ลบ Module">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Module Items (Lessons & Quizzes) -->
+              <div class="p-3 sm:p-4">
+                <% if (!module.items || module.items.length === 0) { %>
+                  <p class="text-sm text-gray-400 text-center py-5">ยังไม่มีเนื้อหาย่อยในบทนี้</p>
+                <% } else { %>
+                  <div class="flex flex-col gap-2 mb-3">
+                    <% module.items.forEach((item, i) => { %>
+                      <% if (item.type === 'lesson') { %>
+                        <div class="flex items-center justify-between px-3 py-2.5 bg-white border border-gray-100 hover:border-gray-300 hover:shadow-sm transition rounded-lg group">
+                          <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <div class="p-1.5 bg-orange-50 rounded-md text-orange-500 shrink-0">
+                              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 truncate">
+                              <%= index + 1 %>.<%= i + 1 %> <%= item.data.lesson_name %>
+                            </span>
+                            <span class="text-[10px] font-semibold px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded shrink-0">Lesson</span>
+                          </div>
+                          <a href="/instructor/courses/<%= course.course_id %>/modules/lesson/<%= item.data.lesson_id %>"
+                             class="text-xs font-semibold px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition opacity-60 group-hover:opacity-100 shrink-0">
+                            แก้ไข
+                          </a>
+                        </div>
+                      <% } else if (item.type === 'quiz') { %>
+                        <div class="flex items-center justify-between px-3 py-2.5 bg-white border border-gray-100 hover:border-gray-300 hover:shadow-sm transition rounded-lg group">
+                          <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <div class="p-1.5 bg-purple-50 rounded-md text-purple-500 shrink-0">
+                              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 truncate">
+                              <%= index + 1 %>.<%= i + 1 %> <%= item.data.title %>
+                            </span>
+                            <span class="text-[10px] font-semibold px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded shrink-0">Quiz</span>
+                          </div>
+                          <a href="/instructor/courses/<%= course.course_id %>/modules/quiz/<%= item.data.quiz_id %>"
+                             class="text-xs font-semibold px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition opacity-60 group-hover:opacity-100 shrink-0">
+                            แก้ไข
+                          </a>
+                        </div>
+                      <% } %>
+                    <% }) %>
+                  </div>
+                <% } %>
+
+                <!-- Add Content Dropdown -->
+                <div class="relative" data-module-id="<%= module.module_id %>">
+                  <button
+                    onclick="toggleAddMenu(this)"
+                    class="w-full py-2 border-2 border-dashed border-gray-200 text-gray-400 font-medium text-sm rounded-lg hover:border-gray-400 hover:text-gray-600 transition flex items-center justify-center gap-2 group">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    เพิ่มเนื้อหาย่อย
+                  </button>
+
+                  <!-- Dropdown Menu -->
+                  <div class="add-menu hidden absolute left-1/2 -translate-x-1/2 mt-2 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
+                    <div class="p-1">
+                      <button
+                        onclick="openPanel('lesson', { moduleId: '<%= module.module_id %>' }); closeAllMenus();"
+                        class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-lg transition text-left">
+                        <div class="p-1.5 bg-orange-100 rounded-md text-orange-500">
+                          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+                        </div>
+                        <div>
+                          <div class="font-semibold">Lesson</div>
+                          <div class="text-xs text-gray-400">เนื้อหาบทเรียน</div>
+                        </div>
+                      </button>
+                      <button
+                        onclick="openPanel('quiz', { moduleId: '<%= module.module_id %>' }); closeAllMenus();"
+                        class="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition text-left">
+                        <div class="p-1.5 bg-purple-100 rounded-md text-purple-500">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                        </div>
+                        <div>
+                          <div class="font-semibold">Quiz</div>
+                          <div class="text-xs text-gray-400">แบบทดสอบ</div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SIDEBAR PANEL ===================== -->
+<div id="panel-overlay" onclick="closePanel()" class="fixed inset-0 bg-black/30 backdrop-blur-[1px] z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+<div id="side-panel" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out">
+
+  <!-- Panel Header -->
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 shrink-0">
+    <div>
+      <h3 id="panel-title" class="font-bold text-gray-900 text-base"></h3>
+      <p id="panel-subtitle" class="text-xs text-gray-400 mt-0.5"></p>
+    </div>
+    <button onclick="closePanel()" class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+  </div>
+
+  <!-- Panel Body -->
+  <div class="flex-1 overflow-y-auto p-5">
+
+    <!-- [ FORM: Add Module ] -->
+    <div id="form-module" class="panel-form hidden">
+      <form action="/instructor/courses/<%= course.course_id %>/modules/create" method="POST" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อ Module <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            name="module_name"
+            required
+            placeholder="เช่น บทที่ 1: แนะนำ JavaScript"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+          >
+          <p class="text-xs text-gray-400 mt-1.5">ตั้งชื่อให้สื่อถึงเนื้อหาในบทนั้น ๆ</p>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closePanel()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            ยกเลิก
+          </button>
+          <button type="submit" class="flex-1 px-4 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">
+            สร้าง Module
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- [ FORM: Edit Module ] -->
+    <div id="form-edit-module" class="panel-form hidden">
+      <form id="edit-module-form" method="POST" class="flex flex-col gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อ Module <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            id="edit-module-name-input"
+            name="module_name"
+            required
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+          >
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closePanel()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            ยกเลิก
+          </button>
+          <button type="submit" class="flex-1 px-4 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">
+            บันทึก
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- [ FORM: Add Lesson ] -->
+    <div id="form-lesson" class="panel-form hidden">
+      <form id="lesson-form" method="POST" class="flex flex-col gap-4">
+        <div class="p-3 bg-orange-50 border border-orange-100 rounded-lg flex items-center gap-2">
+          <div class="p-1.5 bg-orange-100 rounded text-orange-500 shrink-0">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path></svg>
+          </div>
+          <p class="text-xs text-orange-700 font-medium">Lesson จะถูกสร้างแล้วนำไปแก้ไขเนื้อหาในหน้าถัดไป</p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อ Lesson <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            name="lesson_name"
+            required
+            placeholder="เช่น ตัวแปรและชนิดข้อมูล"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+          >
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closePanel()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            ยกเลิก
+          </button>
+          <button type="submit" class="flex-1 px-4 py-2.5 bg-orange-500 text-white text-sm font-semibold rounded-lg hover:bg-orange-600 transition">
+            สร้าง Lesson
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- [ FORM: Add Quiz ] -->
+    <div id="form-quiz" class="panel-form hidden">
+      <form id="quiz-form" method="POST" class="flex flex-col gap-4">
+        <div class="p-3 bg-purple-50 border border-purple-100 rounded-lg flex items-center gap-2">
+          <div class="p-1.5 bg-purple-100 rounded text-purple-500 shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+          </div>
+          <p class="text-xs text-purple-700 font-medium">Quiz จะถูกสร้างแล้วนำไปเพิ่มคำถามในหน้าถัดไป</p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">ชื่อ Quiz <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            name="title"
+            required
+            placeholder="เช่น แบบทดสอบบทที่ 1"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition"
+          >
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">คำอธิบาย <span class="text-gray-400 font-normal">(ไม่บังคับ)</span></label>
+          <textarea
+            name="description"
+            rows="3"
+            placeholder="อธิบายจุดประสงค์ของแบบทดสอบนี้..."
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition resize-none"
+          ></textarea>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closePanel()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+            ยกเลิก
+          </button>
+          <button type="submit" class="flex-1 px-4 py-2.5 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition">
+            สร้าง Quiz
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<!-- Hidden delete forms (one per module) -->
+<% if (modules && modules.length > 0) { %>
+  <% modules.forEach(module => { %>
+    <form id="delete-form-<%= module.module_id %>"
+          action="/instructor/courses/<%= course.course_id %>/modules/<%= module.module_id %>/delete"
+          method="POST"
+          class="hidden">
+    </form>
+  <% }) %>
+<% } %>
+
+<!-- ===================== DELETE CONFIRM MODAL ===================== -->
+<div id="delete-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px]" onclick="closeDeleteModal()"></div>
+  <div class="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="p-2 bg-red-100 rounded-xl text-red-600 shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+      <div>
+        <h4 class="font-bold text-gray-900">ลบ Module นี้?</h4>
+        <p class="text-sm text-gray-500">เนื้อหาทั้งหมดใน Module จะถูกลบออก</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+        ยกเลิก
+      </button>
+      <button onclick="submitDelete()" class="flex-1 px-4 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition">
+        ลบ
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script>
+  const courseId = '<%= course.course_id %>';
+  let pendingDeleteId = null;
+
+  // ============ PANEL ============
+  function openPanel(type, data = {}) {
+    closeAllMenus();
+    // Hide all forms
+    document.querySelectorAll('.panel-form').forEach(f => f.classList.add('hidden'));
+
+    const panel     = document.getElementById('side-panel');
+    const overlay   = document.getElementById('panel-overlay');
+    const titleEl   = document.getElementById('panel-title');
+    const subtitleEl = document.getElementById('panel-subtitle');
+
+    if (type === 'module') {
+      titleEl.textContent    = 'เพิ่ม Module ใหม่';
+      subtitleEl.textContent = 'กำหนดบทเรียนหลักของคอร์ส';
+      document.getElementById('form-module').classList.remove('hidden');
+
+    } else if (type === 'edit-module') {
+      titleEl.textContent    = 'แก้ไขชื่อ Module';
+      subtitleEl.textContent = 'เปลี่ยนชื่อบทเรียนหลัก';
+      const form = document.getElementById('edit-module-form');
+      form.action = `/instructor/courses/${courseId}/modules/${data.moduleId}/update`;
+      document.getElementById('edit-module-name-input').value = data.moduleName;
+      document.getElementById('form-edit-module').classList.remove('hidden');
+
+    } else if (type === 'lesson') {
+      titleEl.textContent    = 'เพิ่ม Lesson';
+      subtitleEl.textContent = 'บทเรียนย่อยสำหรับเนื้อหาการสอน';
+      const form = document.getElementById('lesson-form');
+      form.action = `/instructor/courses/${courseId}/modules/${data.moduleId}/lessons/create`;
+      document.getElementById('form-lesson').classList.remove('hidden');
+
+    } else if (type === 'quiz') {
+      titleEl.textContent    = 'เพิ่ม Quiz';
+      subtitleEl.textContent = 'แบบทดสอบสำหรับวัดความเข้าใจ';
+      const form = document.getElementById('quiz-form');
+      form.action = `/instructor/courses/${courseId}/modules/${data.moduleId}/quizzes/create`;
+      document.getElementById('form-quiz').classList.remove('hidden');
+    }
+
+    // Show panel
+    overlay.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      overlay.classList.remove('opacity-0');
+      panel.classList.remove('translate-x-full');
+    });
+
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePanel() {
+    const panel   = document.getElementById('side-panel');
+    const overlay = document.getElementById('panel-overlay');
+    panel.classList.add('translate-x-full');
+    overlay.classList.add('opacity-0');
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+    }, 300);
+    document.body.style.overflow = '';
+  }
+
+  // ============ ADD CONTENT DROPDOWN ============
+  function toggleAddMenu(btn) {
+    const wrapper = btn.closest('[data-module-id]');
+    const menu    = wrapper.querySelector('.add-menu');
+    const isOpen  = !menu.classList.contains('hidden');
+    closeAllMenus();
+    if (!isOpen) menu.classList.remove('hidden');
+  }
+
+  function closeAllMenus() {
+    document.querySelectorAll('.add-menu').forEach(m => m.classList.add('hidden'));
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-module-id]')) closeAllMenus();
+  });
+
+  // ============ DELETE CONFIRM ============
+  function confirmDeleteModule(moduleId) {
+    pendingDeleteId = moduleId;
+    document.getElementById('delete-modal').classList.remove('hidden');
+    document.getElementById('delete-modal').classList.add('flex');
+  }
+
+  function closeDeleteModal() {
+    pendingDeleteId = null;
+    document.getElementById('delete-modal').classList.add('hidden');
+    document.getElementById('delete-modal').classList.remove('flex');
+  }
+
+  function submitDelete() {
+    if (pendingDeleteId) {
+      document.getElementById('delete-form-' + pendingDeleteId).submit();
+    }
+  }
+</script>

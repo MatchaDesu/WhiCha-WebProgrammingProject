@@ -1,0 +1,129 @@
+<section class="bg-gray-50 min-h-screen pb-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-8">
+      <a href="/manager" class="text-gray-400 hover:text-black transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </a>
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">ผู้ใช้ทั้งหมด</h1>
+        <p class="text-gray-500 text-sm mt-0.5"><%= users.length %> คน</p>
+      </div>
+    </div>
+
+    <!-- Search + Filter -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-3">
+      <div class="relative flex-1">
+        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input id="search-input" type="text" placeholder="ค้นหาชื่อ, อีเมล..."
+          class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition">
+      </div>
+      <div class="flex gap-2">
+        <button onclick="filterRole('all')" data-role="all"
+          class="role-btn px-3 py-2 text-xs font-semibold rounded-lg border border-black bg-black text-white transition">
+          ทั้งหมด
+        </button>
+        <button onclick="filterRole('student')" data-role="student"
+          class="role-btn px-3 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+          Student
+        </button>
+        <button onclick="filterRole('instructor')" data-role="instructor"
+          class="role-btn px-3 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+          Instructor
+        </button>
+        <button onclick="filterRole('manager')" data-role="manager"
+          class="role-btn px-3 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+          Manager
+        </button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50">
+            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">ผู้ใช้</th>
+            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider hidden sm:table-cell">อีเมล</th>
+            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell">เบอร์โทร</th>
+            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider hidden lg:table-cell">สมัครเมื่อ</th>
+            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">ยศ</th>
+          </tr>
+        </thead>
+        <tbody id="users-table" class="divide-y divide-gray-100">
+          <% users.forEach(u => { %>
+            <tr class="user-row hover:bg-gray-50 transition"
+              data-name="<%= (u.first_name + ' ' + u.last_name + ' ' + u.username + ' ' + u.email).toLowerCase() %>"
+              data-role="<%= u.role %>">
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
+                    <img src="<%= u.profile_image || '/icon/profile-anonymous.svg' %>" class="w-full h-full object-cover">
+                  </div>
+                  <div>
+                    <p class="font-semibold text-gray-900 text-xs"><%= u.first_name %> <%= u.last_name %></p>
+                    <p class="text-[10px] text-gray-400">@<%= u.username %></p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-xs text-gray-600 hidden sm:table-cell"><%= u.email %></td>
+              <td class="px-5 py-3.5 text-xs text-gray-600 hidden md:table-cell"><%= u.phone || '-' %></td>
+              <td class="px-5 py-3.5 text-xs text-gray-400 hidden lg:table-cell">
+                <%= new Date(u.created_at).toLocaleDateString('th-TH') %>
+              </td>
+              <td class="px-5 py-3.5">
+                <form method="POST" action="/manager/<%= u.user_id %>/roles/change">
+                  <select name="role" onchange="this.form.submit()"
+                    class="text-xs font-semibold border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition cursor-pointer hover:bg-gray-50">
+                    <option value="student"    <%= u.role === 'student'    ? 'selected' : '' %>>Student</option>
+                    <option value="instructor" <%= u.role === 'instructor' ? 'selected' : '' %>>Instructor</option>
+                    <option value="manager"    <%= u.role === 'manager'    ? 'selected' : '' %>>Manager</option>
+                  </select>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+
+      <% if (users.length === 0) { %>
+        <div class="p-12 text-center text-gray-400 text-sm">ไม่พบผู้ใช้</div>
+      <% } %>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  let currentRole = 'all';
+
+  function filterRole(role) {
+    currentRole = role;
+    document.querySelectorAll('.role-btn').forEach(btn => {
+      const active = btn.dataset.role === role;
+      btn.classList.toggle('bg-black', active);
+      btn.classList.toggle('text-white', active);
+      btn.classList.toggle('border-black', active);
+      btn.classList.toggle('text-gray-600', !active);
+      btn.classList.toggle('border-gray-200', !active);
+      btn.classList.remove('bg-gray-50');
+    });
+    applyFilters();
+  }
+
+  document.getElementById('search-input').addEventListener('input', applyFilters);
+
+  function applyFilters() {
+    const keyword = document.getElementById('search-input').value.toLowerCase();
+    document.querySelectorAll('.user-row').forEach(row => {
+      const matchRole = currentRole === 'all' || row.dataset.role === currentRole;
+      const matchName = row.dataset.name.includes(keyword);
+      row.style.display = matchRole && matchName ? '' : 'none';
+    });
+  }
+</script>

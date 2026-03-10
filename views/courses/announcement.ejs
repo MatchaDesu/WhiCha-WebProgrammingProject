@@ -1,0 +1,95 @@
+<section id="course-announcement" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto flex flex-col px-4 gap-6 sm:px-6 py-8">
+
+    <%# Header %>
+    <div>
+      <a href="/courses/<%= course.course_id %>/dashboard" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        กลับหน้า Dashboard
+      </a>
+
+      <div class="flex items-center gap-3">
+        <svg class="w-7 h-7 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">ประกาศจากอาจารย์</h1>
+          <p class="text-sm text-gray-500 mt-0.5"><%= course.course_name %></p>
+        </div>
+      </div>
+    </div>
+
+    <%# Create Announcement Form (instructor only) %>
+    <% if (typeof session !== 'undefined' && session?.user?.role === 'instructor' && course.instructor_id === session.user.id) { %>
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      <h2 class="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        สร้างประกาศใหม่
+      </h2>
+      <form action="/courses/<%= course.course_id %>/announcement" method="POST" class="flex flex-col gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">หัวข้อ <span class="text-red-400">*</span></label>
+          <input type="text" name="title" required placeholder="หัวข้อประกาศ"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">เนื้อหา</label>
+          <textarea name="content" rows="4" placeholder="รายละเอียดของประกาศ (ถ้ามี)"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition resize-none"></textarea>
+        </div>
+        <div class="flex justify-end">
+          <button type="submit"
+            class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-6 py-2 rounded-lg text-sm transition">
+            โพสต์ประกาศ
+          </button>
+        </div>
+      </form>
+    </div>
+    <% } %>
+
+    <%# Announcement List %>
+    <div class="flex flex-col gap-4">
+      <% if (announcements.length === 0) { %>
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-10 flex flex-col items-center gap-3 text-center">
+          <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+          <p class="text-gray-400 font-medium">ยังไม่มีประกาศในขณะนี้</p>
+          <p class="text-sm text-gray-400">อาจารย์จะแจ้งข่าวสารคอร์สนี้ที่นี่</p>
+        </div>
+      <% } else { %>
+        <% announcements.forEach(function(ann) { %>
+          <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 flex flex-col gap-2">
+
+            <div class="flex items-start justify-between gap-4">
+              <h3 class="text-base font-bold text-gray-800"><%= ann.title %></h3>
+
+              <%# Delete button (instructor only) %>
+              <% if (typeof session !== 'undefined' && session?.user?.role === 'instructor' && course.instructor_id === session.user.id) { %>
+                <form action="/courses/<%= course.course_id %>/announcement/<%= ann.announcement_id %>/delete" method="POST" class="shrink-0">
+                  <button type="submit" onclick="return confirm('ลบประกาศนี้?')"
+                    class="text-gray-300 hover:text-red-400 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </form>
+              <% } %>
+            </div>
+
+            <% if (ann.content) { %>
+              <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line"><%= ann.content %></p>
+            <% } %>
+
+            <div class="flex items-center gap-2 pt-1 mt-1 border-t border-gray-50">
+              <% if (ann.instructor_image) { %>
+                <img src="<%= ann.instructor_image %>" class="w-6 h-6 rounded-full object-cover" alt="instructor" />
+              <% } %>
+              <span class="text-xs text-gray-400"><%= ann.instructor_name %></span>
+              <span class="text-xs text-gray-300">·</span>
+              <span class="text-xs text-gray-400">
+                <%= new Date(ann.created_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+              </span>
+            </div>
+
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+  </div>
+</section>

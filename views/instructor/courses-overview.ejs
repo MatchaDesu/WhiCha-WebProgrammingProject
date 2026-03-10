@@ -1,0 +1,117 @@
+<section class="bg-gray-50 min-h-screen pb-16">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">จัดการคอร์สเรียน</h1>
+        <p class="text-gray-500 text-sm mt-0.5"><%= courses ? courses.length : 0 %> คอร์ส</p>
+      </div>
+      <a href="/instructor/create-course"
+        class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        สร้างคอร์สใหม่
+      </a>
+    </div>
+
+    <% if (!courses || courses.length === 0) { %>
+
+      <!-- Empty State -->
+      <div class="flex flex-col items-center justify-center py-24 px-4 bg-white border border-dashed border-gray-300 rounded-xl shadow-sm">
+        <div class="w-14 h-14 bg-gray-50 border border-gray-200 rounded-2xl flex items-center justify-center mb-5 text-gray-400">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900 mb-2">ยังไม่มีคอร์สเรียน</h2>
+        <p class="text-gray-500 text-sm text-center max-w-sm mb-6">เริ่มต้นสร้างและแบ่งปันความรู้ของคุณได้เลยตอนนี้</p>
+        <a href="/instructor/create-course"
+          class="px-6 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition">
+          สร้างคอร์สแรกของคุณ
+        </a>
+      </div>
+
+    <% } else { %>
+
+      <!-- Course List -->
+      <div class="flex flex-col gap-4">
+        <% courses.forEach(course => { %>
+          <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
+
+            <div class="flex gap-4 p-5">
+              <!-- Thumbnail -->
+              <div class="w-24 h-16 sm:w-36 sm:h-24 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                <% if (course.course_image) { %>
+                  <img src="<%= course.course_image %>" alt="<%= course.course_name %>" class="w-full h-full object-cover">
+                <% } else { %>
+                  <div class="w-full h-full flex items-center justify-center text-gray-300">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                <% } %>
+              </div>
+
+              <!-- Info -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-start gap-3 mb-1">
+                  <h3 class="font-bold text-gray-900 text-sm sm:text-base line-clamp-1 flex-1">
+                    <%= course.course_name %>
+                  </h3>
+                  <span class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full border
+                    <%= course.course_status === 'published' ? 'bg-green-50 text-green-700 border-green-200'
+                      : course.course_status === 'pending'   ? 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                      : course.course_status === 'rejected'  ? 'bg-red-50 text-red-600 border-red-200'
+                      : 'bg-gray-50 text-gray-500 border-gray-200' %>">
+                    <%= course.course_status === 'published' ? 'เผยแพร่แล้ว'
+                      : course.course_status === 'pending'   ? 'รอการอนุมัติ'
+                      : course.course_status === 'rejected'  ? 'ถูกปฏิเสธ'
+                      : 'ฉบับร่าง' %>
+                  </span>
+                </div>
+
+                <p class="text-xs text-gray-500 mb-2 line-clamp-2 hidden sm:block">
+                  <%= course.description || 'ไม่มีคำอธิบาย' %>
+                </p>
+
+                <p class="text-xs text-gray-400">
+                  ราคา: <span class="font-semibold text-gray-600">
+                    <%= course.course_price > 0 ? '฿' + course.course_price : 'ฟรี' %>
+                  </span>
+                </p>
+
+                <!-- Rejection reason -->
+                <% if (course.course_status === 'rejected' && course.rejection_reason) { %>
+                  <div class="mt-2 text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                    <span class="font-semibold">เหตุผล:</span> <%= course.rejection_reason %>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="border-t border-gray-100 px-5 py-3 bg-gray-50 flex items-center justify-between gap-3">
+              <% if (course.course_status === 'published') { %>
+                <a href="/courses/<%= course.course_id %>"
+                  class="text-xs font-semibold text-gray-500 hover:text-black underline underline-offset-2 transition">
+                  ดูหน้าคอร์สเรียน →
+                </a>
+              <% } else { %>
+                <span></span>
+              <% } %>
+
+              <a href="/instructor/courses/<%= course.course_id %>/edit"
+                class="px-4 py-2 text-xs font-semibold text-white bg-black rounded-lg hover:bg-gray-800 transition">
+                แก้ไขคอร์ส
+              </a>
+            </div>
+
+          </div>
+        <% }) %>
+      </div>
+
+    <% } %>
+  </div>
+</section>

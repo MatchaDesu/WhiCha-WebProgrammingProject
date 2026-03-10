@@ -1,23 +1,23 @@
+const { Parser } = require('json2csv');
 const userModel = require('../models/userModel');
-
-// exports.getAllUsers = async (req, res) => {
-//     try {
-//         const users = await userModel.getAll();
-//         res.render('users', { users });
-//     } catch (err) {
-//         res.status(500).send("Server Error");
-//     }
-// };
+const enrollmentModel = require('../models/enrollmentModel');
+const courseModel     = require('../models/courseModel');
 
 exports.getProfile = async (req, res) => {
     try {
-        const user = await userModel.getById(req.params.id);
+        const user_info = await userModel.getById(req.params.userId);
 
-        if (!user) {
+        if (!user_info) {
             return res.status(404).send("user not found");
         }
 
-        res.render('users', { user });
+        const enrolledCourses = await enrollmentModel.getByUserWithProgress(req.params.userId);
+
+        const teachingCourses = user_info.role === 'instructor'
+            ? await courseModel.getByInstructor(req.params.userId)
+            : [];
+
+        res.render('users/profile', { user_info , enrolledCourses, teachingCourses });
     } catch (err) {
         res.status(500).send("Server Error");
     }
@@ -25,7 +25,7 @@ exports.getProfile = async (req, res) => {
 
 exports.editProfile = async (req, res) => {
     try {
-        const user = await userModel.getById(req.params.id);
+        const user = await userModel.getById(req.params.userId);
 
         if (!user) {
             return res.status(404).send("user not found");
@@ -33,26 +33,7 @@ exports.editProfile = async (req, res) => {
 
         res.render('users/edit', { user });
     } catch (err) {
+        console.log(err);
         res.status(500).send("Server Error");
     }
-};
-
-exports.uploadProfile = async (req, res) => {
-
-    try {
-        const userId = req.params.id;
-
-        if (!req.file) {
-            return res.status(400).send("No file uploaded");
-        }
-
-        const imagePath = `/uploads/users/${userId}/profile/${req.file.filename}`;
-
-        await userModel.updateProfile(userId, imagePath);
-
-        res.redirect(`/users/${userId}`);
-    } catch (err) {
-        res.status(500).send("Server Error");
-    }
-
 };

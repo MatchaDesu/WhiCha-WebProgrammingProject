@@ -4,9 +4,13 @@ const path = require('path');
 const dbPath = path.join(__dirname, '../data/database.db');
 
 let db = new sqlite3.Database(dbPath, (err) => {
+
+  db.run("PRAGMA foreign_keys = ON");
+
   if (err) {
       return console.error(err.message);
   }
+
   console.log('Connected to the SQlite database.');
 });
 
