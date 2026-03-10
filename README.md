@@ -35,7 +35,7 @@ npm start
 
 ค่าเริ่มต้นเซิร์ฟเวอร์คือ `http://localhost:3000`
 
-3. (ออปชัน) seed ข้อมูลเริ่มต้น
+3. (optional) seed ข้อมูลเริ่มต้น
 
 ```bash
 npm run seed
