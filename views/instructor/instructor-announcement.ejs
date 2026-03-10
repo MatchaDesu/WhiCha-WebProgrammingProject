@@ -1,0 +1,281 @@
+<section id="course-dashboard" class="bg-gray-50 min-h-screen pb-12">
+  <div class="container mx-auto px-4 sm:px-6 py-8">
+
+    <div class="mb-6">
+      <a href="/instructor" class="inline-flex items-center text-gray-500 hover:text-gray-800 transition mb-4 text-sm font-medium">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        กลับหน้ารวมคอร์ส
+      </a>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 line-clamp-1">
+          <%= course.course_name %>
+        </h1>
+      </div>
+    </div>
+
+    <%- include('../partials/course-nav.ejs') %>
+
+    <!-- Main Content -->
+    <div class="bg-white rounded-b-lg shadow-sm p-4 sm:p-6 lg:p-8">
+
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h2 class="text-xl font-bold text-gray-800">ประกาศคอร์ส</h2>
+          <p class="text-sm text-gray-500 mt-1">แจ้งข่าวสาร อัปเดต หรือประกาศสำคัญให้นักเรียนทราบ</p>
+        </div>
+        <button onclick="openPanel('create')" class="w-full sm:w-auto px-6 py-2.5 bg-black text-white font-semibold rounded-lg shadow-sm hover:bg-gray-800 transition flex items-center justify-center gap-2 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          สร้างประกาศใหม่
+        </button>
+      </div>
+
+      <% if (!announcements || announcements.length === 0) { %>
+        <div class="text-center py-20 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+          <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-400">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+            </svg>
+          </div>
+          <p class="text-gray-500 font-medium mb-1">ยังไม่มีประกาศในคอร์สนี้</p>
+          <p class="text-sm text-gray-400 mb-5">สร้างประกาศแรกเพื่อแจ้งข่าวสารให้นักเรียน</p>
+          <button onclick="openPanel('create')" class="text-sm font-semibold text-black underline underline-offset-2 hover:text-gray-600 transition">
+            + สร้างประกาศแรก
+          </button>
+        </div>
+      <% } else { %>
+
+        <div class="flex flex-col gap-4">
+          <% announcements.forEach(function(ann) { %>
+            <div class="border border-gray-200 rounded-xl bg-white shadow-sm p-5 flex flex-col gap-3">
+
+              <div class="flex items-start justify-between gap-4">
+                <h3 class="font-bold text-gray-800 text-base leading-snug"><%= ann.title %></h3>
+                <div class="flex items-center gap-1 shrink-0">
+
+                  <%# ใช้ data-* แทน inline template literal เพื่อหลีกเลี่ยง quote/backtick ซ้อนกัน %>
+                  <button
+                    class="btn-edit p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                    data-id="<%= ann.announcement_id %>"
+                    data-title="<%- JSON.stringify(ann.title) %>"
+                    data-content="<%- JSON.stringify(ann.content || '') %>"
+                    title="แก้ไขประกาศ">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    class="btn-delete p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                    data-id="<%= ann.announcement_id %>"
+                    title="ลบประกาศ">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+
+                </div>
+              </div>
+
+              <% if (ann.content) { %>
+                <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line"><%= ann.content %></p>
+              <% } %>
+
+              <div class="flex items-center gap-2 pt-2 border-t border-gray-100 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <%= new Date(ann.created_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+              </div>
+
+            </div>
+          <% }) %>
+        </div>
+
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SIDE PANEL ===================== -->
+<div id="panel-overlay" class="fixed inset-0 z-40 bg-black/40 backdrop-blur-[1px] hidden opacity-0 transition-opacity duration-300" onclick="closePanel()"></div>
+
+<div id="side-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+  <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200 shrink-0">
+    <div>
+      <h3 id="panel-title" class="text-lg font-bold text-gray-900"></h3>
+      <p id="panel-subtitle" class="text-sm text-gray-500 mt-0.5"></p>
+    </div>
+    <button onclick="closePanel()" class="p-2 rounded-lg hover:bg-gray-100 transition text-gray-400 hover:text-gray-600">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="flex-1 overflow-y-auto px-6 py-6">
+
+    <!-- Create Form -->
+    <form id="create-form" action="/instructor/courses/<%= course.course_id %>/announcement" method="POST" class="panel-form hidden flex flex-col gap-5">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">หัวข้อประกาศ <span class="text-red-500">*</span></label>
+        <input type="text" name="title" required placeholder="เช่น แจ้งการเปลี่ยนแปลงตารางเรียน"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">เนื้อหาประกาศ</label>
+        <textarea name="content" rows="7" placeholder="รายละเอียดของประกาศ (ถ้ามี)"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition resize-none"></textarea>
+      </div>
+      <button type="submit" class="w-full py-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition text-sm mt-2">
+        โพสต์ประกาศ
+      </button>
+    </form>
+
+    <!-- Edit Form -->
+    <form id="edit-form" action="" method="POST" class="panel-form hidden flex flex-col gap-5">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">หัวข้อประกาศ <span class="text-red-500">*</span></label>
+        <input id="edit-title-input" type="text" name="title" required
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">เนื้อหาประกาศ</label>
+        <textarea id="edit-content-input" name="content" rows="7"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition resize-none"></textarea>
+      </div>
+      <button type="submit" class="w-full py-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition text-sm mt-2">
+        บันทึกการแก้ไข
+      </button>
+    </form>
+
+  </div>
+</div>
+
+<!-- ===================== DELETE FORMS ===================== -->
+<% if (announcements && announcements.length > 0) { %>
+  <% announcements.forEach(function(ann) { %>
+    <form id="delete-form-<%= ann.announcement_id %>"
+      action="/instructor/courses/<%= course.course_id %>/announcement/<%= ann.announcement_id %>/delete"
+      method="POST" class="hidden"></form>
+  <% }) %>
+<% } %>
+
+<!-- ===================== DELETE CONFIRM MODAL ===================== -->
+<div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center px-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px]" onclick="closeDeleteModal()"></div>
+  <div class="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="p-2 bg-red-100 rounded-xl text-red-600 shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+      </div>
+      <div>
+        <h4 class="font-bold text-gray-900">ลบประกาศนี้?</h4>
+        <p class="text-sm text-gray-500">ประกาศจะถูกลบออกถาวรและนักเรียนจะไม่เห็นอีก</p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">ยกเลิก</button>
+      <button onclick="submitDelete()" class="flex-1 px-4 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition">ลบ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script>
+  var courseId = '<%= course.course_id %>';
+  var pendingDeleteId = null;
+
+  // Bind ปุ่มหลัง DOM โหลดเสร็จ — ไม่ใช้ inline onclick เพื่อหลีกเลี่ยง quote/backtick ซ้อนกัน
+  document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('.btn-edit').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openPanel('edit', {
+          id:      btn.dataset.id,
+          title:   JSON.parse(btn.dataset.title),
+          content: JSON.parse(btn.dataset.content)
+        });
+      });
+    });
+
+    document.querySelectorAll('.btn-delete').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        confirmDelete(btn.dataset.id);
+      });
+    });
+
+  });
+
+  // ── Panel ──────────────────────────────────────────────────────────────────
+  function openPanel(type, data) {
+    data = data || {};
+    document.querySelectorAll('.panel-form').forEach(function (f) {
+      f.classList.add('hidden');
+    });
+
+    var panel      = document.getElementById('side-panel');
+    var overlay    = document.getElementById('panel-overlay');
+    var titleEl    = document.getElementById('panel-title');
+    var subtitleEl = document.getElementById('panel-subtitle');
+
+    if (type === 'create') {
+      titleEl.textContent    = 'สร้างประกาศใหม่';
+      subtitleEl.textContent = 'แจ้งข่าวสารให้กับนักเรียนในคอร์ส';
+      var createForm = document.getElementById('create-form');
+      createForm.classList.remove('hidden');
+      createForm.reset();
+
+    } else if (type === 'edit') {
+      titleEl.textContent    = 'แก้ไขประกาศ';
+      subtitleEl.textContent = 'อัปเดตเนื้อหาของประกาศ';
+      var editForm = document.getElementById('edit-form');
+      editForm.action = '/instructor/courses/' + courseId + '/announcement/' + data.id + '/edit';
+      document.getElementById('edit-title-input').value   = data.title;
+      document.getElementById('edit-content-input').value = data.content || '';
+      editForm.classList.remove('hidden');
+    }
+
+    overlay.classList.remove('hidden');
+    requestAnimationFrame(function () {
+      overlay.classList.remove('opacity-0');
+      panel.classList.remove('translate-x-full');
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePanel() {
+    var panel   = document.getElementById('side-panel');
+    var overlay = document.getElementById('panel-overlay');
+    panel.classList.add('translate-x-full');
+    overlay.classList.add('opacity-0');
+    setTimeout(function () { overlay.classList.add('hidden'); }, 300);
+    document.body.style.overflow = '';
+  }
+
+  // ── Delete ─────────────────────────────────────────────────────────────────
+  function confirmDelete(id) {
+    pendingDeleteId = id;
+    var modal = document.getElementById('delete-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeDeleteModal() {
+    pendingDeleteId = null;
+    var modal = document.getElementById('delete-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  function submitDelete() {
+    if (pendingDeleteId) {
+      document.getElementById('delete-form-' + pendingDeleteId).submit();
+    }
+  }
+</script>

@@ -10,6 +10,7 @@ const quizModel = require('../models/quizModel');
 const questionModel = require('../models/questionModel');
 const choiceModel = require('../models/choiceModel');
 const enrollmentModel = require('../models/enrollmentModel');
+const announcementModel = require('../models/announcementModel');
 
 exports.dashboard = async (req, res) => {
     try {
@@ -393,5 +394,70 @@ exports.deleteQuestion = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("Delete Question Error");
+    }
+};
+
+// ── Announcement ──────────────────────────────────────────────────────────────
+
+exports.getAnnouncements = async (req, res) => {
+    try {
+        const courseId      = req.params.id;
+        const course        = await courseModel.getById(courseId);
+        const announcements = await announcementModel.getByCourse(courseId);
+
+        res.render('instructor/instructor-announcement', {
+            course,
+            announcements: announcements || []
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
+
+exports.createAnnouncement = async (req, res) => {
+    try {
+        const courseId     = req.params.id;
+        const instructorId = req.session.user.id;
+        const { title, content } = req.body;
+
+        await announcementModel.createAnnouncement({
+            course_id:     courseId,
+            instructor_id: instructorId,
+            title,
+            content
+        });
+
+        res.redirect(`/instructor/courses/${courseId}/announcement`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Create Announcement Error");
+    }
+};
+
+exports.editAnnouncement = async (req, res) => {
+    try {
+        const { id, announcementId } = req.params;
+        const { title, content }     = req.body;
+
+        await announcementModel.updateAnnouncement(announcementId, { title, content });
+
+        res.redirect(`/instructor/courses/${id}/announcement`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Edit Announcement Error");
+    }
+};
+
+exports.deleteAnnouncement = async (req, res) => {
+    try {
+        const { id, announcementId } = req.params;
+
+        await announcementModel.deleteAnnouncement(announcementId);
+
+        res.redirect(`/instructor/courses/${id}/announcement`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Delete Announcement Error");
     }
 };

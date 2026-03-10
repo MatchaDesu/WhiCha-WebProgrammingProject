@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const managerController = require('../controllers/managerController');
+const { requireManager } = require('../middlewares/authMiddleware');
+
+router.use(requireManager);
 
 router.get('/', managerController.dashboard);
 router.get('/dashboard', managerController.dashboard);

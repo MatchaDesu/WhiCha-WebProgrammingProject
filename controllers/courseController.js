@@ -39,6 +39,7 @@ exports.getDetail = async (req, res) => {
         const course  = await courseModel.getById(courseId);
         const lessons = await lessonModel.getByCourse(courseId);
         const modules = await moduleModel.getByCourse(courseId);
+        const enrollments = await enrollmentModel.getByCourse(courseId);
 
         let isEnrolled    = false;
         let userReview    = null;
@@ -49,11 +50,11 @@ exports.getDetail = async (req, res) => {
             const userId = req.session.user.id;
             isEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
 
-            // รีวิวของ user คนนี้ (ใช้เช็คว่ารีวิวไปแล้วหรือยัง)
             userReview = await reviewModel.getByUserAndCourse(userId, courseId);
         }
 
-        // รายการรีวิวทั้งหมด + สรุป % แนะนำ
+        const student_count = enrollments.length;
+
         reviews       = await reviewModel.getByCourse(courseId);
         reviewSummary = await reviewModel.getSummaryByCourse(courseId);
 
@@ -65,6 +66,7 @@ exports.getDetail = async (req, res) => {
             reviews,
             reviewSummary,
             userReview,
+            student_count
         });
 
     } catch (err) {

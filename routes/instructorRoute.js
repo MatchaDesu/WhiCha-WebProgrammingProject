@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const instructorController = require('../controllers/instructorController');
+const { requireInstructor } = require('../middlewares/authMiddleware');
+
+router.use(requireInstructor);
 
 router.get('/', instructorController.dashboard);
 router.get('/create-course', instructorController.courseCreate);
@@ -15,6 +18,11 @@ router.get('/courses/:id/modules/:type/:itemId', instructorController.getCourseM
 
 router.get('/courses/:id/students', instructorController.getCourseStudents);
 router.get('/courses/:id/students/export-csv', instructorController.getStudentCSV);
+
+router.get('/courses/:id/announcement', instructorController.getAnnouncements);
+router.post('/courses/:id/announcement', instructorController.createAnnouncement);
+router.post('/courses/:id/announcement/:announcementId/edit', instructorController.editAnnouncement);
+router.post('/courses/:id/announcement/:announcementId/delete', instructorController.deleteAnnouncement);
 
 router.post('/courses/:id/modules/create', instructorController.createModule);
 router.post('/courses/:id/modules/:moduleId/update', instructorController.updateModule);
