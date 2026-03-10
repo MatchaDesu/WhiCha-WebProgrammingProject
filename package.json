@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "seed" : "node seed.js",
+    "seed": "node seed.js",
     "build": "npx @tailwindcss/cli -i public/css/config.css -o public/css/tailwind.css --watch"
   },
   "keywords": [],
@@ -20,6 +20,7 @@
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.19.0",
+    "json2csv": "^6.0.0-alpha.2",
     "multer": "^2.0.2",
     "sqlite3": "^5.1.7",
     "tailwindcss": "^4.2.0"

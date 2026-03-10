@@ -102,14 +102,9 @@
             </div>
 
             <div class="flex flex-col gap-2 flex-1 mt-2">
-              <div class="flex items-center justify-between mb-2">
-                <label class="text-sm font-semibold text-gray-700">เนื้อหาบทเรียน</label>
-              </div>
-
+              <label class="text-sm font-semibold text-gray-700">เนื้อหาบทเรียน</label>
               <div id="toast-editor" class="bg-white rounded-lg shadow-sm border border-gray-200"></div>
-              
               <textarea id="hidden-content" name="content" style="display: none;"><%= lesson.content || '' %></textarea>
-
             </div>
 
           </form>
@@ -122,12 +117,12 @@
 
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     const editorElement = document.querySelector('#toast-editor');
     const hiddenContent = document.getElementById('hidden-content');
-    const lessonForm = document.getElementById('lesson-form');
+    const lessonForm    = document.getElementById('lesson-form');
+    const lessonId      = '<%= currentItem ? currentItem.data.lesson_id : "" %>';
 
-    // ถ้ามีส่วนของ editor ให้ทำการเริ่มการทำงาน TOAST UI
     if (editorElement && hiddenContent) {
       const editor = new toastui.Editor({
         el: editorElement,
@@ -142,7 +137,7 @@
             formData.append('image', blob);
 
             try {
-              const res  = await fetch('/upload/lesson-image', { method: 'POST', body: formData });
+              const res  = await fetch(`/upload/lesson-image/${lessonId}`, { method: 'POST', body: formData });
               const data = await res.json();
               callback(data.url, blob.name || 'image');
             } catch (err) {
@@ -153,12 +148,9 @@
         }
       });
 
-      // ดักจับจังหวะก่อนฟอร์มถูก Submit เพื่ออัปเดตค่าจาก Editor ลงใน Hidden Input
       if (lessonForm) {
-        lessonForm.addEventListener('submit', function(e) {
-          // ดึงค่า Markdown ล่าสุดไปใส่ใน Textarea ซ่อนไว้ เพื่อส่งให้ Backend
-          hiddenContent.value = editor.getMarkdown(); 
-          // หาก Backend ของคุณเก็บเป็น HTML ให้เปลี่ยนเป็น: editor.getHTML()
+        lessonForm.addEventListener('submit', function () {
+          hiddenContent.value = editor.getMarkdown();
         });
       }
     }

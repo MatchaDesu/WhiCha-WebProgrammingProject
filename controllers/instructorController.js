@@ -1,3 +1,6 @@
+const { Parser } = require('json2csv');
+
+const userModel = require('../models/userModel');
 const courseModel = require('../models/courseModel');
 const categoryModel = require('../models/categoryModel');
 const moduleModel = require('../models/moduleModel');
@@ -8,10 +11,6 @@ const questionModel = require('../models/questionModel');
 const choiceModel = require('../models/choiceModel');
 const enrollmentModel = require('../models/enrollmentModel');
 
-/* =========================
-   DASHBOARD
-========================= */
-
 exports.dashboard = async (req, res) => {
     try {
         const user_id = req.session.user.id;
@@ -21,10 +20,6 @@ exports.dashboard = async (req, res) => {
         res.send(err);
     }
 };
-
-/* =========================
-   COURSE CREATION
-========================= */
 
 exports.courseCreate = async (req, res) => {
     const categories = await categoryModel.getAll();
@@ -49,11 +44,6 @@ exports.createCourse = async (req, res) => {
     }
 };
 
-/* =========================
-   COURSE DASHBOARD TABS
-========================= */
-
-// [Tab 1] ตั้งค่าคอร์สเรียน
 exports.getCourseSettings = async (req, res) => {
     try {
         const courseId = req.params.id;
@@ -67,18 +57,17 @@ exports.getCourseSettings = async (req, res) => {
     }
 };
 
-// [Tab 2] จัดการเนื้อหา (Modules)
 exports.getCourseModules = async (req, res) => {
     try {
         const courseId = req.params.id;
         const { type, itemId } = req.params;
 
-        const course  = await courseModel.getById(courseId);
+        const course = await courseModel.getById(courseId);
         const modules = await moduleModel.getByCourse(courseId);
 
         // Build items for each module
         for (let module of modules) {
-            const items  = await moduleItemModel.getItemsByModule(module.module_id);
+            const items = await moduleItemModel.getItemsByModule(module.module_id);
             module.items = [];
 
             for (let item of items) {
@@ -87,7 +76,7 @@ exports.getCourseModules = async (req, res) => {
                     module.items.push({ type: 'lesson', data: lesson });
 
                 } else if (item.item_type === 'quiz') {
-                    const quiz      = await quizModel.getById(item.item_id);
+                    const quiz = await quizModel.getById(item.item_id);
                     const questions = await questionModel.getByQuiz(quiz.quiz_id) || [];
 
                     for (let q of questions) {
@@ -100,12 +89,10 @@ exports.getCourseModules = async (req, res) => {
             }
         }
 
-        // ถ้าไม่มี type/itemId → หน้า module list ปกติ
         if (!type || !itemId) {
             return res.render('instructor/course-modules', { course, modules, currentItem: null });
         }
 
-        // หา currentItem ที่ตรงกับ type + itemId
         let currentItem = null;
         for (let module of modules) {
             for (let item of module.items) {
@@ -113,7 +100,7 @@ exports.getCourseModules = async (req, res) => {
                     item.type === type &&
                     (
                         (type === 'lesson' && item.data.lesson_id == itemId) ||
-                        (type === 'quiz'   && item.data.quiz_id   == itemId)
+                        (type === 'quiz' && item.data.quiz_id == itemId)
                     )
                 ) {
                     currentItem = item;
@@ -123,14 +110,12 @@ exports.getCourseModules = async (req, res) => {
             if (currentItem) break;
         }
 
-        // Render ไฟล์ตาม type
         if (type === 'lesson') {
             return res.render('instructor/lesson-editor', { course, modules, currentItem });
         } else if (type === 'quiz') {
             return res.render('instructor/quiz-editor', { course, modules, currentItem });
         }
 
-        // fallback
         return res.render('instructor/course-modules', { course, modules, currentItem });
 
     } catch (err) {
@@ -151,7 +136,6 @@ exports.updateModule = async (req, res) => {
     }
 };
 
-// [Tab 3] รายชื่อนักเรียน
 exports.getCourseStudents = async (req, res) => {
     try {
         const courseId = req.params.id;
@@ -166,9 +150,35 @@ exports.getCourseStudents = async (req, res) => {
     }
 };
 
-/* =========================
-   COURSE ACTIONS
-========================= */
+exports.getStudentCSV = async (req, res) => {
+    try {
+        const courseId = req.params.id;
+        const enrollments = await enrollmentModel.getByCourse(courseId);
+
+        const fields = [
+            'user_id',
+            'first_name',
+            'last_name',
+            'email',
+            'enrolled_at',
+            'completed_lessons',
+            'total_lessons'
+        ];
+
+        const parser = new Parser({ fields });
+        let csv = parser.parse(enrollments);
+
+        csv = '\uFEFF' + csv;
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment(`students.csv`);
+        res.send(csv);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+};
 
 exports.updateCourse = async (req, res) => {
     try {
@@ -201,10 +211,6 @@ exports.pendingCourse = async (req, res) => {
     }
 };
 
-/* =========================
-   MODULE ACTIONS
-========================= */
-
 exports.createModule = async (req, res) => {
     try {
         const course_id = req.params.id;
@@ -217,7 +223,6 @@ exports.createModule = async (req, res) => {
             order_index: nextOrder
         });
 
-        // Redirect กลับไปหน้าจัดการเนื้อหา (Tab 2)
         res.redirect(`/instructor/courses/${course_id}/modules`);
     } catch (err) {
         res.status(500).send("Module Error");
@@ -229,16 +234,11 @@ exports.deleteModule = async (req, res) => {
         const module = await moduleModel.getById(req.params.moduleId);
         await moduleModel.deleteModule(req.params.moduleId);
 
-        // Redirect กลับไปหน้าจัดการเนื้อหา (Tab 2)
         res.redirect(`/instructor/courses/${module.course_id}/modules`);
     } catch (err) {
         res.status(500).send("Delete Error");
     }
 };
-
-/* =========================
-   LESSON ACTIONS
-========================= */
 
 exports.createLesson = async (req, res) => {
     try {
@@ -261,7 +261,6 @@ exports.createLesson = async (req, res) => {
             order_index: nextOrder
         });
 
-        // Redirect เปิดหน้า Lesson ที่เพิ่งสร้างใหม่
         res.redirect(`/instructor/courses/${module.course_id}/modules/lesson/${lesson.lesson_id}`);
     } catch (err) {
         console.error(err);
@@ -276,16 +275,11 @@ exports.updateLesson = async (req, res) => {
             content: req.body.content
         });
 
-        // เซฟเสร็จแล้วเปิดหน้าเดิมค้างไว้
         res.redirect(`/instructor/courses/${req.params.id}/modules/lesson/${req.params.lessonId}`);
     } catch (err) {
         res.status(500).send("Update Lesson Error");
     }
 };
-
-/* =========================
-   QUIZ ACTIONS
-========================= */
 
 exports.createQuiz = async (req, res) => {
     try {
@@ -308,7 +302,6 @@ exports.createQuiz = async (req, res) => {
             order_index: nextOrder
         });
 
-        // Redirect เปิดหน้า Quiz ที่เพิ่งสร้างใหม่
         res.redirect(`/instructor/courses/${module.course_id}/modules/quiz/${quiz.quiz_id}`);
     } catch (err) {
         console.error(err);
@@ -323,17 +316,12 @@ exports.updateQuiz = async (req, res) => {
             description: req.body.description
         });
 
-        // เซฟเสร็จแล้วเปิดหน้าเดิมค้างไว้
         res.redirect(`/instructor/courses/${req.params.id}/modules/quiz/${req.params.quizId}`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Update Quiz Error");
     }
 };
-
-/* =========================
-   QUESTION & CHOICES (QUIZ)
-========================= */
 
 exports.createQuestion = async (req, res) => {
     try {
@@ -358,7 +346,6 @@ exports.createQuestion = async (req, res) => {
             }
         }
 
-        // เซฟคำถามเสร็จ กลับไปหน้าแก้ Quiz
         res.redirect(`/instructor/courses/${id}/modules/quiz/${quizId}`);
     } catch (err) {
         console.error(err);

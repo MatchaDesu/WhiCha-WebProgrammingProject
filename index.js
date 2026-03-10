@@ -65,4 +65,3 @@ app.use('/upload', uploadRoute);
 app.listen(PORT, () => {
     console.log("Server is Running...");
 })
-

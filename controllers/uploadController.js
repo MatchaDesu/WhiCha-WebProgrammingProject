@@ -59,11 +59,12 @@ exports.uploadLessonImage = async (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        const url = `/uploads/lessons/${req.file.filename}`;
+        const lessonId = req.params.id;
+        const url = `/uploads/lessons/${lessonId}/${req.file.filename}`;
         res.json({ url });
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Upload failed' });
+        res.status(500).json({ error: 'Server Error' });
     }
 };

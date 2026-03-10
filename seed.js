@@ -41,7 +41,7 @@ async function seed() {
     'reviews',
     'announcements', 'bookmarks',
     'quiz_attempts', 'choices', 'questions', 'quizzes',
-    'lesson_progress', 'content_medias', 'lessons',
+    'lesson_progress', 'lessons',
     'modules_items', 'modules',
     'enrollments', 'courses', 'categories', 'users',
   ];

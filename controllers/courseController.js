@@ -10,6 +10,7 @@ const choiceModel = require('../models/choiceModel');
 const lessonProgressModel = require('../models/lessonProgressModel');
 const quizAttemptModel = require('../models/quizAttemptModel');
 const reviewModel = require('../models/reviewModel');
+const announcementModel = require('../models/announcementModel');
 
 exports.getPublishedCourses = async (req, res) => {
     try {
@@ -123,20 +124,43 @@ exports.submitReview = async (req, res) => {
 };
 
 
+exports.getAnnouncement = async (req, res) => {
+    try {
+        const courseId = req.params.courseId;
+
+        const course        = await courseModel.getById(courseId);
+        const announcements = await announcementModel.getByCourse(courseId);
+
+        res.render('courses/announcement', {
+            course,
+            announcements: announcements || []
+        });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Server Error");
+    }
+}
+
 exports.getDashboard = async (req, res) => {
     try {
         const courseId = req.params.courseId;
 
-        const course = await courseModel.getById(courseId);
-        const modules = await moduleModel.getByCourse(courseId);
-        const enrollments = await enrollmentModel.getByCourse(courseId);
+        const course       = await courseModel.getById(courseId);
+        const modules      = await moduleModel.getByCourse(courseId);
+        const enrollments  = await enrollmentModel.getByCourse(courseId);
+        const announcements = await announcementModel.getByCourse(courseId);
 
-        const moduleCount = modules ? modules.length : 0;
-        const studentCount = enrollments ? enrollments.length : 0;
+        const moduleCount  = modules      ? modules.length      : 0;
+        const studentCount = enrollments  ? enrollments.length  : 0;
+        const latestAnnouncement = announcements && announcements.length > 0
+            ? announcements[0]
+            : null;
 
         res.render('courses/dashboard', {
             course,
-            stats : { moduleCount, studentCount } 
+            stats : { moduleCount, studentCount },
+            latestAnnouncement
         });
 
     } catch (err) {

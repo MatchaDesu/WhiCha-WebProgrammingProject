@@ -6,6 +6,7 @@ const enrollmentController = require('../controllers/enrollmentController');
 router.get("/", courseController.getPublishedCourses);
 router.get("/:courseId/", courseController.getDetail);
 
+router.get("/:courseId/announcement", courseController.getAnnouncement);
 router.get("/:courseId/dashboard", courseController.getDashboard);
 router.get("/:courseId/students", courseController.getStudentDashboard);
 

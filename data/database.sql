@@ -138,20 +138,6 @@ CREATE TABLE IF NOT EXISTS lessons (
 );
 
 -- ------------------------------------------------------------
--- content_medias
--- ไฟล์แนบของแต่ละบทเรียน (รูป, วิดีโอ, PDF ฯลฯ)
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS content_medias (
-    media_id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    lesson_id  INTEGER NOT NULL,
-    media_name TEXT,
-    media_path TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (lesson_id) REFERENCES lessons(lesson_id) ON DELETE CASCADE
-);
-
--- ------------------------------------------------------------
 -- lesson_progress
 -- [ADDED] is_completed : 0 = กำลังเรียน, 1 = เรียนจบแล้ว
 -- [ADDED] completed_at : เวลาที่กดเสร็จ
@@ -228,10 +214,6 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
 
--- ------------------------------------------------------------
--- bookmarks
--- ผู้เรียน bookmark คอร์สที่สนใจไว้ดูทีหลัง
--- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS bookmarks (
     bookmark_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id     INTEGER NOT NULL,
@@ -244,10 +226,6 @@ CREATE TABLE IF NOT EXISTS bookmarks (
     FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
--- ------------------------------------------------------------
--- announcements
--- ประกาศจาก instructor ถึงผู้เรียนในคอร์ส
--- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS announcements (
     announcement_id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id       INTEGER NOT NULL,
@@ -260,14 +238,6 @@ CREATE TABLE IF NOT EXISTS announcements (
     FOREIGN KEY (instructor_id) REFERENCES users(user_id)     ON DELETE RESTRICT
 );
 
--- ============================================================
---  VIEW: course_progress_view
---  คำนวณ progress ของผู้เรียนแต่ละคนในแต่ละคอร์ส
---
---  progress_percent =
---    (lessons ที่ is_completed=1 + quizzes ที่ submitted_at IS NOT NULL)
---    / items ทั้งหมดใน course * 100
--- ============================================================
 CREATE VIEW IF NOT EXISTS course_progress_view AS
 SELECT
     e.user_id,
@@ -315,11 +285,6 @@ LEFT JOIN quiz_attempts qa
     AND mi.item_type = 'quiz'
 
 GROUP BY e.user_id, e.course_id;
-
--- ============================================================
---  VIEW: course_reviews_view
---  รวม review + ข้อมูลผู้รีวิว สำหรับแสดงในหน้า detail
--- ============================================================
 
 CREATE VIEW IF NOT EXISTS course_reviews_view AS
 SELECT
