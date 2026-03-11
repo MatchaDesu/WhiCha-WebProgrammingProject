@@ -36,7 +36,7 @@ npm run seed
 | Student | student01@whicha.com | student1234 |
 | Student | student02@whicha.com | student1234 |
 | Student | student03@whicha.com | student1234 |
-| Student | student04@whicha.com | 12345 |
+| Student | student04@whicha.com | student1234 |
 
 
 รายชื่อสมาชิก  
