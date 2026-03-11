@@ -22,32 +22,11 @@ npm start
 ```bash
 npm run seed
 ```
-## บัญชีสำหรับทดสอบ
-Student:
-Email: “student01@whicha.com ” | 
-password: “student1234”
-
-Manager:
-Email: “manager01@whicha.com” | 
-password: “manager1234”
-
-Instructor:
-Email: “instructor01@whicha.com” | 
-password: “instructor1234”
-Email: “instructor02@whicha.com” | 
-password: “instructor1234”
-Email: “instructor03@whicha.com” | 
-password: “12345”
-Email: “instructor04@whicha.com” | 
-password: “12345”
-Email: “instructor05@whicha.com” | 
-password: “12345”
 
 ## บัญชีสำหรับทดสอบ
 
 | Role | Email | Password |
 |-----|------|------|
-| Student | student01@whicha.com | student1234 |
 | Manager | manager01@whicha.com | manager1234 |
 | Instructor | instructor01@whicha.com | instructor1234 |
 | Instructor | instructor02@whicha.com | instructor1234 |
@@ -59,15 +38,6 @@ password: “12345”
 | Student | student03@whicha.com | student1234 |
 | Student | student04@whicha.com | 12345 |
 
-Student:
-Email: “student01@whicha.com ” | 
-password: “student1234”
-Email: “student02@whicha.com ” | 
-password: “student1234”
-Email: “student03@whicha.com ” | 
-password: “student1234”
-Email: “student04@whicha.com ” | 
-password: “12345”
 
 รายชื่อสมาชิก
 นางสาวพลอยชมพู จินดามัย  67070110
