@@ -29,8 +29,9 @@ password: “student1234”
 
 Manager:
 Email: “manager01@whicha.com” | 
-password: “ manager1234”
-			Instructor:
+password: “manager1234”
+
+Instructor:
 Email: “instructor01@whicha.com” | 
 password: “instructor1234”
 Email: “instructor02@whicha.com” | 
@@ -41,6 +42,7 @@ Email: “instructor04@whicha.com” |
 password: “12345”
 Email: “instructor05@whicha.com” | 
 password: “12345”
+
 Student:
 Email: “student01@whicha.com ” | 
 password: “student1234”
