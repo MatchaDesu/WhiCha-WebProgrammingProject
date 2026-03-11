@@ -79,7 +79,6 @@ exports.getCheckout = async (req, res) => {
     try {
         const courseId = req.params.courseId;
 
-        // ต้อง login ก่อน
         if (!req.session || !req.session.user) {
             return res.redirect(`/signin`);
         }
@@ -89,7 +88,6 @@ exports.getCheckout = async (req, res) => {
         const course = await courseModel.getById(courseId);
         if (!course) return res.status(404).send('Not found');
 
-        // ถ้า enroll ไปแล้ว ไม่ต้องผ่าน checkout — กลับหน้า detail เลย
         const alreadyEnrolled = await enrollmentModel.isEnrolled(userId, courseId);
         if (alreadyEnrolled) return res.redirect(`/courses/${courseId}`);
 
@@ -107,11 +105,9 @@ exports.submitReview = async (req, res) => {
         const userId   = req.session.user.id;
         const { is_recommended, comment } = req.body;
 
-        // ตรวจว่า enroll อยู่ก่อน
         const enrolled = await enrollmentModel.isEnrolled(userId, courseId);
         if (!enrolled) return res.status(403).send('Forbidden');
 
-        // ตรวจ is_recommended ต้องเป็น 0 หรือ 1
         const thumb = Number(is_recommended);
         if (thumb !== 0 && thumb !== 1) return res.status(400).send('Bad Request');
 
@@ -206,7 +202,6 @@ exports.learnContent = async (req, res) => {
                 if (item.item_type === 'lesson') {
                     const lesson = await lessonModel.getById(item.item_id);
 
-                    // ✅ ดึง progress ของ user ในบทเรียนนี้
                     const progress = await lessonProgressModel.getByUserAndLesson(userId, lesson.lesson_id);
                     lesson.is_completed = progress ? progress.is_completed : 0;
 
@@ -215,7 +210,6 @@ exports.learnContent = async (req, res) => {
                 } else if (item.item_type === 'quiz') {
                     const quiz = await quizModel.getById(item.item_id);
 
-                    // ✅ ดึง attempt ของ user ใน quiz นี้
                     const attempt = await quizAttemptModel.getByUserAndQuiz(userId, quiz.quiz_id);
                     quiz.submitted_at  = attempt ? attempt.submitted_at  : null;
                     quiz.score         = attempt ? attempt.score         : null;
@@ -227,7 +221,6 @@ exports.learnContent = async (req, res) => {
             }
         }
 
-        // currentItem (เหมือนเดิม)
         const { type, itemId } = req.params;
         let currentItem = null;
         if (type && itemId) {
@@ -244,7 +237,6 @@ exports.learnContent = async (req, res) => {
             }
         }
 
-        // Quiz questions + choices (เหมือนเดิม)
         if (currentItem && currentItem.type === 'quiz') {
             const questions = await questionModel.getByQuiz(currentItem.data.quiz_id);
             if (questions && questions.length > 0) {
@@ -255,7 +247,6 @@ exports.learnContent = async (req, res) => {
             currentItem.data.questions = questions || [];
         }
 
-        // ✅ คำนวณ progressPercent จาก view
         const progressData = await lessonProgressModel.getCourseProgress(userId, courseId);
         const progressPercent = progressData ? progressData.progress_percent : 0;
 
@@ -300,15 +291,12 @@ exports.submitQuiz = async (req, res) => {
         const { courseId, quizId } = req.params;
         const userId  = req.session.user.id;
         const answers = req.body.answers || {}; 
-        // answers = { "question_id": "choice_id", ... }
 
-        // ดึงคำถามทั้งหมดพร้อม choices ของ quiz นี้
         const questions = await questionModel.getByQuiz(quizId);
         for (let q of questions) {
             q.choices = await choiceModel.getByQuestion(q.question_id);
         }
 
-        // คำนวณคะแนน
         let score       = 0;
         let totalPoints = 0;
 
@@ -318,7 +306,6 @@ exports.submitQuiz = async (req, res) => {
             const selectedChoiceId = answers[q.question_id];
             if (!selectedChoiceId) continue;
 
-            // หา choice ที่ user เลือก แล้วเช็คว่าถูกมั้ย
             const selectedChoice = q.choices.find(
                 c => c.choice_id == selectedChoiceId
             );
@@ -327,10 +314,8 @@ exports.submitQuiz = async (req, res) => {
             }
         }
 
-        // บันทึกลง quiz_attempts
         await quizAttemptModel.saveAttempt(userId, quizId, score, totalPoints,);
 
-        // redirect กลับไปหน้า quiz (จะแสดงผลลัพธ์ให้อัตโนมัติ)
         res.redirect(`/courses/${courseId}/learn/quiz/${quizId}`);
 
     } catch (err) {

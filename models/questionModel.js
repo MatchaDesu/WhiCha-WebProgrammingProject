@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-//เพิ่ม question
 exports.createQuestion = (question) => {
     return new Promise((resolve, reject) => {
 
@@ -55,7 +54,6 @@ exports.reorderQuestions = (quiz_id, bulkUpdate) => {
     });
 };
 
-//ดึง question ทั้งหมด ของ quiz นี้
 exports.getByQuiz = (quiz_id) => {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM questions 

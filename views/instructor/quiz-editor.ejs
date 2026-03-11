@@ -415,6 +415,7 @@
     const dynSection     = document.getElementById('dynamic-choices');
     const addBtn         = document.getElementById('add-choice-btn');
     const hintText       = document.getElementById('correct-hint-text');
+    const tfHiddenInputs = tfSection.querySelectorAll('input[type="hidden"]');
 
     if (type === 'true_false') {
       tfSection.classList.remove('hidden');
@@ -422,12 +423,14 @@
       dynSection.classList.add('hidden');
       addBtn.classList.add('hidden');
       hintText.textContent = 'radio';
+      tfHiddenInputs.forEach(input => { input.name = 'choices[]'; });
     } else {
       tfSection.classList.add('hidden');
       tfSection.classList.remove('flex');
       dynSection.classList.remove('hidden');
       addBtn.classList.remove('hidden');
       hintText.textContent = type === 'multiple' ? 'checkbox ทุกข้อที่ถูก' : 'radio ข้อที่ถูก';
+      tfHiddenInputs.forEach(input => { input.name = ''; });
 
       // Rebuild existing choices' input type
       const inputType = type === 'multiple' ? 'checkbox' : 'radio';

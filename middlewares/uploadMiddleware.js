@@ -8,7 +8,6 @@ const ensureDir = (dirPath) => {
     }
 };
 
-// fileFilter แยกตาม type
 const fileFilters = {
     image: (req, file, cb) => {
         if (!file.mimetype.startsWith("image/")) {
@@ -17,19 +16,16 @@ const fileFilters = {
         cb(null, true);
     },
     any: (req, file, cb) => {
-        // ยอมรับทุกประเภทไฟล์ (สำหรับ content_medias)
         cb(null, true);
     }
 };
 
-// Storage factory — รองรับ params หลายชื่อ (id, lessonId, courseId ฯลฯ)
 const createStorage = (subfolder, useIdSubdir = true) => {
     return multer.diskStorage({
         destination: (req, file, cb) => {
             let uploadPath;
 
             if (useIdSubdir) {
-                // หา id จาก params ทุกชื่อที่เป็นไปได้
                 const id = req.params.id
                         || req.params.lessonId
                         || req.params.courseId
@@ -40,7 +36,6 @@ const createStorage = (subfolder, useIdSubdir = true) => {
 
                 uploadPath = path.join(__dirname, "..", "uploads", subfolder, String(id));
             } else {
-                // ไม่แยก subfolder ตาม id (เช่น lesson-images จาก editor)
                 uploadPath = path.join(__dirname, "..", "uploads", subfolder);
             }
 

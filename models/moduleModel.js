@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-// สร้าง module
 exports.createModule = ({ course_id, module_name, order_index }) => {
   return new Promise((resolve, reject) => {
 
@@ -32,7 +31,6 @@ exports.getById = (module_id) => {
   });
 };
 
-// แก้ไข module
 exports.updateModule = (module_id, { module_name }) => {
   return new Promise((resolve, reject) => {
 
@@ -49,7 +47,6 @@ exports.updateModule = (module_id, { module_name }) => {
   });
 };
 
-// ลบแบบลบจริง (Hard delete)
 exports.deleteModule = (module_id) => {
   return new Promise((resolve, reject) => {
 
@@ -65,7 +62,6 @@ exports.deleteModule = (module_id) => {
   });
 };
 
-// เรียงลำดับใหม่แบบ bulk
 exports.reorderModule = (course_id, bulkUpdate) => {
   return new Promise((resolve, reject) => {
 
@@ -99,7 +95,6 @@ exports.reorderModule = (course_id, bulkUpdate) => {
   });
 };
 
-// ดึง module ทั้งหมดของ course
 exports.getByCourse = (course_id) => {
   return new Promise((resolve, reject) => {
 

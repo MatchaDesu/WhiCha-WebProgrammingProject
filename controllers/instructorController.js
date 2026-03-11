@@ -65,8 +65,6 @@ exports.getCourseModules = async (req, res) => {
 
         const course = await courseModel.getById(courseId);
         const modules = await moduleModel.getByCourse(courseId);
-
-        // Build items for each module
         for (let module of modules) {
             const items = await moduleItemModel.getItemsByModule(module.module_id);
             module.items = [];

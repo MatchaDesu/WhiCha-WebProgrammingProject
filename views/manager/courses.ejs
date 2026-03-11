@@ -27,7 +27,7 @@
         <% ['all','published','pending','draft','rejected'].forEach(s => { %>
           <button onclick="filterStatus('<%= s %>')" data-status="<%= s %>"
             class="status-btn px-3 py-2 text-xs font-semibold rounded-lg border transition
-              <%= s === 'all' ? 'border-black bg-black text-white' : 'border-gray-200 text-gray-600 hover:bg-gray-50' %>">
+              <%= s === 'all' ? 'border-black bg-black text-white' : 'border-gray-200 text-gray-600' %>">
             <%= s === 'all' ? 'ทั้งหมด'
               : s === 'published' ? 'Published'
               : s === 'pending'   ? 'Pending'

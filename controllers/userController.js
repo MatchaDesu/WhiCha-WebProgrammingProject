@@ -1,4 +1,3 @@
-const { Parser } = require('json2csv');
 const userModel = require('../models/userModel');
 const enrollmentModel = require('../models/enrollmentModel');
 const courseModel     = require('../models/courseModel');

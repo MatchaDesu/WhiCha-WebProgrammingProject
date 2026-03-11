@@ -214,18 +214,6 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(quiz_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS bookmarks (
-    bookmark_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     INTEGER NOT NULL,
-    course_id   INTEGER NOT NULL,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    UNIQUE(user_id, course_id),
-
-    FOREIGN KEY (user_id)   REFERENCES users(user_id)     ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS announcements (
     announcement_id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id       INTEGER NOT NULL,

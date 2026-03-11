@@ -58,7 +58,6 @@ exports.deleteQuiz = (quiz_id) => {
   });
 };
 
-//ดึง quiz ทั้งหมด ของ course นี้
 exports.getByModule = (module_id) => {
   return new Promise((resolve, reject) => {
 

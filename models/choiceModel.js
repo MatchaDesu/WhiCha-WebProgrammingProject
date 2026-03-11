@@ -1,9 +1,7 @@
 const db = require('../config/db');
 
-//เพิ่ม choice ใน question
 exports.createChoice = (choice) => {
   return new Promise((resolve, reject) => {
-    //is_correct 0 or 1
     const { question_id, choice_text, is_correct } = choice;
     
     const sql = `INSERT INTO choices (question_id, choice_text, is_correct) 
@@ -32,12 +30,9 @@ exports.updateChoice = (choice_id, choice) => {
   });
 };
 
-//ดึง choice ทั้งหมด ของ question นี้
 exports.getByQuestion = (question_id) => {
   return new Promise((resolve, reject) => {
     const sql = `SELECT * FROM choices WHERE question_id = ?`;
-
-    //1 คำถามมีหลาย choice
     db.all(sql, [question_id], (err, rows) => {
       if (err) return reject(err);
       resolve(rows);

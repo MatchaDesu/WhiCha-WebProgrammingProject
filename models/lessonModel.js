@@ -49,7 +49,6 @@ exports.getById = (lesson_id) => {
 
 exports.getByCourse = function(courseId) {
     return new Promise((resolve, reject) => {
-        // ดึงบทเรียนทั้งหมดที่อยู่ใน Modules ของ Course นี้
         const sql = `
             SELECT l.lesson_id, l.lesson_name AS name, m.module_name
             FROM lessons l
@@ -60,7 +59,7 @@ exports.getByCourse = function(courseId) {
         
         db.all(sql, [courseId], (err, rows) => {
             if (err) return reject(err);
-            resolve(rows); // จะได้ Array ของบทเรียนกลับไป
+            resolve(rows);
         });
     });
 };
