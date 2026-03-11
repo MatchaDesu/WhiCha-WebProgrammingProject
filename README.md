@@ -43,6 +43,22 @@ password: “12345”
 Email: “instructor05@whicha.com” | 
 password: “12345”
 
+## บัญชีสำหรับทดสอบ
+
+| Role | Email | Password |
+|-----|------|------|
+| Student | student01@whicha.com | student1234 |
+| Manager | manager01@whicha.com | manager1234 |
+| Instructor | instructor01@whicha.com | instructor1234 |
+| Instructor | instructor02@whicha.com | instructor1234 |
+| Instructor | instructor03@whicha.com | 12345 |
+| Instructor | instructor04@whicha.com | 12345 |
+| Instructor | instructor05@whicha.com | 12345 |
+| Student | student01@whicha.com | student1234 |
+| Student | student02@whicha.com | student1234 |
+| Student | student03@whicha.com | student1234 |
+| Student | student04@whicha.com | 12345 |
+
 Student:
 Email: “student01@whicha.com ” | 
 password: “student1234”
