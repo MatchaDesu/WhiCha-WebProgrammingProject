@@ -292,6 +292,9 @@ exports.submitQuiz = async (req, res) => {
         const userId  = req.session.user.id;
         const answers = req.body.answers || {}; 
 
+        console.log('req.body:', req.body);        // ดูว่า answers มาไหม
+        console.log('answers:', req.body.answers);
+
         const questions = await questionModel.getByQuiz(quizId);
         for (let q of questions) {
             q.choices = await choiceModel.getByQuestion(q.question_id);
@@ -303,7 +306,7 @@ exports.submitQuiz = async (req, res) => {
         for (let q of questions) {
             totalPoints += q.points || 1;
 
-            const selectedChoiceId = answers[q.question_id];
+            const selectedChoiceId = answers[`q${q.question_id}`];
             if (!selectedChoiceId) continue;
 
             const selectedChoice = q.choices.find(
