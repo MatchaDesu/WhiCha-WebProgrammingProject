@@ -292,9 +292,6 @@ exports.submitQuiz = async (req, res) => {
         const userId  = req.session.user.id;
         const answers = req.body.answers || {}; 
 
-        console.log('req.body:', req.body);        // ดูว่า answers มาไหม
-        console.log('answers:', req.body.answers);
-
         const questions = await questionModel.getByQuiz(quizId);
         for (let q of questions) {
             q.choices = await choiceModel.getByQuestion(q.question_id);
